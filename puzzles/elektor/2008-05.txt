@@ -1,6 +1,6 @@
-# Elektor Hexadoku 2008-05 (122 clues)
-# digits from tesseract OCR only (no matching printed solution found)
-D.....8.73...4..
+# Elektor Hexadoku 2008-05 (p. 76), 124 clues
+# transcribed visually from the scan
+D.....9.73...4.B
 14.3....5..2C8.7
 ..EF3..489C.D20.
 862.E1.C4...5F3.
@@ -12,7 +12,7 @@ D.....8.73...4..
 2.......CF.9B7.D
 .....FB.3...0..C
 ..79D4..E.65..21
-.9.....1.8..E.70
+.9..B..1.8..E.70
 .8A759.F...B...4
 .D.2..07.5.4....
 0B.42...9.A....F

@@ -1,11 +1,13 @@
 package main
 
 import (
+	"context"
 	"fmt"
 	"os"
 	"os/exec"
 	"path/filepath"
 	"strings"
+	"time"
 )
 
 // conflicts returns the cells taking part in a row/column/box clash.
@@ -66,6 +68,37 @@ func countBad(bad [16][16]bool) int {
 		}
 	}
 	return n
+}
+
+// buildPuzzle keeps the clue positions of the mask and takes their
+// values from a solution grid.
+func buildPuzzle(mask, sol [16][16]byte) [16][16]byte {
+	var p [16][16]byte
+	for r := 0; r < 16; r++ {
+		for c := 0; c < 16; c++ {
+			if mask[r][c] == '#' {
+				p[r][c] = sol[r][c]
+			} else {
+				p[r][c] = '.'
+			}
+		}
+	}
+	return p
+}
+
+// puzzleIsUnique reports whether the solver finds exactly one solution.
+// Proving a wrong pairing unsolvable can take arbitrarily long, so the
+// call is capped - a timeout counts as "not this one".
+func puzzleIsUnique(g [16][16]byte, solver, tmpDir string) bool {
+	f := filepath.Join(tmpDir, "pairing.txt")
+	if err := os.WriteFile(f, []byte(gridString(g)), 0o644); err != nil {
+		return false
+	}
+	defer os.Remove(f)
+	ctx, cancel := context.WithTimeout(context.Background(), 20*time.Second)
+	defer cancel()
+	out, _ := exec.CommandContext(ctx, solver, "-unique", f).Output()
+	return strings.Contains(string(out), "solution is unique")
 }
 
 func gridString(g [16][16]byte) string {

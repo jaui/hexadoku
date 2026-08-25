@@ -765,11 +765,12 @@ func processPDF(path, outDir, pdftoppm, pdftotext, tesseract string, dpi int, ve
 			bestSol, bestSolBox, bestDet, bestPage = sol, solBox, det, pageNo
 			break
 		}
+		// The Hexadoku always sits in the back of the magazine, while
+		// the contents page up front mentions it too and can carry a
+		// table that passes for a lattice. So a later page always beats
+		// an earlier one, and a page with both grids ends the search.
 		if sol != nil || det != nil {
-			if bestSol == nil && bestDet == nil ||
-				(sol != nil && det != nil) {
-				bestSol, bestSolBox, bestDet, bestPage = sol, solBox, det, pageNo
-			}
+			bestSol, bestSolBox, bestDet, bestPage = sol, solBox, det, pageNo
 			if sol != nil && det != nil {
 				break
 			}
@@ -777,6 +778,27 @@ func processPDF(path, outDir, pdftoppm, pdftotext, tesseract string, dpi int, ve
 	}
 	if bestSol == nil && bestDet == nil {
 		return fmt.Errorf("no hexadoku grids found")
+	}
+
+	// The page is located at the lower render resolution, but faint
+	// digits can drop out of the ink test there. Re-detect the mask on
+	// the 300 dpi render used for OCR and keep that one - it sees the
+	// same grid with more pixels per cell.
+	var ocrDet *detection
+	const ocrDpi = 300
+	if bestDet != nil {
+		if img, rerr := renderPage(pdftoppm, path, bestPage, ocrDpi, tmpDir); rerr == nil {
+			if d, merr := maskFromImage(img, ocrDpi, bestSolBox); merr == nil {
+				ocrDet = d
+				if d.m.filled > bestDet.m.filled {
+					if verbose {
+						fmt.Printf("  %s: mask %d -> %d clues at %d dpi\n", key, bestDet.m.filled, d.m.filled, ocrDpi)
+					}
+					bestDet = d
+				}
+			}
+			defer os.Remove(img)
+		}
 	}
 
 	parts := []string{}
@@ -797,37 +819,31 @@ func processPDF(path, outDir, pdftoppm, pdftotext, tesseract string, dpi int, ve
 		parts = append(parts, fmt.Sprintf("mask(%d clues)", bestDet.m.filled))
 	}
 
-	// independent digit OCR at higher resolution
-	if bestDet != nil && tesseract != "" {
-		const ocrDpi = 300
-		if img, rerr := renderPage(pdftoppm, path, bestPage, ocrDpi, tmpDir); rerr == nil {
-			if det300, merr := maskFromImage(img, ocrDpi, bestSolBox); merr == nil {
-				if og, oerr := ocrGrid(det300, tesseract, tmpDir); oerr == nil {
-					of := filepath.Join(outDir, key+"_ocr.txt")
-					head := fmt.Sprintf("# Elektor Hexadoku %s, digits read by tesseract OCR (PDF page %d), %d cells\n", key, bestPage, og.filled)
-					if err := os.WriteFile(of, []byte(head+og.String()), 0o644); err != nil {
-						return err
-					}
-					parts = append(parts, fmt.Sprintf("ocr(%d cells)", og.filled))
-				} else if verbose {
-					fmt.Printf("  %s ocr: %v\n", key, oerr)
-				}
-				// scanned issues have no text layer: read the printed
-				// previous-issue solution from the dense lattice
-				if bestSol == nil && det300.dense != nil {
-					if sg, oerr := ocrGrid(det300.dense, tesseract, tmpDir); oerr == nil && sg.filled >= 240 {
-						sf := filepath.Join(outDir, key+"_prevsolution.txt")
-						head := fmt.Sprintf("# solution of a previous issue's Hexadoku, printed in Elektor %s (PDF page %d)\n# read by tesseract OCR from the scan, %d of 256 cells\n", key, bestPage, sg.filled)
-						if err := os.WriteFile(sf, []byte(head+sg.String()), 0o644); err != nil {
-							return err
-						}
-						parts = append(parts, fmt.Sprintf("solution-ocr(%d cells)", sg.filled))
-					} else if verbose {
-						fmt.Printf("  %s solution ocr: %v\n", key, oerr)
-					}
-				}
+	// independent digit OCR on the same high-resolution detection
+	if ocrDet != nil && tesseract != "" {
+		if og, oerr := ocrGrid(ocrDet, tesseract, tmpDir); oerr == nil {
+			of := filepath.Join(outDir, key+"_ocr.txt")
+			head := fmt.Sprintf("# Elektor Hexadoku %s, digits read by tesseract OCR (PDF page %d), %d cells\n", key, bestPage, og.filled)
+			if err := os.WriteFile(of, []byte(head+og.String()), 0o644); err != nil {
+				return err
 			}
-			os.Remove(img)
+			parts = append(parts, fmt.Sprintf("ocr(%d cells)", og.filled))
+		} else if verbose {
+			fmt.Printf("  %s ocr: %v\n", key, oerr)
+		}
+		// scanned issues have no text layer: read the printed
+		// previous-issue solution from the dense lattice
+		if bestSol == nil && ocrDet.dense != nil {
+			if sg, oerr := ocrGrid(ocrDet.dense, tesseract, tmpDir); oerr == nil && sg.filled >= 240 {
+				sf := filepath.Join(outDir, key+"_prevsolution.txt")
+				head := fmt.Sprintf("# solution of a previous issue's Hexadoku, printed in Elektor %s (PDF page %d)\n# read by tesseract OCR from the scan, %d of 256 cells\n", key, bestPage, sg.filled)
+				if err := os.WriteFile(sf, []byte(head+sg.String()), 0o644); err != nil {
+					return err
+				}
+				parts = append(parts, fmt.Sprintf("solution-ocr(%d cells)", sg.filled))
+			} else if verbose {
+				fmt.Printf("  %s solution ocr: %v\n", key, oerr)
+			}
 		}
 	}
 	fmt.Printf("ok   %s: p.%d %s\n", key, bestPage, strings.Join(parts, " + "))
@@ -1040,8 +1056,34 @@ func chain(outDir, solver string) error {
 			}
 		}
 
+		// A pairing is only trustworthy if the resulting puzzle comes
+		// out uniquely solvable. Where OCR could not confirm one, try
+		// the candidates in order of plausibility and let the solver
+		// decide - a wrong pairing practically never solves uniquely.
+		note := ""
+		if solver != "" && !matched {
+			var cands []string
+			if solKey != "" {
+				cands = append(cands, solKey)
+			}
+			for d := 1; d <= 6 && pos[mk]+d < len(timeline); d++ {
+				c := timeline[pos[mk]+d]
+				if _, ok := sols[c]; ok && c != solKey {
+					cands = append(cands, c)
+				}
+			}
+			solKey = ""
+			for _, c := range cands {
+				if puzzleIsUnique(buildPuzzle(mask, sols[c]), solver, outDir) {
+					solKey = c
+					note = fmt.Sprintf("digits from %s_prevsolution (pairing confirmed by unique solvability)", c)
+					break
+				}
+			}
+		}
+
 		var sb strings.Builder
-		clues, note := 0, ""
+		clues := 0
 		if solKey != "" {
 			sol := sols[solKey]
 			for r := 0; r < 16; r++ {
@@ -1055,11 +1097,9 @@ func chain(outDir, solver string) error {
 				}
 				sb.WriteByte('\n')
 			}
-			if matched {
+			if note == "" {
 				sc, n := agreement(mk, solKey)
 				note = fmt.Sprintf("digits from %s_prevsolution (OCR match %.0f%% of %d cells)", solKey, sc*100, n)
-			} else {
-				note = fmt.Sprintf("digits from %s_prevsolution (assumed lag %d, no OCR)", solKey, lagMode)
 			}
 		} else if o, ok := ocrs[mk]; ok {
 			for r := 0; r < 16; r++ {

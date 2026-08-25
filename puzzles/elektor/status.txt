@@ -1,0 +1,98 @@
+
+Issue      Page Mask Solution  Ocr Puzzle
+-----      ---- ---- --------  --- ------
+2006-01      79 x                  -
+2006-02       5 x                  -
+2006-03      79 x                  -
+2006-06      77 x                  -
+2006-09      77 x                  -
+2006-10       5 x                  -
+2006-11      77 x                  -
+2006-12     101 x                  FAIL
+2007-03      77 x                  -
+2007-04       9      x             -
+2007-05      76 x                  -
+2007-06      76 x              x   WARN
+2007-07_08  140 x              x   FAIL
+2007-09      76 x                  -
+2007-10      76 x              x   FAIL
+2007-11      76 x    drop(63)  x   WARN
+2007-12     100 x    drop(68)  x   PASS
+2008-01      78 x    drop(54)  x   FAIL
+2008-02      76 x    x         x   FAIL
+2008-03      74 x    drop(54)  x   PASS
+2008-04      76 x    drop(70)  x   WARN
+2008-05      76 x    x         x   FAIL
+2008-06      76 x    drop(66)  x   WARN
+2008-09      76 x    drop(60)  x   FAIL
+2008-10      75 x              x   FAIL
+2008-11      76 x    drop(58)  x   FAIL
+2008-12     100 x    drop(90)  x   FAIL
+2009-01      76 x    drop(46)  x   FAIL
+2009-02      76 x    drop(69)  x   FAIL
+2009-03      76 x    drop(84)  x   FAIL
+2009-04      74 x    drop(65)  x   PASS
+2009-05      76 x    drop(57)  x   FAIL
+2009-06      73 x    x         x   WARN
+2009-07_08  124 x              x   FAIL
+2009-09      76 x    drop(64)  x   WARN
+2009-10      74 x              x   FAIL
+2009-11      74 x    drop(76)  x   WARN
+2009-12      74 x    drop(86)  x   WARN
+2010-01      74 x    drop(75)  x   FAIL
+2010-02      76 x    drop(97)  x   FAIL
+2010-03      74 x    drop(95)  x   FAIL
+2010-06      76 x    drop(63)  x   FAIL
+2010-10      77 x              x   FAIL
+2010-12      59 x    drop(80)  x   FAIL
+2011-01      75      x             -
+2011-02      75      x             -
+2011-03      75 x    x         x   FAIL
+2011-04      75      x             -
+2011-05      75 x    drop(43)  x   PASS
+2011-07_08  108      x             -
+2011-11      75      x             -
+2011-12      75 x    x         x   PASS
+2012-01      73      x             -
+2012-02      72 x    x         x   PASS
+2012-03      73 x    x         x   PASS
+2012-04      76      x             -
+2012-05      75      x             -
+2012-06      76 x    x         x   PASS
+2012-07_08  139      x             -
+2012-09      79 x    x         x   PASS
+2012-10      78 x              x   PASS
+2012-11      78      x             -
+2012-12      78      x             -
+2013-01_02  124      x             -
+2013-03      72 x    x         x   PASS
+2013-04      76 x    x         x   PASS
+2013-05      78      x             -
+2013-06      78      x             -
+2013-07_08    5 x                  FAIL
+2013-09      74      x             -
+2013-10      74      x             -
+2013-12      76 x    drop(109) x   PASS
+2014-01_02  120 x    x         x   PASS
+2014-03      84      x             -
+2014-04      84      x             -
+2014-05      84      x             -
+2014-06      84      x             -
+2014-07_08  120      x             -
+2014-09       5 x                  -
+2014-10      84      x             -
+2014-11       5 x                  FAIL
+2015-01_02  124      x             -
+2015-03_04  130 x    x         x   PASS
+2015-05_06  130 x    x             FAIL
+2015-07_08  130 x    x             FAIL
+2015-09_10  130 x    x             FAIL
+2015-11_12  130 x    x             FAIL
+2016-01_02  130 x    x         x   FAIL
+2016-03_04  130 x    x             FAIL
+2016-05_06  130 x    x             FAIL
+2016-08     130 x    x         x   FAIL
+2016-09_10  130 x    x         x   FAIL
+2016-11_12  130 x    x             -
+
+

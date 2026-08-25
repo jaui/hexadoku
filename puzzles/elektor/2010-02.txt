@@ -1,12 +1,14 @@
-# Elektor Hexadoku 2010-02 (119 clues)
-# digits from tesseract OCR only (no matching printed solution found); 17 OCR conflicts NOT repairable (17 damaged cells, remainder not uniquely solvable)
+# Elektor Hexadoku 2010-02 (p. 76), 120 clues
+# transcribed visually from the scan; this issue's font renders the
+# digit 0 with a bar, which reads as "G" at scan resolution and which
+# tesseract could not map - the grid contains no other zero
 1..C.3....5.7..F
-.73.CE4..11A.52.
-E..5.F.C7.2.1..9
-..B.1......F.C..
+.73.CE4..16A.52.
+E..5.F.07.2.1..9
+..B.1......F.0..
 ..8..........E..
-4.918.E..7.263.6
-.EDF3.C..8.C48B.
+4.918.E..7.203.6
+.EDF3.C..8.041B.
 A67..4.F1.3..9CD
 8FA..7.63.9..BDC
 .B569.3..2.7F41.
@@ -14,5 +16,5 @@ A67..4.F1.3..9CD
 ..C..........7..
 ..F.E......C.8..
 9..7.A.C2.1.B..5
-.A2.658..9.E.F7.
-C..C.9....F.E..2
+.A2.658..90E.F7.
+C..0.9....F.E..2
