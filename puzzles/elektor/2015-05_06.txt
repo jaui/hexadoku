@@ -1,18 +1,18 @@
-# Elektor Hexadoku 2015-05_06 (90 clues)
-# digits from 2015-09_10_prevsolution (assumed lag 2, no OCR)
-..CA406.2.9F75B1
-..975FA.0.6B82.3
-................
-..0..1.9....F...
-....F27A45...C68
-................
-................
-..F8...5E..C...2
-...........E.1..
-......8769.1.F.0
-................
-...31.F0D.C458.6
-...1EA....3.2.09
-................
-..ED3...80F24A..
-..5274.19CED6B8F
+# Elektor Hexadoku 2015-05_06 (113 clues)
+# digits from tesseract OCR only (no matching printed solution found); 31 OCR conflicts NOT repairable (31 damaged cells, remainder not uniquely solvable)
+...5A...0..8...1
+..3...A......9..
+..14............
+..9DF..B.7C.3..2
+..D293...81...AB
+..7F5409....C23D
+..8A0ED6....5B14
+..BC61E7F..40829
+..48B265A...F7E.
+..AC.921....B8E5
+..561F3C....408A
+..E3D7...BA...C0
+..C7E..0.98.6..F
+..F9............
+..0...1......3..
+...18...E..0...3

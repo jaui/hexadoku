@@ -1,0 +1,7 @@
+ok   2016-01_02: p.130 solution + mask(148 clues) + ocr(148 cells) [12s]
+ok   2016-03_04: p.130 solution + mask(117 clues) + ocr(117 cells) [15s]
+ok   2016-05_06: p.130 solution + mask(98 clues) + ocr(98 cells) [19s]
+ok   2016-08: p.130 solution + mask(108 clues) + ocr(108 cells) [13s]
+ok   2016-09_10: p.130 solution + mask(112 clues) + ocr(112 cells) [20s]
+ok   2016-11_12: p.130 solution + mask(88 clues) [11s]
+FAIL Elektor[nonlinear.ir] 2006-04.pdf: no hexadoku grids found [4s]

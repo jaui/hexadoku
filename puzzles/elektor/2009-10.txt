@@ -1,18 +1,18 @@
-# Elektor Hexadoku 2009-10 (111 clues)
-# digits from tesseract OCR only (no matching printed solution found); 72 OCR conflicts NOT repairable (72 damaged cells, remainder not uniquely solvable)
-B5..E.C1B..83.8.
-3..B.E....26EA..
-.07...8..2B.6E5.
-..B.BE.79.......
-.085.2..BFD.1A..
-....B..E....9.8.
-A.B8.C25..A9E.B1
-.7..........C..3
-.6..ED..12.8..4.
-B0.97...B.0..1F5
-C........E.CF.7E
-BB.B.1...830.A..
-B7..0.4.....B2.F
-B...A10......6..
-2....D61..A.9...
-D.A.3...BA.B..C.
+# Elektor Hexadoku 2009-10 (182 clues)
+# digits from tesseract OCR only (no matching printed solution found); 141 OCR conflicts NOT repairable (141 damaged cells, remainder not uniquely solvable)
+B5.FE9C....8..84
+3C....4F5926EAE0
+50.09.8132BF6E5D
+F1...E679C000518
+60.5.28CBFD31...
+B3....0EA58492.C
+AEB8FC2570A9E3.1
+F7.51B6.B4.7C..3
+B6.0ED3.1.584..7
+B0A974...C0681F5
+CB94653...1CFA7E
+....E10..8.08A.6
+.7..0A4E.9D5B2.F
+.10.A105.4.E2638
+.5..ED61.FA798.4
+....3095....4.CE

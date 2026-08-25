@@ -248,9 +248,10 @@ func solutionFromWords(words []word) (*grid, *ptRect) {
 	if g.filled != 256 {
 		return nil, nil
 	}
+	// cols/rows are cell centers, so the grid edge lies half a cell out
 	bbox := &ptRect{
-		cols[0] - pitchX, rows[0] - pitchY,
-		cols[15] + pitchX, rows[15] + pitchY,
+		cols[0] - pitchX/2, rows[0] - pitchY/2,
+		cols[15] + pitchX/2, rows[15] + pitchY/2,
 	}
 	return g, bbox
 }
@@ -602,6 +603,66 @@ func maskFromImage(imgPath string, dpi int, solBox *ptRect) (*detection, error) 
 		}
 		for _, hg := range evenWindows(lineCenters(hcounts, w*6/10)) {
 			tryLattice(vg, hg)
+		}
+	}
+	if best == nil && excl != nil {
+		// Pass 3: some layouts draw the puzzle with thin, uniform lines
+		// that no line search picks up reliably. But both grids are
+		// printed side by side at the same size, and the solution grid's
+		// geometry is known exactly from the text layer - so mirror it:
+		// keep pitch and row lines, and slide the column block left
+		// until the lines sit on actual ink.
+		pitch := (excl.x1 - excl.x0) / 16
+		hg := make([]float64, 17)
+		for i := range hg {
+			hg[i] = excl.y0 + float64(i)*(excl.y1-excl.y0)/16
+		}
+		// Score by the SECOND weakest of the 17 lines, not the median: a
+		// window shifted by a whole cell still has 16 lines sitting on
+		// ink and only one hanging outside the grid, which a median
+		// happily ignores - and the result is a grid short one column.
+		// The outermost border can be printed lighter, hence second
+		// weakest rather than weakest. Cell pitch is searched too: the
+		// puzzle grid is not always exactly the size of the solution.
+		score := func(vg []float64) float64 {
+			fs := make([]float64, 0, 17)
+			for _, x := range vg {
+				n, dark := 0, 0
+				for y := int(hg[0]); y <= int(hg[16]); y++ {
+					n++
+					if bm.at(int(x)-1, y, thrLine) || bm.at(int(x), y, thrLine) || bm.at(int(x)+1, y, thrLine) {
+						dark++
+					}
+				}
+				if n > 0 {
+					fs = append(fs, float64(dark)/float64(n))
+				}
+			}
+			sort.Float64s(fs)
+			if len(fs) < 2 {
+				return 0
+			}
+			return fs[1]
+		}
+		bestScore := 0.0
+		var bestVg []float64
+		for k := -12; k <= 12; k++ {
+			p := pitch * (1 + float64(k)*0.0025)
+			for x := 0.0; x+16*p < excl.x0; x++ {
+				vg := make([]float64, 17)
+				for i := range vg {
+					vg[i] = x + float64(i)*p
+				}
+				if s := score(vg); s > bestScore {
+					bestScore, bestVg = s, vg
+				}
+			}
+		}
+		if bestVg != nil && bestScore >= 0.55 {
+			m := probeCells(bm, bestVg, hg)
+			if m.filled >= 60 && m.filled <= 200 {
+				best = &detection{m: m, vg: bestVg, hg: hg, bm: bm}
+			}
 		}
 	}
 	if best == nil {
@@ -1136,7 +1197,13 @@ func chain(outDir, solver string) error {
 				}
 			}
 		} else {
-			fmt.Printf("skip %s: no matching solution and no OCR digits\n", mk)
+			// Nothing to build from. Remove a puzzle left over from an
+			// earlier run so it cannot be mistaken for current output.
+			if err := os.Remove(pf); err == nil {
+				fmt.Printf("skip %s: no matching solution and no OCR digits (stale puzzle removed)\n", mk)
+			} else {
+				fmt.Printf("skip %s: no matching solution and no OCR digits\n", mk)
+			}
 			skipped++
 			continue
 		}

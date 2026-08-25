@@ -147,8 +147,17 @@ puzzle must be uniquely solvable *and* its solution must equal a
 solution actually printed in some issue.
 
 For anything the automation cannot resolve, `-crops` exports the
-detected grids as readable PNG bands for visual transcription:
+detected grids as readable PNG bands for visual transcription -
+`crops.ps1` wraps it and looks the page number up in `extract.log`:
 
-    hexextract.exe -crops -1 -bands 4 -out crops -pdftoppm ... issue.pdf
+    .\crops.ps1 2009-01 2009-02 -Bands 8 -Out crops
 
-See `puzzles/elektor/`.
+Read the bands, write the grid into `puzzles/elektor/<issue>.txt` with
+the marker `transcribed visually` in a comment line, and check it with
+`hexadoku.exe -unique`. Files carrying that marker are never overwritten
+by `-chain`. Two independent checks make such a transcription
+trustworthy: a genuine magazine puzzle solves with zero branch nodes,
+and the clue count should match the geometrically detected mask.
+
+`status_elektor.ps1` prints what exists per issue and how each
+reconstructed puzzle fared in validation. See `puzzles/elektor/`.
