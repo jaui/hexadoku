@@ -117,7 +117,8 @@ func exportCrops(pdfPath string, page int, pdftoppm, pdftotext, outDir string, d
 	if err := writeCrop(det, filepath.Join(outDir, key+"_puzzle.png"), bands); err != nil {
 		return err
 	}
-	fmt.Printf("puzzle lattice: %d clues detected\n", det.m.filled)
+	fmt.Printf("puzzle lattice: %d clues detected at x %.0f-%.0f, y %.0f-%.0f\n%s",
+		det.m.filled, det.vg[0], det.vg[16], det.hg[0], det.hg[16], det.m)
 	if det.dense != nil {
 		if err := writeCrop(det.dense, filepath.Join(outDir, key+"_solution.png"), bands); err != nil {
 			return err

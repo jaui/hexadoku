@@ -1,29 +1,29 @@
-drop 2008-04 solution: 70 damaged cells, remainder not uniquely solvable
-drop 2009-11 solution: 76 damaged cells, remainder not uniquely solvable
-drop 2010-01 solution: 75 damaged cells, remainder not uniquely solvable
-drop 2009-03 solution: 84 damaged cells, remainder not uniquely solvable
-drop 2008-01 solution: 54 damaged cells, remainder not uniquely solvable
-drop 2010-12 solution: 80 damaged cells, remainder not uniquely solvable
-drop 2008-06 solution: 66 damaged cells, remainder not uniquely solvable
-drop 2008-12 solution: 90 damaged cells, remainder not uniquely solvable
-drop 2009-05 solution: 57 damaged cells, remainder not uniquely solvable
+drop 2009-09 solution: 64 damaged cells, remainder not uniquely solvable
+drop 2007-11 solution: 63 damaged cells, remainder not uniquely solvable
 drop 2010-02 solution: 97 damaged cells, remainder not uniquely solvable
 drop 2013-12 solution: 109 damaged cells, remainder not uniquely solvable
-drop 2011-05 solution: 43 damaged cells, remainder not uniquely solvable
-drop 2009-02 solution: 69 damaged cells, remainder not uniquely solvable
-drop 2007-11 solution: 63 damaged cells, remainder not uniquely solvable
-drop 2008-03 solution: 54 damaged cells, remainder not uniquely solvable
-drop 2009-09 solution: 64 damaged cells, remainder not uniquely solvable
-drop 2009-12 solution: 86 damaged cells, remainder not uniquely solvable
-drop 2009-01 solution: 46 damaged cells, remainder not uniquely solvable
-drop 2007-12 solution: 68 damaged cells, remainder not uniquely solvable
-drop 2008-09 solution: 60 damaged cells, remainder not uniquely solvable
-drop 2010-06 solution: 63 damaged cells, remainder not uniquely solvable
+drop 2009-05 solution: 57 damaged cells, remainder not uniquely solvable
+drop 2010-01 solution: 75 damaged cells, remainder not uniquely solvable
+drop 2008-12 solution: 90 damaged cells, remainder not uniquely solvable
 drop 2008-11 solution: 58 damaged cells, remainder not uniquely solvable
-drop 2009-04 solution: 65 damaged cells, remainder not uniquely solvable
+drop 2010-06 solution: 63 damaged cells, remainder not uniquely solvable
+drop 2008-03 solution: 54 damaged cells, remainder not uniquely solvable
+drop 2008-06 solution: 66 damaged cells, remainder not uniquely solvable
 drop 2010-03 solution: 95 damaged cells, remainder not uniquely solvable
+drop 2009-02 solution: 69 damaged cells, remainder not uniquely solvable
+drop 2011-05 solution: 43 damaged cells, remainder not uniquely solvable
+drop 2009-03 solution: 84 damaged cells, remainder not uniquely solvable
+drop 2009-11 solution: 76 damaged cells, remainder not uniquely solvable
+drop 2008-01 solution: 54 damaged cells, remainder not uniquely solvable
+drop 2007-12 solution: 68 damaged cells, remainder not uniquely solvable
+drop 2008-04 solution: 70 damaged cells, remainder not uniquely solvable
+drop 2009-12 solution: 86 damaged cells, remainder not uniquely solvable
+drop 2010-12 solution: 80 damaged cells, remainder not uniquely solvable
+drop 2008-09 solution: 60 damaged cells, remainder not uniquely solvable
+drop 2009-01 solution: 46 damaged cells, remainder not uniquely solvable
+drop 2009-04 solution: 65 damaged cells, remainder not uniquely solvable
 solutions: 0 repaired, 24 dropped as unrecoverable
-solution lag: mode 2 issue(s), from 16 OCR matches
+solution lag: mode 2 issue(s), from 21 OCR matches
 skip 2006-01: no matching solution and no OCR digits
 skip 2006-02: no matching solution and no OCR digits
 skip 2006-03: no matching solution and no OCR digits
@@ -31,7 +31,7 @@ skip 2006-06: no matching solution and no OCR digits
 skip 2006-09: no matching solution and no OCR digits
 skip 2006-10: no matching solution and no OCR digits
 skip 2006-11: no matching solution and no OCR digits
-skip 2006-12: no matching solution and no OCR digits (stale puzzle removed)
+skip 2006-12: no matching solution and no OCR digits
 skip 2007-03: no matching solution and no OCR digits
 skip 2007-04: no matching solution and no OCR digits
 skip 2007-05: no matching solution and no OCR digits
@@ -81,15 +81,15 @@ ok   2013-03: 106 clues (digits from 2013-05_prevsolution (OCR match 100% of 106
 ok   2013-04: 114 clues (digits from 2013-06_prevsolution (OCR match 99% of 114 cells))
 ok   2013-12: 112 clues (digits from 2014-03_prevsolution (OCR match 99% of 111 cells))
 ok   2014-01_02: 108 clues (digits from 2014-04_prevsolution (OCR match 100% of 108 cells))
+ok   2015-01_02: 106 clues (digits from tesseract OCR only (no matching printed solution found); 2 OCR conflicts NOT repairable (2 damaged cells, remainder not uniquely solvable))
 ok   2015-03_04: 116 clues (digits from 2015-05_06_prevsolution (OCR match 100% of 116 cells))
-ok   2015-05_06: 113 clues (digits from tesseract OCR only (no matching printed solution found); 31 OCR conflicts NOT repairable (31 damaged cells, remainder not uniquely solvable))
-ok   2015-07_08: 97 clues (digits from tesseract OCR only (no matching printed solution found); 18 OCR conflicts NOT repairable (18 damaged cells, remainder not uniquely solvable))
-ok   2015-09_10: 110 clues (digits from tesseract OCR only (no matching printed solution found); 28 OCR conflicts NOT repairable (28 damaged cells, remainder not uniquely solvable))
-ok   2015-11_12: 70 clues (digits from tesseract OCR only (no matching printed solution found); 12 OCR conflicts NOT repairable (12 damaged cells, remainder not uniquely solvable))
-ok   2016-01_02: 148 clues (digits from tesseract OCR only (no matching printed solution found))
-ok   2016-03_04: 111 clues (digits from tesseract OCR only (no matching printed solution found); 25 OCR conflicts NOT repairable (25 damaged cells, remainder not uniquely solvable))
-ok   2016-05_06: 91 clues (digits from tesseract OCR only (no matching printed solution found); 24 OCR conflicts NOT repairable (24 damaged cells, remainder not uniquely solvable))
+ok   2015-05_06: 144 clues (digits from 2015-07_08_prevsolution (OCR match 95% of 141 cells))
+ok   2015-07_08: 110 clues (digits from 2015-09_10_prevsolution (OCR match 100% of 110 cells))
+ok   2015-09_10: 124 clues (digits from 2015-11_12_prevsolution (OCR match 98% of 122 cells))
+ok   2015-11_12: 91 clues (digits from tesseract OCR only (no matching printed solution found); 2 OCR conflicts NOT repairable (2 damaged cells, remainder not uniquely solvable))
+ok   2016-03_04: 123 clues (digits from 2016-05_06_prevsolution (OCR match 98% of 123 cells))
+ok   2016-05_06: 105 clues (digits from 2016-08_prevsolution (OCR match 100% of 105 cells))
 ok   2016-08: 108 clues (digits from 2016-09_10_prevsolution (OCR match 100% of 108 cells))
 ok   2016-09_10: 112 clues (digits from 2016-11_12_prevsolution (OCR match 100% of 112 cells))
-skip 2016-11_12: no matching solution and no OCR digits
-chain: 39 puzzles built, 13 skipped
+ok   2016-11_12: 111 clues (digits from tesseract OCR only (no matching printed solution found); 2 OCR conflicts NOT repairable (2 damaged cells, remainder not uniquely solvable))
+chain: 40 puzzles built, 12 skipped

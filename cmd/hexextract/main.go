@@ -503,19 +503,8 @@ func maskFromImage(imgPath string, dpi int, solBox *ptRect) (*detection, error) 
 		if m.filled < 60 || m.filled > 200 {
 			return
 		}
-		for i := 0; i < 16; i++ {
-			nr, nc := 0, 0
-			for j := 0; j < 16; j++ {
-				if m.given[i][j] {
-					nr++
-				}
-				if m.given[j][i] {
-					nc++
-				}
-			}
-			if nr == 16 || nc == 16 {
-				return
-			}
+		if !plausibleMask(m) {
+			return
 		}
 		if best == nil || m.filled > best.m.filled {
 			best = &detection{m: m, vg: vg, hg: hg, bm: bm}
@@ -644,8 +633,10 @@ func maskFromImage(imgPath string, dpi int, solBox *ptRect) (*detection, error) 
 			}
 			return fs[1]
 		}
+		// Keep the best-scoring window that also yields a plausible clue
+		// pattern - the highest score alone can be a window slid one
+		// cell off the grid, whose outermost column stays empty.
 		bestScore := 0.0
-		var bestVg []float64
 		for k := -12; k <= 12; k++ {
 			p := pitch * (1 + float64(k)*0.0025)
 			for x := 0.0; x+16*p < excl.x0; x++ {
@@ -653,15 +644,16 @@ func maskFromImage(imgPath string, dpi int, solBox *ptRect) (*detection, error) 
 				for i := range vg {
 					vg[i] = x + float64(i)*p
 				}
-				if s := score(vg); s > bestScore {
-					bestScore, bestVg = s, vg
+				s := score(vg)
+				if s <= bestScore {
+					continue
 				}
-			}
-		}
-		if bestVg != nil && bestScore >= 0.55 {
-			m := probeCells(bm, bestVg, hg)
-			if m.filled >= 60 && m.filled <= 200 {
-				best = &detection{m: m, vg: bestVg, hg: hg, bm: bm}
+				m := probeCells(bm, vg, hg)
+				if m.filled < 60 || m.filled > 200 || !plausibleMask(m) {
+					continue
+				}
+				bestScore = s
+				best = &detection{m: m, vg: vg, hg: hg, bm: bm}
 			}
 		}
 	}
@@ -673,6 +665,28 @@ func maskFromImage(imgPath string, dpi int, solBox *ptRect) (*detection, error) 
 	}
 	best.dense = dense
 	return best, nil
+}
+
+// plausibleMask rejects clue patterns no published puzzle has. A fully
+// occupied line means the window has slid into the solution grid; an
+// empty line means it has slid off the puzzle, so one of its 16 columns
+// sits outside the grid and stays blank.
+func plausibleMask(m *mask) bool {
+	for i := 0; i < 16; i++ {
+		nr, nc := 0, 0
+		for j := 0; j < 16; j++ {
+			if m.given[i][j] {
+				nr++
+			}
+			if m.given[j][i] {
+				nc++
+			}
+		}
+		if nr == 16 || nc == 16 || nr == 0 || nc == 0 {
+			return false
+		}
+	}
+	return true
 }
 
 // latticeIsReal checks that the candidate's 17+17 positions carry
@@ -850,13 +864,16 @@ func processPDF(path, outDir, pdftoppm, pdftotext, tesseract string, dpi int, ve
 	if bestDet != nil {
 		if img, rerr := renderPage(pdftoppm, path, bestPage, ocrDpi, tmpDir); rerr == nil {
 			if d, merr := maskFromImage(img, ocrDpi, bestSolBox); merr == nil {
-				ocrDet = d
-				if d.m.filled > bestDet.m.filled {
-					if verbose {
-						fmt.Printf("  %s: mask %d -> %d clues at %d dpi\n", key, bestDet.m.filled, d.m.filled, ocrDpi)
-					}
-					bestDet = d
+				// Always prefer the high-resolution detection. Comparing
+				// clue counts across resolutions is wrong: a lattice
+				// fitted to the wrong thing can carry MORE "clues" than
+				// the real grid and would win on count alone.
+				if verbose && d.m.filled != bestDet.m.filled {
+					fmt.Printf("  %s: mask %d clues at %d dpi -> %d clues at %d dpi\n",
+						key, bestDet.m.filled, dpi, d.m.filled, ocrDpi)
 				}
+				ocrDet = d
+				bestDet = d
 			}
 			defer os.Remove(img)
 		}

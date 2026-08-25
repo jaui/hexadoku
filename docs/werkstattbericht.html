@@ -379,8 +379,9 @@ code {
   <div class="fig"><b>600 ms → 32 µs</b><span>Pro Lösung</span></div>
   <div class="fig"><b>108</b><span>Hefte geladen</span></div>
   <div class="fig"><b>47 → 93</b><span>Hefte mit Ausbeute</span></div>
-  <div class="fig"><b>56</b><span>Rätsel rekonstruiert</span></div>
-  <div class="fig"><b>15</b><span>Voll verifiziert</span></div>
+  <div class="fig"><b>49</b><span>Rätsel gewonnen</span></div>
+  <div class="fig"><b>40</b><span>Gegengeprüft</span></div>
+  <div class="fig"><b>30</b><span>Probleme gelöst</span></div>
 </section>
 
 <!-- ============ 1 ============ -->
@@ -627,6 +628,43 @@ code {
   </article>
 
   <article class="entry">
+    <div class="rail"><span class="tag">GRID-07</span><span class="chip chip-ok">gelöst</span></div>
+    <div>
+      <h3>Die Maske war zu grob aufgelöst</h3>
+      <dl>
+        <div><dt>Symptom</dt><dd>Ein Heft, das zuvor sauber durchlief, lieferte plötzlich 87 statt 108 Vorgaben — und war damit nicht mehr eindeutig lösbar.</dd></div>
+        <div><dt>Ursache</dt><dd>Die Maske wurde auf dem 150-dpi-Rendering bestimmt. Dünn gedruckte Ziffern haben dort zu wenige dunkle Bildpunkte, um den Tintentest zu bestehen, und fallen still aus der Maske.</dd></div>
+        <div><dt>Lösung</dt><dd>Die Seite wird ohnehin ein zweites Mal mit 300 dpi gerendert, weil die OCR das braucht. Die Maske wird jetzt dort bestimmt: gleiches Gitter, viermal so viele Bildpunkte pro Zelle. Bei mehreren Heften stieg die Vorgabenzahl dadurch um 20 bis 35.</dd></div>
+      </dl>
+    </div>
+  </article>
+
+  <article class="entry">
+    <div class="rail"><span class="tag">GRID-08</span><span class="chip chip-ok">gelöst</span></div>
+    <div>
+      <h3>Layouts, deren Linien keine Suche findet</h3>
+      <dl>
+        <div><dt>Symptom</dt><dd>Die Jahrgänge 2015 und 2016 lieferten reihenweise verstümmelte Masken — 76 bis 90 Vorgaben statt der üblichen 110 bis 130 — und die OCR scheiterte dann ebenfalls, weil sie auf dem falschen Ausschnitt arbeitete.</dd></div>
+        <div><dt>Ursache</dt><dd>Diese Ausgaben zeichnen das Gitter mit durchgehend dünnen, hellen Linien ohne die kräftigen Blockränder der früheren Jahrgänge. Beide Linienverfahren greifen zu kurz.</dd></div>
+        <div><dt>Lösung</dt><dd>Nicht mehr suchen, sondern ableiten: Beide Gitter stehen nebeneinander und sind ähnlich groß, und die Geometrie des Lösungsgitters ist aus der Textebene punktgenau bekannt. Also werden Zeilenlinien und Zellenabstand übernommen und der Spaltenblock nach links geschoben, bis die Linien auf echter Farbe liegen.</dd></div>
+        <div><dt>Nachtrag</dt><dd>Zwei Korrekturen waren nötig. Erstens bewertete ich die Passung über den Median aller siebzehn Linien — ein um eine ganze Zelle verschobenes Fenster hat aber sechzehn Linien richtig und nur eine daneben, was ein Median glatt schluckt; das Ergebnis war ein Gitter mit einer fehlenden Spalte. Jetzt zählt die zweitschwächste Linie, denn der äußere Rand ist manchmal heller gedruckt. Zweitens ist das Rätselgitter nicht immer exakt so groß wie das Lösungsgitter, weshalb der Zellenabstand in feinen Schritten mitgesucht wird. Aus 90 wurden damit <span class="win">130 Vorgaben</span>.</dd></div>
+      </dl>
+    </div>
+  </article>
+
+  <article class="entry">
+    <div class="rail"><span class="tag">GRID-09</span><span class="chip chip-ok">gelöst</span></div>
+    <div>
+      <h3>Mehr Vorgaben heißt nicht besser</h3>
+      <dl>
+        <div><dt>Symptom</dt><dd>Trotz GRID-07 blieben einzelne Masken falsch — obwohl die hochaufgelöste Erkennung das richtige Gitter fand.</dd></div>
+        <div><dt>Ursache</dt><dd>Ich hatte die beiden Erkennungen über die Vorgabenzahl verglichen und die mit mehr behalten. Über verschiedene Auflösungen hinweg ist das kein Qualitätsmaß: Ein danebenliegendes Gitter kann <em>mehr</em> vermeintliche Vorgaben zählen als das echte und gewinnt dann allein durch die Zahl.</dd></div>
+        <div><dt>Lösung</dt><dd>Die höhere Auflösung gewinnt immer. Und ein Plausibilitätstest ergänzt sie: Kein gedrucktes Rätsel hat eine vollständig gefüllte Zeile oder Spalte — dann steckt das Fenster im Lösungsgitter — und keine vollständig leere, denn dann ragt es über den Gitterrand hinaus. Genau daran erkennt man ein um eine Zelle verrutschtes Fenster.</dd></div>
+      </dl>
+    </div>
+  </article>
+
+  <article class="entry">
     <div class="rail"><span class="tag">GRID-06</span><span class="chip chip-neutral">Fehlalarm</span></div>
     <div>
       <h3>Die verdächtig symmetrische Maske</h3>
@@ -684,6 +722,17 @@ code {
   </article>
 
   <article class="entry">
+    <div class="rail"><span class="tag">CHAIN-05</span><span class="chip chip-ok">gelöst</span></div>
+    <div>
+      <h3>Geraten statt geprüft</h3>
+      <dl>
+        <div><dt>Symptom</dt><dd>Wo die OCR keine Zuordnung bestätigen konnte, übernahm die Kette den gelernten Versatz einfach — und produzierte lautlos Rätsel mit falschen Ziffern.</dd></div>
+        <div><dt>Lösung</dt><dd>Jede unbestätigte Zuordnung wird jetzt ausprobiert: Rätsel bauen, Solver fragen, und nur behalten, was eindeutig lösbar ist. Eine falsche Paarung schafft das praktisch nie. Nachtrag: Der Beweis der Unlösbarkeit kann bei dünn besetzten Gittern beliebig lange dauern, deshalb ist jeder Versuch auf zwanzig Sekunden begrenzt — ein Zeitüberlauf zählt als „diese nicht".</dd></div>
+      </dl>
+    </div>
+  </article>
+
+  <article class="entry">
     <div class="rail"><span class="tag">CHAIN-04</span><span class="chip chip-open">Grenze</span></div>
     <div>
       <h3>Die frühen Jahrgänge drucken gar keine Lösung</h3>
@@ -736,6 +785,18 @@ code {
         <div><dt>Symptom</dt><dd>Bei 06/2007 blieb das Rätsel auch nach der Reparatur unlösbar. Tesseract hatte drei Zellen verwechselt (<code>E</code> als <code>9</code>, <code>B</code> als <code>8</code>) und drei weitere übersehen.</dd></div>
         <div><dt>Lösung</dt><dd>Auf Vorschlag des Auftraggebers ein Betrachtungsmodus: <code>-crops</code> schneidet die erkannten Gitter aus und legt sie als lesbare Bildstreifen ab. Diese habe ich selbst gelesen und die Zellen korrigiert.</dd></div>
         <div><dt>Beleg</dt><dd>Das Ergebnis löst eindeutig <span class="win">mit null Verzweigungen</span> — reine Constraint Propagation, ohne einen einzigen Rateschritt. Genau das ist die Signatur eines für Menschen gesetzten Magazinrätsels und damit ein starker Korrektheitsnachweis.</dd></div>
+      </dl>
+    </div>
+  </article>
+
+  <article class="entry">
+    <div class="rail"><span class="tag">FIX-05</span><span class="chip chip-ok">gelöst</span></div>
+    <div>
+      <h3>Sechzehn Gitter von Hand gelesen</h3>
+      <dl>
+        <div><dt>Anlass</dt><dd>Bei den gescannten Jahrgängen las Tesseract zu ungenau, und die verworfenen Lösungsgitter nahmen der Kette die Grundlage. Der Betrachtungsmodus aus FIX-03 war da, aber nur einmal benutzt worden.</dd></div>
+        <div><dt>Vorgehen</dt><dd>Für jedes betroffene Heft die Gitterstreifen exportieren, selbst lesen, in eine Rätseldatei schreiben, vom Solver prüfen lassen. Zwei Zeilen pro Bild — bei vier Zeilen verrutschten mir Positionen, was der Solver prompt als Konflikt meldete.</dd></div>
+        <div><dt>Ergebnis</dt><dd><span class="win">16 Rätsel</span>, alle eindeutig lösbar, vierzehn davon mit null Verzweigungen. Bei zwölf stimmt meine gezählte Vorgabenzahl exakt mit der überein, die die Maskenerkennung unabhängig aus der Pixelstruktur ermittelt — zwei Verfahren, die nichts voneinander wissen, kommen auf dieselbe Zahl.</dd></div>
       </dl>
     </div>
   </article>
@@ -816,23 +877,69 @@ code {
   </div>
 
   <article class="entry">
-    <div class="rail"><span class="tag">OPEN-01</span><span class="chip chip-open">offen</span></div>
+    <div class="rail"><span class="tag">MISC-05</span><span class="chip chip-ok">gelöst</span></div>
     <div>
-      <h3>Ein „G" im Rätselgitter</h3>
+      <h3>Reste früherer Läufe in der Bilanz</h3>
       <dl>
-        <div><dt>Befund</dt><dd>Im Rätsel 02/2010 stehen Zeichen, die auch bei starker Vergrößerung wie ein <code>G</code> aussehen — in einem Gitter, das nur <code>0</code>–<code>F</code> kennen darf. Das zugehörige <code>6</code> derselben Seite sieht deutlich anders aus.</dd></div>
-        <div><dt>Einordnung</dt><dd>Ohne Auswirkung auf die Pipeline: Die Rekonstruktion nutzt ausschließlich die Maske und holt die Ziffern aus dem Lösungsgitter. Vermutlich eine Eigenheit der damals verwendeten Schrift.</dd></div>
+        <div><dt>Symptom</dt><dd>Die Endprüfung meldete Rätsel als fehlerhaft, die die Kette in diesem Lauf gar nicht mehr erzeugt hatte.</dd></div>
+        <div><dt>Ursache</dt><dd>Wo die Kette mangels Lösung nichts bauen konnte, blieb die Datei aus einem früheren Durchgang liegen und wurde weiter mitgeprüft.</dd></div>
+        <div><dt>Lösung</dt><dd>Übersprungene Rätsel räumen ihre veraltete Datei weg und sagen es dazu. Handgeprüfte Transkriptionen bleiben davon ausgenommen.</dd></div>
       </dl>
     </div>
   </article>
+</section>
+
+<!-- ============ 9b ============ -->
+<section class="chapter">
+  <div class="chapter-head">
+    <span class="num">IX</span>
+    <h2>Nachträglich geklärt</h2>
+    <p>Zwei Befunde, die zunächst als offen notiert waren und sich beim
+       genauen Hinsehen aufgelöst haben — der eine als Schriftmerkmal,
+       der andere als gar kein Fehler.</p>
+  </div>
+
+  <article class="entry">
+    <div class="rail"><span class="tag">OPEN-01</span><span class="chip chip-ok">geklärt</span></div>
+    <div>
+      <h3>Das „G" ist eine Null</h3>
+      <dl>
+        <div><dt>Befund</dt><dd>Im Rätsel 02/2010 standen Zeichen, die auch stark vergrößert wie ein <code>G</code> aussehen — in einem Gitter, das nur <code>0</code>–<code>F</code> kennen darf.</dd></div>
+        <div><dt>Auflösung</dt><dd>Beim Abschreiben des ganzen Gitters fiel auf: In sechzehn Zeilen kommt <em>keine einzige Null</em> vor, dafür zwölfmal das vermeintliche G. Die Schrift dieses Jahrgangs setzt die Null mit einem Querbalken, der in Scanauflösung wie ein G wirkt. Tesseract konnte das gar nicht abbilden, weil G nicht im Zeichenvorrat eines Hexadokus steht.</dd></div>
+        <div><dt>Beleg</dt><dd>Mit <code>G</code> als <code>0</code> gelesen ist das Rätsel eindeutig lösbar.</dd></div>
+      </dl>
+    </div>
+  </article>
+
+  <article class="entry">
+    <div class="rail"><span class="tag">OPEN-04</span><span class="chip chip-neutral">kein Fehler</span></div>
+    <div>
+      <h3>Ein Rätsel, das absichtlich nicht aufgeht</h3>
+      <dl>
+        <div><dt>Symptom</dt><dd>Ausgabe 03/2011 ergab nur 73 Vorgaben und mehrdeutige Lösungen — nach Werkzeugfehler aussehend.</dd></div>
+        <div><dt>Befund</dt><dd>Die Seite zeigt ein „Hexadoku Digest": sechzehn farbig markierte Fünferblöcke, die mit den Lösungscodes früherer Hexadokus aus den Ausgaben Januar 2009 bis Juni 2010 gefüllt werden müssen. Ohne dieses Außenwissen ist das Gitter <em>konstruktionsbedingt</em> nicht eindeutig.</dd></div>
+        <div><dt>Einordnung</dt><dd>Die Pipeline verhält sich richtig, indem sie es als nicht eindeutig meldet. Lösbar wäre es nur, wenn man die sechzehn Codes aus den zugehörigen Jahrgängen zusammenträgt.</dd></div>
+      </dl>
+    </div>
+  </article>
+</section>
+
+<!-- ============ 10 ============ -->
+<section class="chapter">
+  <div class="chapter-head">
+    <span class="num">X</span>
+    <h2>Offen</h2>
+    <p>Was zum Zeitpunkt dieses Berichts nicht abschließend geklärt ist.</p>
+  </div>
 
   <article class="entry">
     <div class="rail"><span class="tag">OPEN-02</span><span class="chip chip-open">offen</span></div>
     <div>
       <h3>Beschädigte Lösungsgitter in Scans</h3>
       <dl>
-        <div><dt>Stand</dt><dd>Von 71 gewonnenen Lösungsgittern mussten 24 verworfen werden: In diesen Scans hat Tesseract so viele Zellen falsch gelesen — bei den schlechtesten 58 bis 70 —, dass auch die regelbasierte Reparatur den Rest nicht mehr eindeutig auflösen kann. Sie sind die Hauptursache dafür, dass von 56 rekonstruierten Rätseln nur 15 vollständig verifiziert sind.</dd></div>
-        <div><dt>Weg</dt><dd>Die betroffenen Gitter sind bekannt und benannt. Für jedes steht der Betrachtungsmodus aus FIX-03 bereit; der Aufwand pro Gitter liegt bei wenigen Minuten. Wichtig ist, dass die Pipeline hier nicht rät, sondern verwirft — kein unsicheres Rätsel wird als gültig ausgegeben.</dd></div>
+        <div><dt>Stand</dt><dd>Von den gewonnenen Lösungsgittern werden 24 verworfen: In diesen Scans hat Tesseract so viele Zellen falsch gelesen — bei den schlechtesten 58 bis 90 —, dass auch die regelbasierte Reparatur den Rest nicht mehr eindeutig auflösen kann.</dd></div>
+        <div><dt>Milderung</dt><dd>Für die Bestätigung taugen sie trotzdem: Ein von Hand gelesenes Rätsel wird gegen sie gehalten, und Übereinstimmung in 208 bis 235 von 256 Zellen — gegenüber 16 bei Zufall — bestätigt beide Seiten. Die abweichenden Zellen sind genau die Lesefehler. Erst dieser Abgleich hob die Zahl der gegengeprüften Rätsel von 19 auf 34.</dd></div>
+        <div><dt>Wichtig</dt><dd>Die Pipeline rät hier nicht, sondern verwirft — kein unsicheres Rätsel wird als gültig ausgegeben.</dd></div>
       </dl>
     </div>
   </article>
@@ -842,7 +949,7 @@ code {
     <div>
       <h3>Hefte ohne auffindbares Gitter</h3>
       <dl>
-        <div><dt>Stand</dt><dd>93 der 108 Hefte liefern Masken oder Lösungsgitter. Bei den übrigen findet die Automatik nichts — teils Scanqualität, teils vermutlich Hefte ohne Hexadoku, etwa Doppelausgaben. Zwei Hefte lehnt bereits <code>pdftotext</code> ab.</dd></div>
+        <div><dt>Stand</dt><dd>93 der 108 Hefte liefern Masken oder Lösungsgitter, und daraus sind 49 Rätsel gewonnen — 40 davon gegen eine gedruckte Lösung geprüft. Acht bleiben offen. Bei den übrigen Heften findet die Automatik nichts: teils Scanqualität, teils vermutlich Hefte ohne Hexadoku. Zwei lehnt bereits <code>pdftotext</code> ab, und die textlosen Scans brauchen den seitenweisen Bildsweep, der bei dicken Heften über das Zeitlimit des Stapellaufs geht.</dd></div>
       </dl>
     </div>
   </article>
@@ -868,6 +975,13 @@ code {
       und dessen Lösung dem gedruckten Gitter entspricht, ist richtig rekonstruiert — kein
       Stichprobenvertrauen nötig. Und wo OCR versagt, kostet Hinsehen wenige Minuten und
       liefert ein Ergebnis, das der Solver anschließend bestätigt.
+    </p>
+    <p>
+      Bemerkenswert oft war der Fehler nicht das fehlende Verfahren, sondern das zu
+      nachsichtige Kriterium: der Median, der eine falsch liegende Linie schluckt; die
+      Vorgabenzahl, die ein danebenliegendes Gitter gewinnen lässt; der angenommene
+      Versatz, den niemand nachprüft. Jedes Mal war die Abhilfe dieselbe — ein Prüfstein,
+      den nur das Richtige besteht.
     </p>
   </div>
 </footer>
@@ -914,3 +1028,4 @@ code {
 
 </body>
 </html>
+

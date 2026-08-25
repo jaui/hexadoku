@@ -1,18 +1,18 @@
-# Elektor Hexadoku 2015-11_12 (70 clues)
-# digits from tesseract OCR only (no matching printed solution found); 12 OCR conflicts NOT repairable (12 damaged cells, remainder not uniquely solvable)
-..C....E....1...
-..91......C.....
-......9......E.C
-....BE..4...F.7.
-..F.C.1......4.D
-..0..8A......6F.
-...6.A.B....3.C.
-.......FD5A72...
-.......49883C...
-...1.3.6....7.8.
-...7..B......F3.
-....8.C......A.0
-....25..A..4D.E8
-......0......9..
-...D.....42.6...
-..4....D....F...
+# Elektor Hexadoku 2015-11_12 (91 clues)
+# digits from tesseract OCR only (no matching printed solution found); 2 OCR conflicts NOT repairable (2 damaged cells, remainder not uniquely solvable)
+C....E....1....8
+91......C.....63
+..3.9.5....E.C..
+..BE..4..F0.1..9
+F.C.1........D..
+03.BA......6F.8B
+.6.A.B......C..5
+.....FD5A72.....
+.....49803C.....
+1..3.6......8..4
+7..0B......F3.EC
+..8........A.0.1
+3.25.9A..4..E8.7
+..6.0.2..C...4..
+D0...5..2.6...BA
+4....D....F....2

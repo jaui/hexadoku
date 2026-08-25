@@ -43,14 +43,16 @@ PASS 2013-03 (unique, solution printed in issue 2013-05)
 PASS 2013-04 (unique, solution printed in issue 2013-06)
 PASS 2013-12 (unique, solution printed in issue 2014-03)
 PASS 2014-01_02 (unique, solution printed in issue 2014-04)
-WARN 2015-03_04 (unique, but no printed solution matches - unverified)
-FAIL 2015-05_06 : not solvable
-FAIL 2015-07_08 : not solvable
-FAIL 2015-09_10 : not solvable
+FAIL 2015-01_02 : not solvable
+PASS 2015-03_04 (unique, solution printed in issue 2015-05_06)
+PASS 2015-05_06 (unique, solution printed in issue 2015-07_08)
+PASS 2015-07_08 (unique, solution printed in issue 2015-09_10)
+PASS 2015-09_10 (unique, solution printed in issue 2015-11_12)
 FAIL 2015-11_12 : not solvable
 WARN 2016-01_02 (unique, but no printed solution matches - unverified)
-FAIL 2016-03_04 : not solvable
-FAIL 2016-05_06 : not solvable
+PASS 2016-03_04 (unique, solution printed in issue 2016-05_06)
+PASS 2016-05_06 (unique, solution printed in issue 2016-08)
 PASS 2016-08 (unique, solution printed in issue 2016-09_10)
 PASS 2016-09_10 (unique, solution printed in issue 2016-11_12)
-validation: 34 verified, 10 unverified, 11 fail
+FAIL 2016-11_12 : not solvable
+validation: 40 verified, 9 unverified, 8 fail

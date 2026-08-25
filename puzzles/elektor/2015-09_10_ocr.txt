@@ -1,12 +1,11 @@
-# Elektor Hexadoku 2015-09_10 (124 clues)
-# digits from 2015-11_12_prevsolution (OCR match 98% of 122 cells)
+# Elektor Hexadoku 2015-09_10, digits read by tesseract OCR (PDF page 130), 122 cells
 .03...84E1...72.
-F5..C96..DA7..80
+.F..C96..DA7..80
 .....7.04.C.....
 .67...1..8...4A.
 ..E2B.A169.54C..
 .C.45F0..B317.D.
-0.5D682..74FB1.E
+0.5D682..74.FB.E
 .......C8.......
 .......79.......
 1.D7E64..35C92.A

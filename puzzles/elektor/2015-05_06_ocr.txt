@@ -1,5 +1,4 @@
-# Elektor Hexadoku 2015-05_06 (144 clues)
-# digits from 2015-07_08_prevsolution (OCR match 95% of 141 cells)
+# Elektor Hexadoku 2015-05_06, digits read by tesseract OCR (PDF page 130), 141 cells
 .5A...0..8...13.
 3...A......9...7
 14............D9
@@ -7,9 +6,9 @@
 D293...81...ABF6
 7F5409....C23DE8
 8A0ED6....5B147C
-BC61E7F..4D82905
-48B265A..F1C7E93
-A0C921....8E456F
+BC61E7F..4082905
+48B265A...F7E9.3
+AC9.21....8E456F
 561F3C....408ABD
 E3D7...BA...C012
 C7E..0.98.6..FA1
