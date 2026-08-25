@@ -8,6 +8,11 @@ each row, column and 4x4 box must contain the hex digits 0-F exactly once.
 The original C++ brute-force/constraint solver is kept for reference in
 `cpp/hexadoku.cpp`.
 
+A write-up of every problem hit while building this and how it was
+solved is in [`docs/werkstattbericht.html`](docs/werkstattbericht.html)
+(German): solver data layout, the PDF toolchain dead end, grid detection
+in scans, and how the puzzle/solution pairing was derived from the data.
+
 Algorithm
 ---------
 

@@ -1,0 +1,916 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+</head>
+<body>
+<title>Hexadoku Werkstattbericht</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@500;600;700&family=Source+Serif+4:opsz,wght@8..60,400;8..60,600&family=JetBrains+Mono:wght@400;500;700&display=swap">
+
+<style>
+:root {
+  --paper:      #FBFAF7;
+  --paper-sunk: #F2F0EA;
+  --ink:        #191614;
+  --ink-soft:   #6E6862;
+  --rule:       #DED9D0;
+  --rule-soft:  #EAE6DE;
+  --accent:     #C8102E;
+  --accent-bg:  #FBE9EB;
+  --ok:         #2F6B4F;
+  --ok-bg:      #E7F0EA;
+  --warn:       #8A5A12;
+  --warn-bg:    #F6EEDF;
+  --neutral-bg: #ECE9E2;
+
+  --f-display: "Archivo", "Helvetica Neue", Arial, sans-serif;
+  --f-body:    "Source Serif 4", Georgia, "Times New Roman", serif;
+  --f-mono:    "JetBrains Mono", ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --paper:      #15130F;
+    --paper-sunk: #1E1B16;
+    --ink:        #EEEAE2;
+    --ink-soft:   #9C948A;
+    --rule:       #35302A;
+    --rule-soft:  #262219;
+    --accent:     #F2637A;
+    --accent-bg:  #33191E;
+    --ok:         #74C79C;
+    --ok-bg:      #16281F;
+    --warn:       #D8A75A;
+    --warn-bg:    #2A2113;
+    --neutral-bg: #241F19;
+  }
+}
+
+:root[data-theme="dark"] {
+  --paper:      #15130F;
+  --paper-sunk: #1E1B16;
+  --ink:        #EEEAE2;
+  --ink-soft:   #9C948A;
+  --rule:       #35302A;
+  --rule-soft:  #262219;
+  --accent:     #F2637A;
+  --accent-bg:  #33191E;
+  --ok:         #74C79C;
+  --ok-bg:      #16281F;
+  --warn:       #D8A75A;
+  --warn-bg:    #2A2113;
+  --neutral-bg: #241F19;
+}
+
+* { box-sizing: border-box; }
+
+body {
+  margin: 0;
+  background: var(--paper);
+  color: var(--ink);
+  font-family: var(--f-body);
+  font-size: 17px;
+  line-height: 1.62;
+  -webkit-font-smoothing: antialiased;
+}
+
+.wrap {
+  max-width: 76rem;
+  margin: 0 auto;
+  padding: 0 2rem 6rem;
+}
+
+/* ---------- Kopf ---------- */
+
+.masthead {
+  border-bottom: 2px solid var(--ink);
+  padding: 3.5rem 0 1.25rem;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 2.5rem;
+  align-items: end;
+}
+
+.eyebrow {
+  font-family: var(--f-mono);
+  font-size: 0.7rem;
+  font-weight: 500;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--accent);
+  margin: 0 0 1rem;
+}
+
+h1 {
+  font-family: var(--f-display);
+  font-weight: 700;
+  font-size: clamp(2.4rem, 6vw, 4rem);
+  line-height: 1.02;
+  letter-spacing: -0.025em;
+  margin: 0;
+  text-wrap: balance;
+}
+
+.standfirst {
+  margin: 1.5rem 0 0;
+  max-width: 42rem;
+  font-size: 1.15rem;
+  color: var(--ink-soft);
+}
+
+/* echtes 16x16-Gitter: Elektor 06-2007, per Sichtprüfung gerettet */
+.grid-art {
+  display: grid;
+  grid-template-columns: repeat(16, 1fr);
+  width: 17rem;
+  aspect-ratio: 1;
+  border: 1.5px solid var(--ink);
+  background: var(--ink);
+  gap: 0.5px;
+  flex: none;
+}
+.grid-art span {
+  background: var(--paper);
+  font-family: var(--f-mono);
+  font-size: 0.52rem;
+  font-weight: 500;
+  display: grid;
+  place-items: center;
+  color: var(--ink);
+}
+.grid-art span.b { box-shadow: inset 0 0 0 0.5px var(--rule); }
+.grid-art span.g { background: var(--accent-bg); }
+@media (max-width: 860px) { .grid-art { display: none; } }
+
+.grid-cap {
+  font-family: var(--f-mono);
+  font-size: 0.62rem;
+  letter-spacing: 0.04em;
+  color: var(--ink-soft);
+  text-align: right;
+  margin: 0.6rem 0 0;
+  max-width: 17rem;
+  line-height: 1.5;
+}
+
+/* ---------- Kennzahlen ---------- */
+
+.figures {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(9rem, 1fr));
+  gap: 0;
+  border-bottom: 1px solid var(--rule);
+  margin-bottom: 4rem;
+}
+
+.fig {
+  padding: 1.5rem 1.5rem 1.5rem 0;
+  border-right: 1px solid var(--rule-soft);
+}
+.fig:last-child { border-right: 0; }
+
+.fig b {
+  display: block;
+  font-family: var(--f-display);
+  font-weight: 700;
+  font-size: 2rem;
+  letter-spacing: -0.02em;
+  font-variant-numeric: tabular-nums;
+  line-height: 1.1;
+}
+.fig span {
+  display: block;
+  font-family: var(--f-mono);
+  font-size: 0.66rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--ink-soft);
+  margin-top: 0.45rem;
+}
+
+/* ---------- Abschnitte ---------- */
+
+.chapter { margin-bottom: 4.5rem; }
+
+.chapter-head {
+  display: grid;
+  grid-template-columns: 7rem minmax(0, 1fr);
+  gap: 2rem;
+  align-items: baseline;
+  border-top: 2px solid var(--ink);
+  padding-top: 1rem;
+  margin-bottom: 2.25rem;
+}
+
+.chapter-head .num {
+  font-family: var(--f-mono);
+  font-size: 0.7rem;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  color: var(--accent);
+}
+
+.chapter-head h2 {
+  font-family: var(--f-display);
+  font-weight: 600;
+  font-size: 1.6rem;
+  letter-spacing: -0.015em;
+  margin: 0;
+  text-wrap: balance;
+}
+
+.chapter-head p {
+  grid-column: 2;
+  margin: 0.5rem 0 0;
+  color: var(--ink-soft);
+  max-width: 44rem;
+}
+
+/* ---------- Einträge ---------- */
+
+.entry {
+  display: grid;
+  grid-template-columns: 7rem minmax(0, 1fr);
+  gap: 2rem;
+  padding: 1.6rem 0;
+  border-top: 1px solid var(--rule-soft);
+}
+.entry:first-of-type { border-top: 1px solid var(--rule); }
+
+.entry .rail {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  align-items: flex-start;
+}
+
+.tag {
+  font-family: var(--f-mono);
+  font-size: 0.68rem;
+  font-weight: 500;
+  letter-spacing: 0.06em;
+  color: var(--ink-soft);
+  font-variant-numeric: tabular-nums;
+}
+
+.chip {
+  font-family: var(--f-mono);
+  font-size: 0.6rem;
+  font-weight: 500;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  padding: 0.2rem 0.45rem;
+  border-radius: 2px;
+  white-space: nowrap;
+}
+.chip-ok      { background: var(--ok-bg);      color: var(--ok); }
+.chip-open    { background: var(--warn-bg);    color: var(--warn); }
+.chip-neutral { background: var(--neutral-bg); color: var(--ink-soft); }
+
+.entry h3 {
+  font-family: var(--f-display);
+  font-weight: 600;
+  font-size: 1.08rem;
+  letter-spacing: -0.005em;
+  margin: 0 0 0.75rem;
+  text-wrap: balance;
+}
+
+.entry dl {
+  margin: 0;
+  display: grid;
+  gap: 0.4rem;
+  max-width: 46rem;
+}
+.entry dl > div {
+  display: grid;
+  grid-template-columns: 5.5rem minmax(0, 1fr);
+  gap: 1rem;
+}
+.entry dt {
+  font-family: var(--f-mono);
+  font-size: 0.64rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--ink-soft);
+  padding-top: 0.32rem;
+}
+.entry dd { margin: 0; }
+
+@media (max-width: 700px) {
+  .entry, .chapter-head { grid-template-columns: minmax(0, 1fr); gap: 0.75rem; }
+  .chapter-head p { grid-column: 1; }
+  .entry .rail { flex-direction: row; align-items: center; gap: 0.75rem; }
+  .entry dl > div { grid-template-columns: minmax(0, 1fr); gap: 0.1rem; }
+  .entry dt { padding-top: 0.4rem; }
+}
+
+code {
+  font-family: var(--f-mono);
+  font-size: 0.86em;
+  background: var(--paper-sunk);
+  padding: 0.1em 0.32em;
+  border-radius: 2px;
+  overflow-wrap: break-word;
+}
+
+.win {
+  display: inline-block;
+  font-family: var(--f-mono);
+  font-size: 0.86em;
+  font-weight: 500;
+  color: var(--accent);
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+/* ---------- Schluss ---------- */
+
+.closing {
+  border-top: 2px solid var(--ink);
+  padding-top: 1.75rem;
+  display: grid;
+  grid-template-columns: 7rem minmax(0, 1fr);
+  gap: 2rem;
+}
+.closing .num {
+  font-family: var(--f-mono);
+  font-size: 0.7rem;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  color: var(--accent);
+}
+.closing h2 {
+  font-family: var(--f-display);
+  font-weight: 600;
+  font-size: 1.6rem;
+  margin: 0 0 1rem;
+  letter-spacing: -0.015em;
+}
+.closing p { max-width: 44rem; margin: 0 0 1rem; }
+.closing p:last-child { margin-bottom: 0; }
+@media (max-width: 700px) {
+  .closing { grid-template-columns: minmax(0, 1fr); gap: 0.75rem; }
+}
+</style>
+
+<div class="wrap">
+
+<header class="masthead">
+  <div>
+    <p class="eyebrow">Werkstattbericht · Solver &amp; Archivpipeline</p>
+    <h1>Hexadoku</h1>
+    <p class="standfirst">
+      Vom C++-Brute-Force-Solver zur Go-Fassung mit Bitmasken — und weiter zu einer
+      Pipeline, die 16×16-Rätsel aus zehn Jahrgängen Elektor-Scans zurückgewinnt.
+      Dies ist die Liste dessen, was dabei schiefging, und wie es gelöst wurde.
+    </p>
+  </div>
+  <div>
+    <div class="grid-art" id="gridArt" aria-label="Hexadoku aus Elektor 06-2007"></div>
+    <p class="grid-cap">Elektor 06-2007 · per Sichtprüfung gerettet<br>120 Vorgaben · löst mit 0 Verzweigungen</p>
+  </div>
+</header>
+
+<section class="figures">
+  <div class="fig"><b>600 ms → 32 µs</b><span>Pro Lösung</span></div>
+  <div class="fig"><b>108</b><span>Hefte geladen</span></div>
+  <div class="fig"><b>47 → 93</b><span>Hefte mit Ausbeute</span></div>
+  <div class="fig"><b>56</b><span>Rätsel rekonstruiert</span></div>
+  <div class="fig"><b>15</b><span>Voll verifiziert</span></div>
+</section>
+
+<!-- ============ 1 ============ -->
+<section class="chapter">
+  <div class="chapter-head">
+    <span class="num">I</span>
+    <h2>Werkzeugkette und Build</h2>
+    <p>Die Startbedingungen: kein Go auf dem Rechner, und ein Repository, dessen einzige
+       Quelldatei den Go-Build blockiert.</p>
+  </div>
+
+  <article class="entry">
+    <div class="rail"><span class="tag">BUILD-01</span><span class="chip chip-ok">gelöst</span></div>
+    <div>
+      <h3>Kein Go installiert</h3>
+      <dl>
+        <div><dt>Symptom</dt><dd><code>go</code> ist kein bekannter Befehl.</dd></div>
+        <div><dt>Lösung</dt><dd>Go 1.26.7 per <code>winget install GoLang.Go</code>. Nachtrag: Der Installer setzt PATH erst für neue Sitzungen — in jeder Shell dieser Sitzung muss <code>C:\Program Files\Go\bin</code> vorangestellt werden, sonst scheitert der nächste Aufruf wieder.</dd></div>
+      </dl>
+    </div>
+  </article>
+
+  <article class="entry">
+    <div class="rail"><span class="tag">BUILD-02</span><span class="chip chip-ok">gelöst</span></div>
+    <div>
+      <h3>C++-Datei blockiert den Go-Build</h3>
+      <dl>
+        <div><dt>Symptom</dt><dd><code>C++ source files not allowed when not using cgo or SWIG</code> — der Go-Build bricht ab, obwohl die <code>.cpp</code> gar nicht gebraucht wird.</dd></div>
+        <div><dt>Ursache</dt><dd>Go beansprucht das Paketverzeichnis exklusiv und lehnt fremde Quelldateien ab.</dd></div>
+        <div><dt>Lösung</dt><dd>Die Referenzimplementierung per <code>git mv</code> nach <code>cpp/</code> verschoben — Historie bleibt erhalten, sie ist weiter als Vergleichsmaßstab übersetzbar.</dd></div>
+      </dl>
+    </div>
+  </article>
+</section>
+
+<!-- ============ 2 ============ -->
+<section class="chapter">
+  <div class="chapter-head">
+    <span class="num">II</span>
+    <h2>Der Solver</h2>
+    <p>Die Portierung selbst war unspektakulär. Interessant wurde es bei der Frage, was
+       Verallgemeinerung kostet — und daran, dass die ersten Messungen nichts taugten.</p>
+  </div>
+
+  <article class="entry">
+    <div class="rail"><span class="tag">SOLV-01</span><span class="chip chip-ok">gelöst</span></div>
+    <div>
+      <h3>Ein Objekt pro Suchknoten</h3>
+      <dl>
+        <div><dt>Symptom</dt><dd>Der C++-Solver braucht rund 600 ms für ein Rätsel, das kaum Rateschritte erfordert.</dd></div>
+        <div><dt>Ursache</dt><dd>Jeder Verzweigungsknoten kopierte ein Objekt mit 256 <code>vector&lt;bool&gt;</code>-Zellen — Heap-Allokation im heißesten Pfad.</dd></div>
+        <div><dt>Lösung</dt><dd>Kandidatenmengen als <code>uint16</code>-Bitmasken; der komplette Zustand liegt in einem flachen Struct von ~350 Byte. Backtracking ist eine Struct-Kopie, keine Allokation. <code>OnesCount16</code>/<code>TrailingZeros16</code> werden auf amd64 zu <code>POPCNT</code>/<code>TZCNT</code>. Ergebnis: <span class="win">32 µs statt 600 ms</span>.</dd></div>
+      </dl>
+    </div>
+  </article>
+
+  <article class="entry">
+    <div class="rail"><span class="tag">SOLV-02</span><span class="chip chip-ok">gelöst</span></div>
+    <div>
+      <h3>Kostet die Sudoku-Unterstützung Tempo?</h3>
+      <dl>
+        <div><dt>Symptom</dt><dd>Für 9×9 musste die Gittergröße zur Laufzeitvariablen werden. Damit entfielen Compile-Zeit-Konstanten wie <code>k&gt;&gt;4</code> und <code>k&amp;15</code>; Zeilen- und Spaltenindex kamen aus Tabellen.</dd></div>
+        <div><dt>Lösung</dt><dd>Die heißen Routinen existieren bewusst doppelt (<code>solver.go</code>): 16×16 nutzt Schiebeoperationen, 9×9 konstante Divisionen, die der Compiler in Multiplikationen umschreibt. Das brachte gegenüber einem größengenerischen Kern rund <span class="win">13 %</span> auf schweren Hexadokus — die Integration kostete am Ende nichts.</dd></div>
+      </dl>
+    </div>
+  </article>
+
+  <article class="entry">
+    <div class="rail"><span class="tag">SOLV-03</span><span class="chip chip-ok">gelöst</span></div>
+    <div>
+      <h3>Messungen, die alles und nichts zeigten</h3>
+      <dl>
+        <div><dt>Symptom</dt><dd>Dieselbe Binärdatei lieferte 50, 59 und 62 µs in drei aufeinanderfolgenden Läufen. Auf dieser Grundlage war die Frage aus SOLV-02 nicht zu beantworten.</dd></div>
+        <div><dt>Ursache</dt><dd>Zu wenige Wiederholungen und Konkurrenz durch andere Prozesse — im Hintergrund liefen Downloads.</dd></div>
+        <div><dt>Lösung</dt><dd>20 000 statt 1 000 Durchläufe, gestartet mit erhöhter Prozesspriorität. Danach reproduzierbar 32,0 µs beziehungsweise 3,76 ms für das schwerste Rätsel.</dd></div>
+      </dl>
+    </div>
+  </article>
+
+  <article class="entry">
+    <div class="rail"><span class="tag">SOLV-04</span><span class="chip chip-ok">gelöst</span></div>
+    <div>
+      <h3>Mehrere Rätsel in einer Datei</h3>
+      <dl>
+        <div><dt>Symptom</dt><dd>Die selbst erzeugten Rätseldateien enthalten drei Gitter, durch Leerzeilen getrennt. Der Parser zählte 243 Zellen und meldete Unsinn.</dd></div>
+        <div><dt>Lösung</dt><dd>Blockerkennung an Leerzeilen; zusätzlich ein Sammlungsmodus für Dateien mit einem vollständigen Rätsel pro Zeile, wie ihn Norvigs <code>top95</code> verwendet.</dd></div>
+      </dl>
+    </div>
+  </article>
+</section>
+
+<!-- ============ 3 ============ -->
+<section class="chapter">
+  <div class="chapter-head">
+    <span class="num">III</span>
+    <h2>An die Rätsel kommen</h2>
+    <p>Die Originale liegen hinter der Bezahlschranke des Verlags. Der Weg dorthin führte
+       über Sekundärquellen — und über einen Browser, der lokale Dateien nicht anfasst.</p>
+  </div>
+
+  <article class="entry">
+    <div class="rail"><span class="tag">SRC-01</span><span class="chip chip-ok">gelöst</span></div>
+    <div>
+      <h3>Elektor-Rätsel hinter der Paywall</h3>
+      <dl>
+        <div><dt>Symptom</dt><dd>Die Hexadoku-Seiten der Ausgaben sind auf der Verlagsseite nur gegen Bezahlung einsehbar; GitHub-Sammlungen enthalten Fremdrätsel, keine Elektor-Originale.</dd></div>
+        <div><dt>Lösung</dt><dd>Auf Hinweis des Auftraggebers über Archivbestände: archive.org führt die Jahrgänge als Scans. Zwei Sammlungen decken 2006 bis 2016 ab — genau die Hexadoku-Ära. Ein eigener Downloader holt sie wiederaufnahmefähig und größenverifiziert.</dd></div>
+      </dl>
+    </div>
+  </article>
+
+  <article class="entry">
+    <div class="rail"><span class="tag">SRC-02</span><span class="chip chip-ok">gelöst</span></div>
+    <div>
+      <h3>Der Browser öffnet keine lokalen Dateien</h3>
+      <dl>
+        <div><dt>Symptom</dt><dd>Um eine PDF-Seite vergrößert zu betrachten, sollte sie im Browser geöffnet werden. <code>file://</code>-Adressen werden abgewiesen.</dd></div>
+        <div><dt>Lösung</dt><dd>Ein sechszeiliger Go-Dateiserver auf <code>127.0.0.1</code>. Nachtrag: Als Hintergrundprozess per <code>go run</code> gestartet, war er nicht erreichbar — <code>go run</code> beendet sich mitsamt Kindprozess. Erst kompilieren, dann starten.</dd></div>
+      </dl>
+    </div>
+  </article>
+</section>
+
+<!-- ============ 4 ============ -->
+<section class="chapter">
+  <div class="chapter-head">
+    <span class="num">IV</span>
+    <h2>PDF-Verarbeitung</h2>
+    <p>Der teuerste Irrweg des Projekts. Eine Go-Bibliothek schien naheliegend und kostete
+       drei Fehlerklassen, einen Speicherüberlauf und einen kompletten Umbau.</p>
+  </div>
+
+  <article class="entry">
+    <div class="rail"><span class="tag">PDF-01</span><span class="chip chip-ok">gelöst</span></div>
+    <div>
+      <h3>Endlosschleife und Speicherüberlauf</h3>
+      <dl>
+        <div><dt>Symptom</dt><dd>Bei der Ausgabe 01/2006 kehrte der Extraktor nie zurück. Der Auftraggeber meldete: RAM am Anschlag.</dd></div>
+        <div><dt>Ursache</dt><dd>Die Go-Bibliothek <code>ledongthuc/pdf</code> lief bei defekten Objekt-Offsets in eine Allokationsschleife. Der erste Schutz — Zeitlimit von 120 Sekunden — griff zu spät: Der Speicher war lange vorher voll.</dd></div>
+        <div><dt>Lösung</dt><dd>Sofort: Prozesse beendet, Batch-Skript auf halbsekündliches Nachsehen umgestellt, Notbremse bei 3 GB Prozessspeicher, zusätzlich <code>GOMEMLIMIT=1GiB</code>. Dauerhaft: siehe PDF-04.</dd></div>
+      </dl>
+    </div>
+  </article>
+
+  <article class="entry">
+    <div class="rail"><span class="tag">PDF-02</span><span class="chip chip-ok">gelöst</span></div>
+    <div>
+      <h3>Abstürze und verschlüsselte Hefte</h3>
+      <dl>
+        <div><dt>Symptom</dt><dd>Zwei weitere Fehlerklassen derselben Bibliothek: Panics beim Parsen beschädigter Objekte, und ein glattes Nein bei Heften mit Standardverschlüsselung (die sich ohne Passwort öffnen lassen).</dd></div>
+        <div><dt>Lösung</dt><dd>Zwischenzeitlich abgefangen, endgültig erledigt durch den Werkzeugwechsel.</dd></div>
+      </dl>
+    </div>
+  </article>
+
+  <article class="entry">
+    <div class="rail"><span class="tag">PDF-03</span><span class="chip chip-neutral">verworfen</span></div>
+    <div>
+      <h3>Erster Ausweg: pdfcpu</h3>
+      <dl>
+        <div><dt>Symptom</dt><dd>Der Versuch, eingebettete Bilder mit <code>pdfcpu</code> zu extrahieren, endete mit <code>cannot dereference page node</code>.</dd></div>
+        <div><dt>Ursache</dt><dd>Dieselben defekten Offsets, an denen schon die Go-Bibliothek scheiterte. Die Archivscans sind strukturell fehlerhaft; nur ein Parser mit ausgereifter Reparaturlogik kommt damit zurecht.</dd></div>
+      </dl>
+    </div>
+  </article>
+
+  <article class="entry">
+    <div class="rail"><span class="tag">PDF-04</span><span class="chip chip-ok">gelöst</span></div>
+    <div>
+      <h3>Wechsel auf poppler</h3>
+      <dl>
+        <div><dt>Lösung</dt><dd>Die Go-PDF-Bibliothek vollständig entfernt. Text kommt jetzt aus <code>pdftotext -bbox</code> — mit Koordinaten pro Wort, also genau das, was die Gittererkennung braucht —, Seitenbilder aus <code>pdftoppm</code>.</dd></div>
+        <div><dt>Wirkung</dt><dd>Alle drei Fehlerklassen auf einen Schlag weg. Verarbeitete Hefte: <span class="win">47 → 87</span>. Die Ausgabe 01/2006, vorher der Speicherfresser, war danach in Sekunden erledigt.</dd></div>
+      </dl>
+    </div>
+  </article>
+</section>
+
+<!-- ============ 5 ============ -->
+<section class="chapter">
+  <div class="chapter-head">
+    <span class="num">V</span>
+    <h2>Das Gitter im Bild finden</h2>
+    <p>Die zentrale Entdeckung: Das aktuelle Rätsel ist auf der Heftseite eine Grafik,
+       kein Text. Es musste also aus dem gerenderten Bild geometrisch rekonstruiert werden.</p>
+  </div>
+
+  <article class="entry">
+    <div class="rail"><span class="tag">GRID-01</span><span class="chip chip-ok">gelöst</span></div>
+    <div>
+      <h3>Die Rätselziffern existieren nicht als Text</h3>
+      <dl>
+        <div><dt>Symptom</dt><dd>Die Textebene der Hexadoku-Seite enthält alle 256 Ziffern des <em>Lösungs</em>gitters, aber keine einzige aus dem Rätsel.</dd></div>
+        <div><dt>Ursache</dt><dd>Der Verlag setzt das Rätsel als eingebettete Grafik.</dd></div>
+        <div><dt>Lösung</dt><dd>Statt Zeichen zu lesen, wird die <em>Geometrie</em> rekonstruiert: Seite rendern, die 17 senkrechten und 17 waagerechten Gitterlinien finden, und pro Zelle prüfen, ob Farbe darin liegt. Das ergibt die Vorgabenmaske — welche Zellen belegt sind, ohne zu wissen womit.</dd></div>
+      </dl>
+    </div>
+  </article>
+
+  <article class="entry">
+    <div class="rail"><span class="tag">GRID-02</span><span class="chip chip-ok">gelöst</span></div>
+    <div>
+      <h3>Haarlinien, die kein Lauf überlebt</h3>
+      <dl>
+        <div><dt>Symptom</dt><dd>Erkannt wurden nur die fetten Trennlinien der 4×4-Blöcke — vier statt siebzehn.</dd></div>
+        <div><dt>Ursache</dt><dd>Die Zellenlinien sind hell und kantengeglättet; ein Test auf zusammenhängende dunkle Läufe erfasst sie nicht. In Scans sind sie zusätzlich unterbrochen.</dd></div>
+        <div><dt>Lösung</dt><dd>Zwei Schwellwerte statt einem: ein strenger für Ziffern und fette Linien, ein milder für Haarlinien. Und zwei Verfahren: zusammenhängende Läufe für saubere Digitalsatz-Seiten, Abzählen dunkler Bildpunkte je Spalte und Zeile für Scans.</dd></div>
+      </dl>
+    </div>
+  </article>
+
+  <article class="entry">
+    <div class="rail"><span class="tag">GRID-03</span><span class="chip chip-ok">gelöst</span></div>
+    <div>
+      <h3>Das Fenster rutscht ins Nachbargitter</h3>
+      <dl>
+        <div><dt>Symptom</dt><dd>Drei Anläufe, drei falsche Ergebnisse: 102 Vorgaben (eine Randspalte fehlte), dann 195 (das Fenster stand halb im Lösungsgitter), dann 192.</dd></div>
+        <div><dt>Ursache</dt><dd>Beide Gitter stehen nebeneinander und haben denselben Zellenabstand. Jedes um eine Spalte verschobene 17er-Fenster ist genauso gleichmäßig wie das richtige — Gleichmäßigkeit allein entscheidet nicht.</dd></div>
+        <div><dt>Lösung</dt><dd>Drei Kriterien zusammen: Die Lage des Lösungsgitters ist aus der Textebene punktgenau bekannt und wird ausgeschlossen; kein echtes Rätsel hat eine vollständig gefüllte Zeile oder Spalte; unter den verbleibenden Kandidaten gewinnt der mit den <em>meisten</em> Vorgaben, denn ein verschobenes Fenster verliert immer eine Randspalte. Ergebnis: <span class="win">110 Vorgaben</span> — Zelle für Zelle deckungsgleich mit der von Hand geprüften Fassung.</dd></div>
+      </dl>
+    </div>
+  </article>
+
+  <article class="entry">
+    <div class="rail"><span class="tag">GRID-04</span><span class="chip chip-ok">gelöst</span></div>
+    <div>
+      <h3>Graue Preisfelder als Ziffern gezählt</h3>
+      <dl>
+        <div><dt>Symptom</dt><dd>Die im Heft grau hinterlegten Einsendefelder sind leer, wurden aber als Vorgaben gewertet.</dd></div>
+        <div><dt>Lösung</dt><dd>Nicht „Farbe vorhanden", sondern ein Fensterkriterium: Eine Ziffer bedeckt wenige Prozent der Zellfläche. Alles über 45 % ist eine Flächenfüllung, kein Zeichen.</dd></div>
+      </dl>
+    </div>
+  </article>
+
+  <article class="entry">
+    <div class="rail"><span class="tag">GRID-05</span><span class="chip chip-ok">gelöst</span></div>
+    <div>
+      <h3>Ein Gitter, wo keines ist</h3>
+      <dl>
+        <div><dt>Symptom</dt><dd>Nach der Umstellung auf Bildpunktzählung fand die Suche „Gitter" über Textspalten und Formularen.</dd></div>
+        <div><dt>Lösung</dt><dd>Echtheitsprüfung: An einer echten Gitterlinie ist der überwiegende Teil der Bildpunkte entlang der ganzen Linie dunkel. Der Median über alle 34 Linien muss über 70 % liegen — mit einem Bildpunkt Spielraum für schiefe Scans. Textbereiche fallen dabei durch.</dd></div>
+      </dl>
+    </div>
+  </article>
+
+  <article class="entry">
+    <div class="rail"><span class="tag">GRID-06</span><span class="chip chip-neutral">Fehlalarm</span></div>
+    <div>
+      <h3>Die verdächtig symmetrische Maske</h3>
+      <dl>
+        <div><dt>Symptom</dt><dd>Für 02/2010 kam eine Maske mit perfekter vierfacher Spiegelsymmetrie heraus. Das sah nach einem Artefakt aus, und ich habe es als Fehltreffer bezeichnet.</dd></div>
+        <div><dt>Befund</dt><dd>Falsch. Der Abgleich mit dem Seitenbild ergab: Die Maske stimmt Zelle für Zelle. Gedruckte Rätsel haben oft ein bewusst symmetrisches Vorgabenmuster.</dd></div>
+        <div><dt>Lehre</dt><dd>Ein Signal, das zu einem bekannten Fehlerbild passt, muss nicht diese Ursache haben. Der Blick auf die Quelle kostete zwei Minuten und ersparte eine „Korrektur", die funktionierenden Code beschädigt hätte.</dd></div>
+      </dl>
+    </div>
+  </article>
+</section>
+
+<!-- ============ 6 ============ -->
+<section class="chapter">
+  <div class="chapter-head">
+    <span class="num">VI</span>
+    <h2>Von der Maske zu den Ziffern</h2>
+    <p>Die Maske sagt, <em>wo</em> Vorgaben stehen. Woher die Ziffern kommen, beantwortet
+       das Heft selbst — es druckt die Lösung. Nur eben nicht dort, wo ich sie vermutete.</p>
+  </div>
+
+  <article class="entry">
+    <div class="rail"><span class="tag">CHAIN-01</span><span class="chip chip-ok">gelöst</span></div>
+    <div>
+      <h3>Die Lösung steht nicht im Folgeheft</h3>
+      <dl>
+        <div><dt>Symptom</dt><dd>Die erste Rekonstruktion ergab 42 Rätsel, von denen fast alle unlösbar waren. Bei korrekten Masken ein widersprüchliches Bild.</dd></div>
+        <div><dt>Ursache</dt><dd>Meine Annahme, das nächste Heft drucke die Lösung des vorigen, war falsch. Tatsächlich vergehen wegen der Einsendefrist rund <em>zwei</em> Ausgaben — und der Versatz schwankt zwischen der monatlichen und der zweimonatlichen Erscheinungsweise.</dd></div>
+        <div><dt>Lösung</dt><dd>Den Versatz nicht annehmen, sondern messen: Die OCR-Lesung eines Rätsels wird gegen alle gedruckten Lösungsgitter gehalten; ab 85 % Übereinstimmung gilt die Zuordnung als gefunden. Der so gelernte häufigste Versatz — zwei Hefte, aus zehn Treffern — wird auf die Fälle ohne brauchbare OCR übertragen.</dd></div>
+      </dl>
+    </div>
+  </article>
+
+  <article class="entry">
+    <div class="rail"><span class="tag">CHAIN-02</span><span class="chip chip-ok">gelöst</span></div>
+    <div>
+      <h3>Scans ohne Lösungsgitter in der Textebene</h3>
+      <dl>
+        <div><dt>Symptom</dt><dd>Für die gescannten Jahrgänge fehlten die Lösungsgitter vollständig — genau die Hefte, die reihenweise unlösbare Rätsel lieferten.</dd></div>
+        <div><dt>Lösung</dt><dd>Dieselbe Gittererkennung findet auf der Seite auch das <em>dichte</em> Gitter — 230 oder mehr belegte Zellen sind die gedruckte Lösung. Tesseract liest es. In den Tests 256 beziehungsweise 255 von 256 Zellen.</dd></div>
+      </dl>
+    </div>
+  </article>
+
+  <article class="entry">
+    <div class="rail"><span class="tag">CHAIN-03</span><span class="chip chip-ok">gelöst</span></div>
+    <div>
+      <h3>Hefte ganz ohne Textebene</h3>
+      <dl>
+        <div><dt>Symptom</dt><dd>Rund ein Dutzend Hefte scheiterten binnen einer Sekunde. Ursache war nicht die Bilderkennung — sie lief nie an.</dd></div>
+        <div><dt>Ursache</dt><dd>Reine Bildscans ohne jede Textebene. Die Suche nach dem Wort „Hexadoku" fand nichts, also gab es keine Kandidatenseite.</dd></div>
+        <div><dt>Lösung</dt><dd>Seitenweiser Bildsweep vom Heftende her, wo das Hexadoku immer steht. Eine Kandidatenseite gilt erst als bestätigt, wenn Tesseract in dem gefundenen Gitter tatsächlich Hex-Zeichen liest — das schließt Tabellen und Anzeigenformulare aus. Die Ausgabe 06/2007 war so in 30 Sekunden gefunden.</dd></div>
+      </dl>
+    </div>
+  </article>
+
+  <article class="entry">
+    <div class="rail"><span class="tag">CHAIN-04</span><span class="chip chip-open">Grenze</span></div>
+    <div>
+      <h3>Die frühen Jahrgänge drucken gar keine Lösung</h3>
+      <dl>
+        <div><dt>Befund</dt><dd>In der Ära um 2007 veröffentlichte der Verlag nur einen fünfstelligen Preiscode wie <code>DF908</code>, kein vollständiges Lösungsgitter. Das kam erst später dazu.</dd></div>
+        <div><dt>Folge</dt><dd>Für diese Jahrgänge gibt es nichts zum Gegenprüfen. Die Ziffern müssen aus dem Rätselgitter selbst gelesen werden, und als Qualitätsmaß bleibt allein die eindeutige Lösbarkeit — die allerdings ein scharfes Kriterium ist.</dd></div>
+      </dl>
+    </div>
+  </article>
+</section>
+
+<!-- ============ 7 ============ -->
+<section class="chapter">
+  <div class="chapter-head">
+    <span class="num">VII</span>
+    <h2>Fehler finden und selbst beheben</h2>
+    <p>OCR liest zuverlässig genug, um zu helfen, und unzuverlässig genug, um zu schaden.
+       Die Rettung war, dass ein Hexadoku seine eigenen Fehler verrät.</p>
+  </div>
+
+  <article class="entry">
+    <div class="rail"><span class="tag">FIX-01</span><span class="chip chip-ok">gelöst</span></div>
+    <div>
+      <h3>Der Solver als Korrekturinstanz</h3>
+      <dl>
+        <div><dt>Symptom</dt><dd>Ein einziges falsch gelesenes Zeichen im Lösungsgitter verdirbt jedes daraus gebaute Rätsel.</dd></div>
+        <div><dt>Einsicht</dt><dd>Ein Lesefehler verletzt fast immer die Hexadoku-Regeln — er erzeugt eine Dublette in Zeile, Spalte oder Block. Das macht die Regelmenge zu einem scharfen Fehlerdetektor.</dd></div>
+        <div><dt>Lösung</dt><dd>Betroffene Zellen leeren und vom Solver zurückrechnen lassen. Ist der Rest eindeutig lösbar, ist die Ergänzung nicht geraten, sondern bewiesen. Dasselbe Verfahren greift bei Rätselgittern, dort mit Beibehaltung der Vorgabenpositionen.</dd></div>
+      </dl>
+    </div>
+  </article>
+
+  <article class="entry">
+    <div class="rail"><span class="tag">FIX-02</span><span class="chip chip-ok">gelöst</span></div>
+    <div>
+      <h3>Exitcode als Fehler missdeutet</h3>
+      <dl>
+        <div><dt>Symptom</dt><dd>Die Reparatur meldete <code>solver: exit status 1</code> statt eines Befunds.</dd></div>
+        <div><dt>Ursache</dt><dd>Der Solver beendet sich mit Code 1, wenn ein Rätsel unlösbar ist. Das ist hier eine <em>Antwort</em>, kein Ausführungsfehler — die Prozessschnittstelle behandelte es aber als solchen.</dd></div>
+        <div><dt>Lösung</dt><dd>Exitcode ignorieren, Ausgabe auswerten. Danach lieferte das Werkzeug die ehrliche Diagnose: „Rest nicht eindeutig lösbar" — und wies damit korrekt auf weitere Lesefehler hin.</dd></div>
+      </dl>
+    </div>
+  </article>
+
+  <article class="entry">
+    <div class="rail"><span class="tag">FIX-03</span><span class="chip chip-ok">gelöst</span></div>
+    <div>
+      <h3>Wenn die Automatik aufgibt: selbst hinsehen</h3>
+      <dl>
+        <div><dt>Symptom</dt><dd>Bei 06/2007 blieb das Rätsel auch nach der Reparatur unlösbar. Tesseract hatte drei Zellen verwechselt (<code>E</code> als <code>9</code>, <code>B</code> als <code>8</code>) und drei weitere übersehen.</dd></div>
+        <div><dt>Lösung</dt><dd>Auf Vorschlag des Auftraggebers ein Betrachtungsmodus: <code>-crops</code> schneidet die erkannten Gitter aus und legt sie als lesbare Bildstreifen ab. Diese habe ich selbst gelesen und die Zellen korrigiert.</dd></div>
+        <div><dt>Beleg</dt><dd>Das Ergebnis löst eindeutig <span class="win">mit null Verzweigungen</span> — reine Constraint Propagation, ohne einen einzigen Rateschritt. Genau das ist die Signatur eines für Menschen gesetzten Magazinrätsels und damit ein starker Korrektheitsnachweis.</dd></div>
+      </dl>
+    </div>
+  </article>
+
+  <article class="entry">
+    <div class="rail"><span class="tag">FIX-04</span><span class="chip chip-ok">gelöst</span></div>
+    <div>
+      <h3>Handarbeit vor Überschreiben schützen</h3>
+      <dl>
+        <div><dt>Symptom</dt><dd>Der nächste Lauf der Rekonstruktion hätte die von Hand geprüfte Fassung kommentarlos ersetzt.</dd></div>
+        <div><dt>Lösung</dt><dd>Dateien mit dem Vermerk „visuell transkribiert" bleiben unangetastet; das Werkzeug meldet das ausdrücklich, statt still zu übergehen.</dd></div>
+      </dl>
+    </div>
+  </article>
+</section>
+
+<!-- ============ 8 ============ -->
+<section class="chapter">
+  <div class="chapter-head">
+    <span class="num">VIII</span>
+    <h2>Kleine Fallen</h2>
+    <p>Vier Fehler, die wenig Zeit kosteten, aber jeweils lange genug in die Irre führten,
+       um festgehalten zu werden.</p>
+  </div>
+
+  <article class="entry">
+    <div class="rail"><span class="tag">MISC-01</span><span class="chip chip-ok">gelöst</span></div>
+    <div>
+      <h3>Seiten am Seitenvorschub gezählt</h3>
+      <dl>
+        <div><dt>Symptom</dt><dd>Die gesuchte Hexadoku-Seite zeigte einen Bluetooth-Artikel.</dd></div>
+        <div><dt>Ursache</dt><dd>Ich hatte Seiten durch Zählen von Seitenvorschubzeichen im Fließtext ermittelt — das ergab Seite 72 statt 76.</dd></div>
+        <div><dt>Lösung</dt><dd>Seiten über die vom Werkzeug ausgewiesenen Seitenmarken bestimmen, nicht über Zeichen im Text.</dd></div>
+      </dl>
+    </div>
+  </article>
+
+  <article class="entry">
+    <div class="rail"><span class="tag">MISC-02</span><span class="chip chip-ok">gelöst</span></div>
+    <div>
+      <h3>Operatorrangfolge in der Zeilenprüfung</h3>
+      <dl>
+        <div><dt>Symptom</dt><dd>Latent: <code>a || b &amp;&amp; c</code> bindet als <code>a || (b &amp;&amp; c)</code>. Eine Kommentarzeile von exakt 16 Zeichen wäre als Gitterzeile gelesen worden.</dd></div>
+        <div><dt>Lösung</dt><dd>Statt der verschachtelten Bedingung eine ausdrückliche Prüfung: 16 Zeichen, und jedes davon ein gültiges Gitterzeichen.</dd></div>
+      </dl>
+    </div>
+  </article>
+
+  <article class="entry">
+    <div class="rail"><span class="tag">MISC-03</span><span class="chip chip-ok">gelöst</span></div>
+    <div>
+      <h3>Trennlinien für zwei Gittergrößen</h3>
+      <dl>
+        <div><dt>Symptom</dt><dd>Nach der Sudoku-Erweiterung stimmte die Länge der Trennlinien in der Ausgabe für keine der beiden Größen.</dd></div>
+        <div><dt>Lösung</dt><dd>Die Linie nicht aus einer Formel ableiten, sondern aus denselben Blockbreiten aufbauen, aus denen auch die Gitterzeilen gesetzt werden.</dd></div>
+      </dl>
+    </div>
+  </article>
+
+  <article class="entry">
+    <div class="rail"><span class="tag">MISC-04</span><span class="chip chip-ok">gelöst</span></div>
+    <div>
+      <h3>Positionsbezogenes Struct-Literal</h3>
+      <dl>
+        <div><dt>Symptom</dt><dd><code>too few values in struct literal</code> nach dem Ergänzen eines Feldes.</dd></div>
+        <div><dt>Lösung</dt><dd>Auf benannte Felder umgestellt. Ein Struct, das noch wächst, sollte nicht positionsbezogen initialisiert werden.</dd></div>
+      </dl>
+    </div>
+  </article>
+</section>
+
+<!-- ============ 9 ============ -->
+<section class="chapter">
+  <div class="chapter-head">
+    <span class="num">IX</span>
+    <h2>Offen</h2>
+    <p>Was zum Zeitpunkt dieses Berichts nicht abschließend geklärt ist.</p>
+  </div>
+
+  <article class="entry">
+    <div class="rail"><span class="tag">OPEN-01</span><span class="chip chip-open">offen</span></div>
+    <div>
+      <h3>Ein „G" im Rätselgitter</h3>
+      <dl>
+        <div><dt>Befund</dt><dd>Im Rätsel 02/2010 stehen Zeichen, die auch bei starker Vergrößerung wie ein <code>G</code> aussehen — in einem Gitter, das nur <code>0</code>–<code>F</code> kennen darf. Das zugehörige <code>6</code> derselben Seite sieht deutlich anders aus.</dd></div>
+        <div><dt>Einordnung</dt><dd>Ohne Auswirkung auf die Pipeline: Die Rekonstruktion nutzt ausschließlich die Maske und holt die Ziffern aus dem Lösungsgitter. Vermutlich eine Eigenheit der damals verwendeten Schrift.</dd></div>
+      </dl>
+    </div>
+  </article>
+
+  <article class="entry">
+    <div class="rail"><span class="tag">OPEN-02</span><span class="chip chip-open">offen</span></div>
+    <div>
+      <h3>Beschädigte Lösungsgitter in Scans</h3>
+      <dl>
+        <div><dt>Stand</dt><dd>Von 71 gewonnenen Lösungsgittern mussten 24 verworfen werden: In diesen Scans hat Tesseract so viele Zellen falsch gelesen — bei den schlechtesten 58 bis 70 —, dass auch die regelbasierte Reparatur den Rest nicht mehr eindeutig auflösen kann. Sie sind die Hauptursache dafür, dass von 56 rekonstruierten Rätseln nur 15 vollständig verifiziert sind.</dd></div>
+        <div><dt>Weg</dt><dd>Die betroffenen Gitter sind bekannt und benannt. Für jedes steht der Betrachtungsmodus aus FIX-03 bereit; der Aufwand pro Gitter liegt bei wenigen Minuten. Wichtig ist, dass die Pipeline hier nicht rät, sondern verwirft — kein unsicheres Rätsel wird als gültig ausgegeben.</dd></div>
+      </dl>
+    </div>
+  </article>
+
+  <article class="entry">
+    <div class="rail"><span class="tag">OPEN-03</span><span class="chip chip-open">offen</span></div>
+    <div>
+      <h3>Hefte ohne auffindbares Gitter</h3>
+      <dl>
+        <div><dt>Stand</dt><dd>93 der 108 Hefte liefern Masken oder Lösungsgitter. Bei den übrigen findet die Automatik nichts — teils Scanqualität, teils vermutlich Hefte ohne Hexadoku, etwa Doppelausgaben. Zwei Hefte lehnt bereits <code>pdftotext</code> ab.</dd></div>
+      </dl>
+    </div>
+  </article>
+</section>
+
+<footer class="closing">
+  <span class="num">✳</span>
+  <div>
+    <h2>Was sich als tragfähig erwiesen hat</h2>
+    <p>
+      Drei Entscheidungen haben das Projekt getragen. Erstens: einen Werkzeugirrweg
+      früh ganz aufgeben, statt ihn zu flicken — der Wechsel auf poppler beseitigte drei
+      Fehlerklassen mit einem Schnitt und verdoppelte fast die Ausbeute.
+    </p>
+    <p>
+      Zweitens: Annahmen über die Quelle messen statt setzen. Der Versatz zwischen Rätsel
+      und gedruckter Lösung war die teuerste Fehlannahme des Projekts; ihn aus den Daten
+      selbst zu lernen, machte die Rekonstruktion robust gegen alle Wechsel der
+      Erscheinungsweise.
+    </p>
+    <p>
+      Drittens: Der Gegenstand prüft sich selbst. Ein Hexadoku, das eindeutig lösbar ist
+      und dessen Lösung dem gedruckten Gitter entspricht, ist richtig rekonstruiert — kein
+      Stichprobenvertrauen nötig. Und wo OCR versagt, kostet Hinsehen wenige Minuten und
+      liefert ein Ergebnis, das der Solver anschließend bestätigt.
+    </p>
+  </div>
+</footer>
+
+</div>
+
+<script>
+// Kopfgrafik: das reale Rätsel aus Elektor 06-2007, per Sichtprüfung
+// rekonstruiert. Punkt = leere Zelle, Raute = graues Einsendefeld.
+(function () {
+  var rows = [
+    "A..52..B9D..C.16",
+    "6..3...9.0418E2.",
+    "09......6.E...7.",
+    "..2.8.E3.CA....5",
+    "F640AC...51928..",
+    "...EB8.1...6..A.",
+    ".B.85......D.4..",
+    "5....9.68.0A.D..",
+    "E51...8.A.2..B..",
+    "8..7..3.C####.0.",
+    ".2.F0.B....7..4E",
+    ".40C..6D3E..A...",
+    "..7....4.2.5E93B",
+    ".1.4.BC.7.6..250",
+    ".03B..95..D.7..A",
+    "D..A6..2.B934..8"
+  ];
+  var host = document.getElementById("gridArt");
+  if (!host) return;
+  var frag = document.createDocumentFragment();
+  for (var r = 0; r < 16; r++) {
+    for (var c = 0; c < 16; c++) {
+      var ch = rows[r][c];
+      var cell = document.createElement("span");
+      cell.className = ch === "#" ? "g" : "b";
+      cell.textContent = ch === "." || ch === "#" ? "" : ch;
+      frag.appendChild(cell);
+    }
+  }
+  host.appendChild(frag);
+})();
+</script>
+
+</body>
+</html>
