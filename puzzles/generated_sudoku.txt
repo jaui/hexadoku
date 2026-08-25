@@ -1,0 +1,33 @@
+# 9x9 puzzle 1: 22 clues, difficulty 95 branch nodes, minimal (removing any clue loses uniqueness), seed 20260825
+.73..9..2
+...1....4
+...2...7.
+.9...8...
+..6.3..4.
+5....6...
+4.....52.
+8......9.
+.1.7.....
+
+# 9x9 puzzle 2: 24 clues, difficulty 31 branch nodes, minimal (removing any clue loses uniqueness), seed 20260825
+..8...7.6
+647.1.2..
+.....4...
+..6..5..9
+1..7.2...
+....4....
+......38.
+.75....62
+.9......5
+
+# 9x9 puzzle 3: 24 clues, difficulty 57 branch nodes, minimal (removing any clue loses uniqueness), seed 20260825
+8.34..25.
+....8.16.
+.16......
+5..2.....
+.4...39..
+....47...
+4..7....8
+....14...
+6.......2
+

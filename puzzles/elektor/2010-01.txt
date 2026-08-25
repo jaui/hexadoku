@@ -1,0 +1,18 @@
+# Elektor Hexadoku 2010-01 (121 clues)
+# digits from tesseract OCR only (no matching printed solution found); 4 OCR conflicts NOT repairable (4 damaged cells, remainder not uniquely solvable)
+4.E.....25..B..6
+15..94A....FE..3
+6.03..17C.98..A.
+8B.FD2.....69.4.
+..C.F63ED.5.8A21
+5.....8.A...CD..
+18..5..A.EFC4B9.
+.......B4980..F5
+.0.4...CF8E.D...
+..........39.1.8
+.37.E.0.....A...
+EF1.A.D8.C0.39..
+..6.0C.D32.15.89
+.2..AB758.4...3.
+3E..2..15F...4.B
+..4.....90.B2...

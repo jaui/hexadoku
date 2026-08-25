@@ -1,0 +1,17 @@
+# Elektor Hexadoku 2007-10, digits read by tesseract OCR (PDF page 76), 140 cells
+.6.F.3..7.A.5.C.
+.F.E.E.5D.0.6.2.
+3.07DC8.B0B4AA.A
+.94.1.2.C6.7.38.
+..E...2..D...0..
+.B.5.8..1.E.C.D.
+.14.5.A.DB.3.9E.
+8.351A0.7A0154.0
+.27.AF.00.EB.1E.
+.F.C.7..E.1.4.9.
+.C2.B3.68.54.0E.
+.58.C.2.EC.D.A3.
+.90.F.4.25.6.CD.
+.4.E.3.0A.B.F.7.
+.76.1.9.A2.5.7B.
+.9.7.F.2A.B.3.E.
