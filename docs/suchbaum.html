@@ -1,0 +1,1163 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Wo verzweigt der Solver?</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@500;600;700&family=Source+Serif+4:opsz,wght@8..60,400;8..60,600&family=JetBrains+Mono:wght@400;500;700&display=swap">
+</head>
+<body>
+
+<style>
+:root {
+  --paper:       #FBFAF7;
+  --surface:     #FFFFFF;
+  --surface-2:   #F4F1EC;
+  --ink:         #191614;
+  --muted:       #7A6E68;
+  --rule:        #E4DED6;
+  --rule-strong: #B8AEA3;
+
+  --accent:      #C8102E;
+  --accent-wash: #F9E3E6;
+  --on-accent:   #FFFCFB;
+  --naked:       #2F6B4F;
+  --naked-wash:  #E3EFE8;
+  --hidden:      #1F6486;
+  --hidden-wash: #E0EDF4;
+  --dead:        #A75A12;
+  --dead-wash:   #F8E9D8;
+  --given-wash:  #EFEAE2;
+
+  --f-display: "Archivo", "Segoe UI", system-ui, sans-serif;
+  --f-body: "Source Serif 4", Georgia, serif;
+  --f-mono: "JetBrains Mono", ui-monospace, "Cascadia Mono", Consolas, monospace;
+
+  --shadow: 0 1px 2px rgba(25, 22, 20, 0.06), 0 8px 24px rgba(25, 22, 20, 0.05);
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --paper:       #141110;
+    --surface:     #1C1917;
+    --surface-2:   #221E1B;
+    --ink:         #EFE9E1;
+    --muted:       #A0958D;
+    --rule:        #2F2925;
+    --rule-strong: #4C443E;
+
+    --accent:      #FF6076;
+    --accent-wash: #3B1A20;
+    --on-accent:   #141110;
+    --naked:       #74CE9E;
+    --naked-wash:  #16301F;
+    --hidden:      #74B9DE;
+    --hidden-wash: #0F2B3A;
+    --dead:        #E5A661;
+    --dead-wash:   #34240F;
+    --given-wash:  #262120;
+
+    --shadow: 0 1px 2px rgba(0, 0, 0, 0.4), 0 8px 24px rgba(0, 0, 0, 0.3);
+  }
+}
+
+:root[data-theme="dark"] {
+  --paper:       #141110;
+  --surface:     #1C1917;
+  --surface-2:   #221E1B;
+  --ink:         #EFE9E1;
+  --muted:       #A0958D;
+  --rule:        #2F2925;
+  --rule-strong: #4C443E;
+
+  --accent:      #FF6076;
+  --accent-wash: #3B1A20;
+  --on-accent:   #141110;
+  --naked:       #74CE9E;
+  --naked-wash:  #16301F;
+  --hidden:      #74B9DE;
+  --hidden-wash: #0F2B3A;
+  --dead:        #E5A661;
+  --dead-wash:   #34240F;
+  --given-wash:  #262120;
+
+  --shadow: 0 1px 2px rgba(0, 0, 0, 0.4), 0 8px 24px rgba(0, 0, 0, 0.3);
+}
+
+* { box-sizing: border-box; }
+
+body {
+  margin: 0;
+  background: var(--paper);
+  color: var(--ink);
+  font-family: var(--f-body);
+  font-size: 16px;
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+}
+
+.wrap {
+  max-width: 78rem;
+  margin: 0 auto;
+  padding: clamp(1.5rem, 4vw, 3.5rem) clamp(1rem, 4vw, 2.5rem) 4rem;
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+}
+
+/* ---------- header ---------- */
+
+.masthead { display: flex; flex-direction: column; gap: 0.6rem; }
+
+.eyebrow {
+  margin: 0;
+  font-family: var(--f-mono);
+  font-size: 0.7rem;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--accent);
+}
+
+h1 {
+  margin: 0;
+  font-family: var(--f-display);
+  font-weight: 700;
+  font-size: clamp(1.9rem, 4.4vw, 3rem);
+  line-height: 1.04;
+  letter-spacing: -0.025em;
+  text-wrap: balance;
+}
+
+.standfirst {
+  margin: 0;
+  max-width: 44rem;
+  font-size: 1.05rem;
+  color: var(--muted);
+}
+.standfirst strong { color: var(--ink); font-weight: 600; }
+
+/* ---------- puzzle picker ---------- */
+
+.picker { display: flex; flex-wrap: wrap; gap: 0.5rem; align-items: stretch; }
+
+.pz {
+  appearance: none;
+  border: 1px solid var(--rule);
+  background: var(--surface);
+  color: var(--ink);
+  border-radius: 2px;
+  padding: 0.5rem 0.8rem;
+  cursor: pointer;
+  text-align: left;
+  font-family: var(--f-display);
+  font-size: 0.82rem;
+  font-weight: 600;
+  line-height: 1.3;
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+  transition: border-color 0.15s, background 0.15s;
+}
+.pz:hover { border-color: var(--rule-strong); }
+.pz .sub {
+  font-family: var(--f-mono);
+  font-size: 0.68rem;
+  font-weight: 400;
+  color: var(--muted);
+  font-variant-numeric: tabular-nums;
+}
+.pz[aria-pressed="true"] {
+  border-color: var(--accent);
+  background: var(--accent-wash);
+}
+.pz[aria-pressed="true"] .sub { color: var(--ink); }
+
+/* ---------- working surface ---------- */
+
+.stage {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 21rem;
+  gap: 1.5rem;
+  align-items: start;
+}
+
+.panel {
+  background: var(--surface);
+  border: 1px solid var(--rule);
+  border-radius: 3px;
+  box-shadow: var(--shadow);
+}
+
+.board-panel { padding: clamp(0.8rem, 2vw, 1.4rem); display: flex; flex-direction: column; gap: 1rem; }
+
+/* ---------- the grid ---------- */
+
+.board {
+  --n: 9;
+  display: grid;
+  grid-template-columns: repeat(var(--n), 1fr);
+  aspect-ratio: 1;
+  width: 100%;
+  border: 2px solid var(--rule-strong);
+  background: var(--rule);
+  gap: 1px;
+}
+
+.cell {
+  position: relative;
+  background: var(--surface);
+  display: grid;
+  place-items: center;
+  font-family: var(--f-mono);
+  font-weight: 500;
+  font-variant-numeric: tabular-nums;
+  line-height: 1;
+  color: var(--ink);
+  overflow: hidden;
+  font-size: clamp(0.5rem, calc(46vw / var(--n)), 1.4rem);
+}
+.board[data-n="16"] .cell { font-size: clamp(0.42rem, calc(40vw / var(--n)), 1rem); }
+
+.cell.bl { box-shadow: inset 2px 0 0 var(--rule-strong); }
+.cell.bt { box-shadow: inset 0 2px 0 var(--rule-strong); }
+.cell.bl.bt { box-shadow: inset 2px 0 0 var(--rule-strong), inset 0 2px 0 var(--rule-strong); }
+
+.cell.given { background: var(--given-wash); font-weight: 700; }
+.cell.from-naked  { color: var(--naked); }
+.cell.from-hidden { color: var(--hidden); }
+.cell.from-branch { color: var(--accent); font-weight: 700; }
+
+.cnt { color: var(--muted); font-size: 0.62em; font-weight: 400; }
+.cnt.lo { color: var(--accent); font-weight: 700; }
+
+.marks {
+  display: grid;
+  width: 100%; height: 100%;
+  padding: 8%;
+  gap: 0;
+  place-items: center;
+  color: var(--muted);
+  font-size: 0.44em;
+  line-height: 1;
+}
+.dot { width: 60%; aspect-ratio: 1; border-radius: 50%; background: var(--muted); opacity: 0.55; }
+
+.cell.mrv {
+  outline: 2px solid var(--accent);
+  outline-offset: -2px;
+  background: var(--accent-wash);
+  z-index: 3;
+}
+.cell.touch-naked  { background: var(--naked-wash); }
+.cell.touch-hidden { background: var(--hidden-wash); }
+.cell.touch-dead   { background: var(--dead-wash); outline: 2px solid var(--dead); outline-offset: -2px; z-index: 3; }
+.cell.touch-branch { background: var(--accent-wash); }
+.cell.touch-undo   { background: var(--surface-2); }
+
+@keyframes pop { from { transform: scale(0.7); opacity: 0.3; } to { transform: scale(1); opacity: 1; } }
+.cell.anim > * { animation: pop 0.18s ease-out; }
+@media (prefers-reduced-motion: reduce) { .cell.anim > * { animation: none; } }
+
+/* ---------- transport ---------- */
+
+.transport { display: flex; flex-wrap: wrap; gap: 0.5rem; align-items: center; }
+
+button.act {
+  appearance: none;
+  font-family: var(--f-display);
+  font-weight: 600;
+  font-size: 0.85rem;
+  padding: 0.5rem 0.85rem;
+  border-radius: 2px;
+  border: 1px solid var(--rule-strong);
+  background: var(--surface);
+  color: var(--ink);
+  cursor: pointer;
+  transition: background 0.15s, border-color 0.15s;
+}
+button.act:hover:not(:disabled) { background: var(--surface-2); }
+button.act:disabled { opacity: 0.4; cursor: default; }
+button.act.primary { background: var(--accent); border-color: var(--accent); color: var(--on-accent); }
+button.act.primary:hover:not(:disabled) { filter: brightness(1.08); background: var(--accent); }
+
+.kbd {
+  font-family: var(--f-mono);
+  font-size: 0.66rem;
+  color: var(--muted);
+  border: 1px solid var(--rule);
+  border-radius: 2px;
+  padding: 0.05rem 0.25rem;
+  margin-left: 0.35rem;
+}
+
+.speed { display: flex; align-items: center; gap: 0.5rem; margin-left: auto; }
+.speed label { font-family: var(--f-mono); font-size: 0.68rem; color: var(--muted); text-transform: uppercase; letter-spacing: 0.08em; }
+input[type="range"] { width: 8rem; accent-color: var(--accent); }
+
+.modes { display: flex; gap: 0.35rem; }
+.mode-btn {
+  appearance: none;
+  font-family: var(--f-mono);
+  font-size: 0.7rem;
+  padding: 0.3rem 0.5rem;
+  border: 1px solid var(--rule);
+  background: var(--surface);
+  color: var(--muted);
+  border-radius: 2px;
+  cursor: pointer;
+}
+.mode-btn[aria-pressed="true"] { border-color: var(--accent); color: var(--accent); background: var(--accent-wash); }
+
+:where(button, input, select, a):focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+
+/* ---------- rail ---------- */
+
+.rail { display: flex; flex-direction: column; gap: 1rem; }
+
+.card { padding: 0.9rem 1rem; display: flex; flex-direction: column; gap: 0.6rem; }
+
+.card h2 {
+  margin: 0;
+  font-family: var(--f-mono);
+  font-size: 0.65rem;
+  font-weight: 700;
+  letter-spacing: 0.13em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
+.event {
+  font-family: var(--f-display);
+  font-size: 0.95rem;
+  font-weight: 600;
+  line-height: 1.35;
+  min-height: 2.6em;
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+}
+.event .why { font-family: var(--f-body); font-weight: 400; font-size: 0.82rem; color: var(--muted); }
+.event.k-naked  { color: var(--naked); }
+.event.k-hidden { color: var(--hidden); }
+.event.k-branch { color: var(--accent); }
+.event.k-dead   { color: var(--dead); }
+.event.k-done   { color: var(--ink); }
+
+.stats { display: grid; grid-template-columns: repeat(2, 1fr); gap: 0.55rem 0.8rem; }
+.stat { display: flex; flex-direction: column; }
+.stat b {
+  font-family: var(--f-mono);
+  font-size: 1.15rem;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  line-height: 1.15;
+}
+.stat span { font-family: var(--f-mono); font-size: 0.62rem; text-transform: uppercase; letter-spacing: 0.08em; color: var(--muted); }
+.stat.hot b { color: var(--accent); }
+
+/* decision path */
+.path { display: flex; flex-direction: column; gap: 0.3rem; max-height: 17rem; overflow-y: auto; }
+.frame {
+  display: flex;
+  align-items: baseline;
+  gap: 0.45rem;
+  padding: 0.28rem 0.4rem;
+  border-left: 2px solid var(--rule);
+  font-family: var(--f-mono);
+  font-size: 0.72rem;
+}
+.frame.live { border-left-color: var(--accent); background: var(--accent-wash); }
+.frame .lvl { color: var(--muted); min-width: 1.6em; }
+.frame .cellref { font-weight: 700; }
+.chips { display: flex; gap: 0.2rem; flex-wrap: wrap; margin-left: auto; }
+.chip {
+  min-width: 1.25em;
+  text-align: center;
+  padding: 0.02rem 0.2rem;
+  border: 1px solid var(--rule-strong);
+  border-radius: 2px;
+  font-size: 0.7rem;
+  color: var(--muted);
+}
+.chip.cur { background: var(--accent); border-color: var(--accent); color: var(--on-accent); font-weight: 700; }
+.chip.dead { text-decoration: line-through; opacity: 0.5; }
+.path .empty-note { font-family: var(--f-body); font-size: 0.82rem; color: var(--muted); }
+
+/* candidate distribution */
+.dist { display: flex; flex-direction: column; gap: 0.22rem; }
+.bar { display: grid; grid-template-columns: 1.6rem 1fr 2rem; gap: 0.4rem; align-items: center; font-family: var(--f-mono); font-size: 0.68rem; }
+.bar .lab { color: var(--muted); text-align: right; font-variant-numeric: tabular-nums; }
+.bar .track { height: 0.6rem; background: var(--surface-2); border-radius: 1px; overflow: hidden; }
+.bar .fill { height: 100%; background: var(--rule-strong); }
+.bar.pick .lab { color: var(--accent); font-weight: 700; }
+.bar.pick .fill { background: var(--accent); }
+.bar .num { color: var(--muted); font-variant-numeric: tabular-nums; }
+
+/* legend */
+.legend { display: flex; flex-direction: column; gap: 0.4rem; }
+.leg { display: flex; align-items: flex-start; gap: 0.5rem; font-size: 0.8rem; line-height: 1.4; }
+.swatch { width: 0.85rem; height: 0.85rem; border-radius: 2px; flex: none; margin-top: 0.22rem; border: 1px solid var(--rule-strong); }
+.leg b { font-family: var(--f-display); font-weight: 600; font-size: 0.8rem; }
+.leg .txt { color: var(--muted); }
+
+/* ---------- prose ---------- */
+
+.prose { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 1.5rem 3rem; }
+.prose h2 {
+  grid-column: 1 / -1;
+  margin: 0;
+  font-family: var(--f-display);
+  font-weight: 700;
+  font-size: 1.5rem;
+  letter-spacing: -0.015em;
+}
+.prose h3 {
+  margin: 0 0 0.35rem;
+  font-family: var(--f-display);
+  font-weight: 600;
+  font-size: 1rem;
+}
+.prose p { margin: 0 0 0.8rem; max-width: 34rem; }
+.prose p:last-child { margin-bottom: 0; }
+.prose code {
+  font-family: var(--f-mono);
+  font-size: 0.85em;
+  background: var(--surface-2);
+  padding: 0.05em 0.3em;
+  border-radius: 2px;
+}
+.prose .col { display: flex; flex-direction: column; }
+
+.numbers { width: 100%; border-collapse: collapse; font-size: 0.85rem; }
+.numbers caption {
+  text-align: left;
+  font-family: var(--f-mono);
+  font-size: 0.65rem;
+  letter-spacing: 0.13em;
+  text-transform: uppercase;
+  color: var(--muted);
+  padding-bottom: 0.5rem;
+}
+.numbers th, .numbers td { text-align: left; padding: 0.4rem 0.6rem 0.4rem 0; border-bottom: 1px solid var(--rule); }
+.numbers th { font-family: var(--f-display); font-weight: 600; font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.05em; color: var(--muted); }
+.numbers td.n { font-family: var(--f-mono); font-variant-numeric: tabular-nums; text-align: right; white-space: nowrap; }
+.numbers tr.hi td { color: var(--accent); font-weight: 600; }
+.table-scroll { overflow-x: auto; }
+
+footer.note {
+  border-top: 1px solid var(--rule);
+  padding-top: 1rem;
+  font-size: 0.82rem;
+  color: var(--muted);
+}
+
+@media (max-width: 60rem) {
+  .stage { grid-template-columns: minmax(0, 1fr); }
+  .prose { grid-template-columns: minmax(0, 1fr); }
+  .board .cell { font-size: clamp(0.5rem, calc(80vw / var(--n)), 1.4rem); }
+  .board[data-n="16"] .cell { font-size: clamp(0.4rem, calc(72vw / var(--n)), 1rem); }
+}
+</style>
+
+<div class="wrap">
+
+<header class="masthead">
+  <p class="eyebrow">Hexadoku-Solver · Suchbaum</p>
+  <h1>Wo verzweigt der Solver?</h1>
+  <p class="standfirst">
+    Geraten wird erst, wenn nichts mehr abzuleiten ist — und dann an der
+    <strong>engsten Stelle des Gitters</strong>. Hier läuft genau der Code aus
+    <code style="font-family:var(--f-mono);font-size:0.85em">solver.go</code>
+    schrittweise ab: Propagation bis zum Stillstand, dann die Zelle mit den wenigsten
+    Kandidaten als Verzweigungspunkt.
+  </p>
+</header>
+
+<div class="picker" id="picker" role="group" aria-label="Rätsel wählen"></div>
+
+<div class="stage">
+
+  <section class="panel board-panel">
+    <div class="board" id="board" data-n="9" style="--n:9" role="img" aria-label="Gitter des Solvers"></div>
+
+    <div class="transport">
+      <button class="act primary" id="btn-step">Schritt<span class="kbd">Leer</span></button>
+      <button class="act" id="btn-branch">Bis zur Verzweigung<span class="kbd">V</span></button>
+      <button class="act" id="btn-auto">Auto<span class="kbd">A</span></button>
+      <button class="act" id="btn-reset">Zurücksetzen<span class="kbd">R</span></button>
+      <div class="speed">
+        <label for="speed">Tempo</label>
+        <input type="range" id="speed" min="1" max="100" value="35">
+      </div>
+    </div>
+
+    <div class="transport">
+      <div class="modes" role="group" aria-label="Kandidatenanzeige">
+        <button class="mode-btn" id="m-count" aria-pressed="true">Anzahl</button>
+        <button class="mode-btn" id="m-marks" aria-pressed="false">Kandidaten</button>
+        <button class="mode-btn" id="m-none" aria-pressed="false">aus</button>
+      </div>
+    </div>
+  </section>
+
+  <aside class="rail">
+
+    <div class="panel card">
+      <h2>Was gerade geschieht</h2>
+      <div class="event k-done" id="event">
+        <span id="ev-head">Bereit.</span>
+        <span class="why" id="ev-why">Schritt drücken, um die Propagation zu starten.</span>
+      </div>
+      <div class="stats">
+        <div class="stat"><b id="st-filled">0</b><span>gesetzt</span></div>
+        <div class="stat"><b id="st-free">0</b><span>frei</span></div>
+        <div class="stat hot"><b id="st-nodes">0</b><span>Verzweigungen</span></div>
+        <div class="stat"><b id="st-depth">0</b><span>Tiefe</span></div>
+      </div>
+    </div>
+
+    <div class="panel card">
+      <h2>Entscheidungspfad</h2>
+      <div class="path" id="path">
+        <p class="empty-note">Noch keine Verzweigung — bis hierher trägt reine Ableitung.</p>
+      </div>
+    </div>
+
+    <div class="panel card" id="dist-card" hidden>
+      <h2>Kandidaten je freier Zelle</h2>
+      <div class="dist" id="dist"></div>
+      <p class="why" style="font-family:var(--f-body);font-size:0.8rem;color:var(--muted);margin:0" id="dist-note"></p>
+    </div>
+
+    <div class="panel card">
+      <h2>Legende</h2>
+      <div class="legend">
+        <div class="leg"><span class="swatch" style="background:var(--given-wash)"></span><span><b>Vorgabe</b> <span class="txt">— stand im Heft.</span></span></div>
+        <div class="leg"><span class="swatch" style="background:var(--naked-wash);border-color:var(--naked)"></span><span><b>Nacktes Single</b> <span class="txt">— in dieser Zelle ist nur noch ein Wert möglich.</span></span></div>
+        <div class="leg"><span class="swatch" style="background:var(--hidden-wash);border-color:var(--hidden)"></span><span><b>Verstecktes Single</b> <span class="txt">— dieser Wert hat in seiner Zeile, Spalte oder seinem Block nur noch diese eine Zelle.</span></span></div>
+        <div class="leg"><span class="swatch" style="background:var(--accent-wash);border-color:var(--accent)"></span><span><b>Verzweigungspunkt</b> <span class="txt">— hier wird geraten: die Zelle mit den wenigsten Kandidaten.</span></span></div>
+        <div class="leg"><span class="swatch" style="background:var(--dead-wash);border-color:var(--dead)"></span><span><b>Widerspruch</b> <span class="txt">— der Zweig ist tot, der Zustand wird zurückgenommen.</span></span></div>
+      </div>
+    </div>
+
+  </aside>
+</div>
+
+<section class="prose">
+  <h2>Die Verzweigungspunkte werden nicht gesucht, sie bleiben übrig</h2>
+
+  <div class="col">
+    <h3>Erst ableiten, bis nichts mehr geht</h3>
+    <p>
+      Jede Zelle trägt eine 16-Bit-Kandidatenmaske:
+      <code>~(rows[r] | cols[c] | boxes[b]) &amp; all</code>. Die Propagation läuft
+      in zwei Mustern bis zum Fixpunkt. <em>Nacktes Single:</em> bleibt in einer Zelle
+      genau ein Bit stehen, ist der Wert erzwungen. <em>Verstecktes Single:</em> pro
+      Einheit werden alle Kandidatenmasken mit zwei Akkumulatoren verodert — einer
+      sammelt „mindestens einmal gesehen“, der andere „mindestens zweimal“. Was in
+      <code>once</code> steht, aber nicht in <code>twice</code>, hat in dieser Einheit
+      genau eine mögliche Zelle.
+    </p>
+    <p>
+      Läuft eine Zelle auf null Kandidaten oder findet ein Wert in einer Einheit
+      keinen Platz mehr, ist der Zweig widerlegt — noch bevor eine einzige weitere
+      Zahl gesetzt wurde. Das ist der eigentliche Grund, warum der Baum schmal
+      bleibt: Widersprüche werden früh erkannt, nicht am Blatt.
+    </p>
+  </div>
+
+  <div class="col">
+    <h3>Und dann an der engsten Stelle raten</h3>
+    <p>
+      Erst wenn die Propagation stillsteht, wird verzweigt. Der Punkt ist dann nicht
+      frei gewählt: <em>MRV</em> (minimum remaining values) nimmt die freie Zelle mit
+      den wenigsten Kandidaten. Der Grund ist reine Arithmetik — eine Zelle mit
+      <em>k</em> Kandidaten verbreitert den Baum an dieser Stelle um den Faktor
+      <em>k</em>. Ob man 2 oder 9 Möglichkeiten durchprobiert, entscheidet über jede
+      darunterliegende Ebene mit.
+    </p>
+    <p>
+      Nach der Propagation hat keine freie Zelle mehr nur einen Kandidaten — sonst
+      wäre sie gesetzt worden. Das Minimum ist also mindestens 2, und praktisch findet
+      MRV fast immer eine Zelle mit genau zwei. Deshalb bricht die Suche in
+      <code>solver.go</code> ab, sobald sie eine Zwei sieht: besser geht es nicht.
+      Die Verteilung in der Seitenleiste zeigt bei jedem Halt, wie die Alternativen
+      tatsächlich aussahen.
+    </p>
+  </div>
+
+  <div class="col">
+    <h3>Zurücknehmen kostet einen Struct-Copy</h3>
+    <p>
+      Vor dem Raten wird der gesamte Zustand kopiert — bei einem einzelnen Gitter
+      sind das rund 350 Byte, drei Maskenfelder plus das Gitter. Scheitert der
+      Zweig, wird der Zustand mit einer Zuweisung zurückgesetzt; es gibt kein
+      Undo-Log und keine Allokation im heißen Pfad. Im Gitter oben sieht man das
+      als kurzes Ausgrauen: alles, was der verworfene Zweig abgeleitet hatte,
+      verschwindet auf einen Schlag.
+    </p>
+  </div>
+
+  <div class="col">
+    <h3>Warum das eine Hexamurai 65 Knoten braucht und das andere drei Millionen</h3>
+    <p>
+      Beide echten Elektor-Hexamurai bestehen aus fünf 16×16-Gittern, aber anders
+      verschränkt. Beim Windrad von 7-8/2009 teilt jedes Außengitter einen 4×12-Streifen
+      mit dem Mittelgitter — Information fließt quer durch die Nähte, und die Propagation
+      kommt fast überall allein durch: 65 Verzweigungen in 2,2 ms.
+    </p>
+    <p>
+      Beim Plus von 7-8/2011 fällt dagegen jede Zeile, Spalte und jeder Block des
+      Mittelgitters mit einer Einheit eines Außengitters zusammen. Das Mittelgitter
+      fügt keine einzige Regel hinzu; übrig bleiben vier nur paarweise gekoppelte
+      Gitter bei 30 % Vorgabendichte. Entsprechend wenig kann abgeleitet werden,
+      entsprechend oft muss geraten werden — 3 364 151 Verzweigungen, 43 Sekunden.
+    </p>
+  </div>
+
+  <div class="col" style="grid-column: 1 / -1">
+    <div class="table-scroll">
+      <table class="numbers">
+        <caption>Verzweigungsknoten, gemessen mit der Go-Fassung</caption>
+        <thead>
+          <tr><th>Aufgabe</th><th>Größe</th><th class="n" style="text-align:right">Vorgaben</th><th class="n" style="text-align:right">Verzweigungen</th><th class="n" style="text-align:right">Zeit</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>Elektor-Hexadoku 05/2009</td><td>16×16</td><td class="n">130</td><td class="n">0</td><td class="n">&lt; 1 ms</td></tr>
+          <tr><td>Hexadoku, eingebaut</td><td>16×16</td><td class="n">115</td><td class="n">10</td><td class="n">32 µs</td></tr>
+          <tr><td>Sudoku <span style="font-family:var(--f-mono);font-size:0.85em">top95 #19</span></td><td>9×9</td><td class="n">23</td><td class="n">11</td><td class="n">&lt; 1 ms</td></tr>
+          <tr><td>Sudoku <span style="font-family:var(--f-mono);font-size:0.85em">top95 #49</span></td><td>9×9</td><td class="n">17</td><td class="n">446</td><td class="n">1,2 ms</td></tr>
+          <tr><td>Hexamurai 7-8/2009 · Windrad</td><td>1088 Zellen</td><td class="n">409</td><td class="n">65</td><td class="n">2,2 ms</td></tr>
+          <tr class="hi"><td>Hexamurai 7-8/2011 · Plus</td><td>768 Zellen</td><td class="n">231</td><td class="n">3 364 151</td><td class="n">43 s</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</section>
+
+<footer class="note">
+  Der Solver auf dieser Seite ist eine Zeile-für-Zeile-Übertragung von
+  <span style="font-family:var(--f-mono);font-size:0.85em">solver.go</span> nach JavaScript —
+  gleiche Kandidatenmasken, gleiche Reihenfolge der Propagationsdurchläufe, gleiche
+  MRV-Wahl. Die Knotenzahlen stimmen mit der Go-Fassung überein: 11 · 446 · 0 · 10.
+</footer>
+
+</div>
+
+<script>
+(() => {
+  'use strict';
+
+  /* ------------------------------------------------------------------ *
+   * Rätsel                                                              *
+   * ------------------------------------------------------------------ */
+
+  const PUZZLES = [
+    {
+      id: 's19', n: 9, name: 'Sudoku · top95 #19',
+      sub: '11 Verzweigungen · gut zum Einzelschritt',
+      text: '.237....68...6.59.9.....7......4.97.3.7.96..2.........5..47.........2....8.......'
+    },
+    {
+      id: 'h05', n: 16, name: 'Elektor-Hexadoku 05/2009',
+      sub: '0 Verzweigungen · reine Ableitung',
+      text: '6..07....2.3AC9F.C9.8B0.45A..26E.A3.E.....76...4B4.E.A6..DC9830..54.072.3.1..8FC.....63.A05.9.D..6BC941F.7D.3...13A.B..D.6.C.E..9E.B41...F...0.3A1C...D7E.82.....0...CE6..9.248.....F98..3.....D.9E....C6.BA.F3.4.5..3..9.0...E....1D.907.354.B8.B.A6.F4........'
+    },
+    {
+      id: 'hx', n: 16, name: 'Hexadoku, eingebaut',
+      sub: '10 Verzweigungen · 16×16',
+      text: 'E......A...6.F8..65...E.18.F.0.A3.7B..65.D...2..8.....B..34...5....07...9.....2..B...2.0F7.8D..65.E...FBD16.C....D.6.3..2.0..A.7....D.....C.287.73BE..9C0A82..6...A..1....7E.B9.29....0.64D...A.476..F.....A0..2B.C3A.5480...EF.DE9.0C2.4.F5..18F..5.B....19.4..'
+    },
+    {
+      id: 's49', n: 9, name: 'Sudoku · top95 #49',
+      sub: '446 Verzweigungen · für den Auto-Lauf',
+      text: '2.3.8....8..7...........1...6.5.7...4......3....1............82.5....6...1.......'
+    }
+  ];
+
+  /* ------------------------------------------------------------------ *
+   * Solver — Zeile für Zeile nach solver.go                             *
+   * ------------------------------------------------------------------ */
+
+  const ctz = m => 31 - Math.clz32(m & -m);
+  function popcount(m) {
+    m = m - ((m >> 1) & 0x5555);
+    m = (m & 0x3333) + ((m >> 2) & 0x3333);
+    m = (m + (m >> 4)) & 0x0f0f;
+    return (m + (m >> 8)) & 0x1f;
+  }
+
+  const GIVEN = 0, NAKED = 1, HIDDEN = 2, BRANCH = 3;
+
+  function makeState(n, text) {
+    const box = n === 16 ? 4 : 3, cells = n * n, all = (1 << n) - 1;
+    const s = {
+      n, box, cells, all,
+      rows: new Int32Array(n), cols: new Int32Array(n), boxes: new Int32Array(n),
+      grid: new Int8Array(cells).fill(-1),
+      origin: new Int8Array(cells).fill(-1),
+      free: cells, units: []
+    };
+    for (let r = 0; r < n; r++) { const u = []; for (let c = 0; c < n; c++) u.push(r * n + c); s.units.push(u); }
+    for (let c = 0; c < n; c++) { const u = []; for (let r = 0; r < n; r++) u.push(r * n + c); s.units.push(u); }
+    for (let b = 0; b < n; b++) {
+      const u = [], r0 = ((b / box) | 0) * box, c0 = (b % box) * box;
+      for (let r = 0; r < box; r++) for (let c = 0; c < box; c++) u.push((r0 + r) * n + c0 + c);
+      s.units.push(u);
+    }
+    let k = 0;
+    for (const ch of text) {
+      let v = -1, isCell = true;
+      if (n === 16) {
+        if (ch >= '0' && ch <= '9') v = ch.charCodeAt(0) - 48;
+        else if (ch >= 'A' && ch <= 'F') v = ch.charCodeAt(0) - 55;
+        else if (ch >= 'a' && ch <= 'f') v = ch.charCodeAt(0) - 87;
+        else if ('.*_'.includes(ch)) v = -1;
+        else isCell = false;
+      } else {
+        if (ch >= '1' && ch <= '9') v = ch.charCodeAt(0) - 49;
+        else if (ch === '0' || '.*_'.includes(ch)) v = -1;
+        else isCell = false;
+      }
+      if (!isCell) continue;
+      if (v >= 0) { assign(s, k, v); s.origin[k] = GIVEN; }
+      k++;
+    }
+    return s;
+  }
+
+  const boxOf = (s, k) => (((k / s.n) | 0) / s.box | 0) * s.box + ((k % s.n) / s.box | 0);
+  const cand = (s, k) => ~(s.rows[(k / s.n) | 0] | s.cols[k % s.n] | s.boxes[boxOf(s, k)]) & s.all;
+  function assign(s, k, v) {
+    const m = 1 << v;
+    s.grid[k] = v;
+    s.rows[(k / s.n) | 0] |= m;
+    s.cols[k % s.n] |= m;
+    s.boxes[boxOf(s, k)] |= m;
+    s.free--;
+  }
+  const placed = (s, u) => u < s.n ? s.rows[u] : u < 2 * s.n ? s.cols[u - s.n] : s.boxes[u - 2 * s.n];
+  const snapshot = s => ({
+    rows: s.rows.slice(), cols: s.cols.slice(), boxes: s.boxes.slice(),
+    grid: s.grid.slice(), origin: s.origin.slice(), free: s.free
+  });
+  function restore(s, snap) {
+    s.rows.set(snap.rows); s.cols.set(snap.cols); s.boxes.set(snap.boxes);
+    s.grid.set(snap.grid); s.origin.set(snap.origin); s.free = snap.free;
+  }
+
+  function* propagate(s) {
+    for (;;) {
+      let changed = false;
+      for (let k = 0; k < s.cells; k++) {
+        if (s.grid[k] >= 0) continue;
+        const m = cand(s, k);
+        if (m === 0) { yield { t: 'dead', k, why: 'empty' }; return false; }
+        if ((m & (m - 1)) === 0) {
+          const v = ctz(m);
+          assign(s, k, v); s.origin[k] = NAKED; changed = true;
+          yield { t: 'naked', k, v };
+        }
+      }
+      for (let u = 0; u < 3 * s.n; u++) {
+        const cs = s.units[u];
+        let once = 0, twice = 0;
+        for (const k of cs) if (s.grid[k] < 0) { const m = cand(s, k); twice |= once & m; once |= m; }
+        if ((once | placed(s, u)) !== s.all) {
+          yield { t: 'dead', k: -1, u, why: 'unit', miss: (~(once | placed(s, u))) & s.all };
+          return false;
+        }
+        let uniq = once & ~twice & s.all;
+        if (!uniq) continue;
+        for (const k of cs) {
+          if (s.grid[k] >= 0) continue;
+          const m = cand(s, k) & uniq;
+          if (m === 0) continue;
+          if (m & (m - 1)) { yield { t: 'dead', k, u, why: 'double' }; return false; }
+          const v = ctz(m);
+          assign(s, k, v); s.origin[k] = HIDDEN; changed = true; uniq &= ~m;
+          yield { t: 'hidden', k, v, u };
+        }
+      }
+      if (!changed) { yield { t: 'fix' }; return true; }
+    }
+  }
+
+  function mrv(s) {
+    let best = -1, bestCnt = s.n + 1;
+    for (let k = 0; k < s.cells; k++) {
+      if (s.grid[k] >= 0) continue;
+      const c = popcount(cand(s, k));
+      if (c < bestCnt) { best = k; bestCnt = c; if (c === 2) break; }
+    }
+    return best;
+  }
+
+  function distribution(s) {
+    const d = new Array(s.n + 1).fill(0);
+    for (let k = 0; k < s.cells; k++) if (s.grid[k] < 0) d[popcount(cand(s, k))]++;
+    return d;
+  }
+
+  function* search(s, depth, stats) {
+    if (!(yield* propagate(s))) return false;
+    if (s.free === 0) { yield { t: 'solved' }; return true; }
+    const k = mrv(s);
+    const m0 = cand(s, k);
+    const save = snapshot(s);
+    yield { t: 'point', k, m: m0, depth, dist: distribution(s) };
+    let m = m0;
+    while (m) {
+      const v = ctz(m); m &= m - 1;
+      stats.nodes++;
+      assign(s, k, v); s.origin[k] = BRANCH;
+      yield { t: 'take', k, v, depth, rest: m, nodes: stats.nodes };
+      if (yield* search(s, depth + 1, stats)) return true;
+      const before = s.grid.slice();
+      restore(s, save);
+      const reverted = [];
+      for (let i = 0; i < s.cells; i++) if (before[i] >= 0 && s.grid[i] < 0) reverted.push(i);
+      yield { t: 'undo', k, v, depth, reverted };
+    }
+    yield { t: 'out', k, depth };
+    return false;
+  }
+
+  /* ------------------------------------------------------------------ *
+   * Darstellung                                                         *
+   * ------------------------------------------------------------------ */
+
+  const $ = id => document.getElementById(id);
+  const boardEl = $('board'), pickerEl = $('picker'), pathEl = $('path');
+  const distCard = $('dist-card'), distEl = $('dist'), distNote = $('dist-note');
+
+  let cur = PUZZLES[0], S = null, it = null, stats = null;
+  let cellEls = [], cellHtml = [], frames = [], finished = false;
+  let markMode = 'count';
+  let lastTouched = new Map();   // Zelle -> Klassensuffix des letzten Ereignisses
+  let mrvCell = -1;
+  let pending = { kind: 'done', head: 'Bereit.', why: 'Schritt drücken, um die Propagation zu starten.' };
+  let distState = null, distDirty = false;
+
+  const chOf = v => cur.n === 16 ? '0123456789ABCDEF'[v] : String(v + 1);
+  const ref = k => 'Z' + (((k / S.n) | 0) + 1) + '·S' + ((k % S.n) + 1);
+  const unitName = u => u < S.n ? 'Zeile ' + (u + 1)
+    : u < 2 * S.n ? 'Spalte ' + (u - S.n + 1)
+      : 'Block ' + (u - 2 * S.n + 1);
+
+  function buildPicker() {
+    pickerEl.innerHTML = '';
+    for (const p of PUZZLES) {
+      const b = document.createElement('button');
+      b.className = 'pz';
+      b.type = 'button';
+      b.setAttribute('aria-pressed', String(p.id === cur.id));
+      b.innerHTML = '<span>' + p.name + '</span><span class="sub">' + p.sub + '</span>';
+      b.addEventListener('click', () => { cur = p; reset(); buildPicker(); });
+      pickerEl.appendChild(b);
+    }
+  }
+
+  function buildBoard() {
+    const n = cur.n, box = n === 16 ? 4 : 3;
+    boardEl.style.setProperty('--n', n);
+    boardEl.dataset.n = String(n);
+    boardEl.innerHTML = '';
+    cellEls = []; cellHtml = [];
+    for (let k = 0; k < n * n; k++) {
+      const r = (k / n) | 0, c = k % n;
+      const d = document.createElement('div');
+      d.className = 'cell';
+      if (c % box === 0 && c > 0) d.classList.add('bl');
+      if (r % box === 0 && r > 0) d.classList.add('bt');
+      boardEl.appendChild(d);
+      cellEls.push(d);
+    }
+  }
+
+  function renderCell(k) {
+    const el = cellEls[k], v = S.grid[k];
+    let cls = 'cell';
+    const r = (k / S.n) | 0, c = k % S.n, box = S.box;
+    if (c % box === 0 && c > 0) cls += ' bl';
+    if (r % box === 0 && r > 0) cls += ' bt';
+
+    if (v >= 0) {
+      const o = S.origin[k];
+      if (o === GIVEN) cls += ' given';
+      else if (o === NAKED) cls += ' from-naked';
+      else if (o === HIDDEN) cls += ' from-hidden';
+      else if (o === BRANCH) cls += ' from-branch';
+    }
+    const touch = lastTouched.get(k);
+    if (touch) cls += ' touch-' + touch + ' anim';
+    if (k === mrvCell) cls += ' mrv';
+
+    let html;
+    if (v >= 0) {
+      html = '<span class="val">' + chOf(v) + '</span>';
+    } else if (markMode === 'none') {
+      html = '';
+    } else {
+      const m = cand(S, k), cnt = popcount(m);
+      if (markMode === 'count') {
+        html = '<span class="cnt' + (cnt <= 2 ? ' lo' : '') + '">' + cnt + '</span>';
+      } else if (S.n === 9) {
+        let inner = '';
+        for (let d = 0; d < 9; d++) inner += '<span>' + ((m >> d) & 1 ? String(d + 1) : '') + '</span>';
+        html = '<div class="marks" style="grid-template-columns:repeat(3,1fr);grid-template-rows:repeat(3,1fr)">' + inner + '</div>';
+      } else {
+        let inner = '';
+        for (let d = 0; d < 16; d++) inner += ((m >> d) & 1) ? '<i class="dot"></i>' : '<i></i>';
+        html = '<div class="marks" style="grid-template-columns:repeat(4,1fr);grid-template-rows:repeat(4,1fr)">' + inner + '</div>';
+      }
+    }
+    if (el.className !== cls) el.className = cls;
+    if (cellHtml[k] !== html) { el.innerHTML = html; cellHtml[k] = html; }
+  }
+
+  function renderBoard() { for (let k = 0; k < S.cells; k++) renderCell(k); }
+
+  function renderStats() {
+    $('st-filled').textContent = S.cells - S.free;
+    $('st-free').textContent = S.free;
+    $('st-nodes').textContent = stats.nodes.toLocaleString('de-DE');
+    $('st-depth').textContent = frames.length;
+  }
+
+  function renderPath() {
+    if (!frames.length) {
+      pathEl.innerHTML = '<p class="empty-note">Noch keine Verzweigung — bis hierher trägt reine Ableitung.</p>';
+      return;
+    }
+    let html = '';
+    frames.forEach((f, i) => {
+      const live = i === frames.length - 1;
+      let chips = '';
+      for (let d = 0; d < S.n; d++) {
+        if (!((f.m >> d) & 1)) continue;
+        const isCur = f.cur === d, isDead = f.tried.includes(d) && !isCur;
+        chips += '<span class="chip' + (isCur ? ' cur' : isDead ? ' dead' : '') + '">' + chOf(d) + '</span>';
+      }
+      html += '<div class="frame' + (live ? ' live' : '') + '">'
+        + '<span class="lvl">' + (i + 1) + '</span>'
+        + '<span class="cellref">' + ref(f.k) + '</span>'
+        + '<span class="chips">' + chips + '</span></div>';
+    });
+    pathEl.innerHTML = html;
+    pathEl.scrollTop = pathEl.scrollHeight;
+  }
+
+  function renderDist(dist, pick) {
+    const rows = [];
+    for (let i = 1; i <= S.n; i++) if (dist[i] > 0) rows.push([i, dist[i]]);
+    const maxV = Math.max(...rows.map(r => r[1]), 1);
+    distEl.innerHTML = rows.map(([k, v]) =>
+      '<div class="bar' + (k === pick ? ' pick' : '') + '">'
+      + '<span class="lab">' + k + '</span>'
+      + '<span class="track"><span class="fill" style="width:' + (100 * v / maxV) + '%"></span></span>'
+      + '<span class="num">' + v + '</span></div>').join('');
+    distNote.textContent = 'Gewählt wird das Minimum: ' + pick + ' Kandidaten. '
+      + (pick === 2 ? 'Enger geht es nicht — deshalb bricht die Suche hier ab.'
+        : 'Keine Zelle kam mit weniger aus.');
+    distCard.hidden = false;
+  }
+
+  /* ------------------------------------------------------------------ *
+   * Schrittsteuerung                                                    *
+   * ------------------------------------------------------------------ */
+
+  function reset() {
+    stopAuto();
+    S = makeState(cur.n, cur.text);
+    stats = { nodes: 0 };
+    it = search(S, 0, stats);
+    frames = [];
+    finished = false;
+    lastTouched.clear();
+    mrvCell = -1;
+    distDirty = false;
+    distCard.hidden = true;
+    pending = { kind: 'done', head: 'Bereit.', why: 'Schritt drücken, um die Propagation zu starten.' };
+    buildBoard();
+    for (const b of ['btn-step', 'btn-branch', 'btn-auto']) $(b).disabled = false;
+    paint();
+  }
+
+  // Ein Ereignis aus dem Solver holen und den Anzeigezustand fortschreiben.
+  // Gezeichnet wird hier nicht - beim Auto-Lauf laufen viele Schritte pro
+  // Bild, und nur der letzte ist am Ende sichtbar.
+  function step() {
+    if (finished) return null;
+    const res = it.next();
+    lastTouched.clear();
+    mrvCell = -1;
+
+    if (res.done) {
+      finished = true;
+      stopAuto();
+      pending = res.value
+        ? { kind: 'done', head: 'Gelöst.', why: stats.nodes + ' Verzweigungen insgesamt.' }
+        : { kind: 'dead', head: 'Keine Lösung.', why: 'Alle Zweige sind widerlegt.' };
+      for (const b of ['btn-step', 'btn-branch', 'btn-auto']) $(b).disabled = true;
+      return null;
+    }
+
+    const e = res.value;
+    switch (e.t) {
+      case 'naked':
+        lastTouched.set(e.k, 'naked');
+        pending = { kind: 'naked', head: 'Nacktes Single · ' + ref(e.k) + ' = ' + chOf(e.v),
+          why: 'In dieser Zelle war nur noch ein Wert möglich.' };
+        break;
+      case 'hidden':
+        lastTouched.set(e.k, 'hidden');
+        pending = { kind: 'hidden', head: 'Verstecktes Single · ' + ref(e.k) + ' = ' + chOf(e.v),
+          why: chOf(e.v) + ' hatte in ' + unitName(e.u) + ' nur noch diese eine Zelle.' };
+        break;
+      case 'fix':
+        pending = { kind: 'done', head: 'Propagation steht still.',
+          why: 'Nichts mehr abzuleiten - jetzt muss verzweigt werden.' };
+        break;
+      case 'point':
+        mrvCell = e.k;
+        distState = { dist: e.dist, pick: popcount(e.m) };
+        distDirty = true;
+        frames.push({ k: e.k, m: e.m, tried: [], cur: null, depth: e.depth });
+        pending = { kind: 'branch', head: 'Verzweigungspunkt · ' + ref(e.k),
+          why: 'Wenigste Kandidaten im ganzen Gitter: ' + popcount(e.m) + '.' };
+        break;
+      case 'take': {
+        lastTouched.set(e.k, 'branch');
+        const f = frames[frames.length - 1];
+        if (f) { f.cur = e.v; f.tried.push(e.v); }
+        pending = { kind: 'branch', head: 'Versuch · ' + ref(e.k) + ' = ' + chOf(e.v),
+          why: e.rest ? 'Noch ' + popcount(e.rest) + ' Alternative(n) in Reserve.'
+                      : 'Letzte Möglichkeit an dieser Stelle.' };
+        break;
+      }
+      case 'dead':
+        if (e.k >= 0) lastTouched.set(e.k, 'dead');
+        pending = { kind: 'dead', head: 'Widerspruch',
+          why: e.why === 'empty' ? ref(e.k) + ' hat keinen Kandidaten mehr.'
+             : e.why === 'unit'  ? 'In ' + unitName(e.u) + ' hat ein Wert keinen Platz mehr.'
+             : ref(e.k) + ' wäre der einzige Ort für zwei verschiedene Werte.' };
+        break;
+      case 'undo': {
+        for (const i of e.reverted) lastTouched.set(i, 'undo');
+        const f = frames[frames.length - 1];
+        if (f) f.cur = null;
+        pending = { kind: 'dead', head: 'Zweig verworfen · ' + ref(e.k) + ' ≠ ' + chOf(e.v),
+          why: e.reverted.length + ' abgeleitete Zellen werden zurückgenommen.' };
+        break;
+      }
+      case 'out':
+        frames.pop();
+        pending = { kind: 'dead', head: 'Ebene erschöpft · ' + ref(e.k),
+          why: 'Kein Kandidat hier führt zum Ziel - eine Ebene höher.' };
+        break;
+      case 'solved':
+        pending = { kind: 'done', head: 'Gelöst.', why: stats.nodes + ' Verzweigungen insgesamt.' };
+        break;
+    }
+    return e;
+  }
+
+  function paint() {
+    $('event').className = 'event k-' + pending.kind;
+    $('ev-head').textContent = pending.head;
+    $('ev-why').textContent = pending.why || '';
+    renderBoard();
+    renderStats();
+    renderPath();
+    if (distDirty) { renderDist(distState.dist, distState.pick); distDirty = false; }
+  }
+
+  function single() { stopAuto(); step(); paint(); }
+
+  function toBranch() {
+    stopAuto();
+    let guard = 0;
+    for (;;) {
+      const e = step();
+      if (!e || e.t === 'point' || guard++ > 500000) break;
+    }
+    paint();
+  }
+
+  let rafId = null, acc = 0, lastT = 0;
+  function tick(t) {
+    if (!lastT) lastT = t;
+    const dt = Math.min((t - lastT) / 1000, 0.1); lastT = t;
+    const sp = Number($('speed').value);
+    const rate = Math.pow(sp / 100, 2.6) * 1600 + 1.5;   // Schritte je Sekunde
+    acc += dt * rate;
+    let budget = Math.min(Math.floor(acc), 20000);
+    acc -= budget;
+    let alive = true;
+    while (budget-- > 0 && alive) alive = step() !== null;
+    paint();
+    if (!alive) return;
+    rafId = requestAnimationFrame(tick);
+  }
+
+  function startAuto() {
+    if (rafId || finished) return;
+    lastT = 0; acc = 0;
+    const b = $('btn-auto');
+    b.innerHTML = 'Pause<span class="kbd">A</span>';
+    b.classList.add('primary');
+    $('btn-step').classList.remove('primary');
+    rafId = requestAnimationFrame(tick);
+  }
+
+  function stopAuto() {
+    if (rafId) cancelAnimationFrame(rafId);
+    rafId = null;
+    const b = $('btn-auto');
+    b.innerHTML = 'Auto<span class="kbd">A</span>';
+    b.classList.remove('primary');
+    $('btn-step').classList.add('primary');
+  }
+
+  function toggleAuto() { rafId ? stopAuto() : startAuto(); }
+
+  /* ------------------------------------------------------------------ *
+   * Verdrahtung                                                         *
+   * ------------------------------------------------------------------ */
+
+  $('btn-step').addEventListener('click', single);
+  $('btn-branch').addEventListener('click', toBranch);
+  $('btn-auto').addEventListener('click', toggleAuto);
+  $('btn-reset').addEventListener('click', reset);
+
+  for (const [id, mode] of [['m-count', 'count'], ['m-marks', 'marks'], ['m-none', 'none']]) {
+    $(id).addEventListener('click', () => {
+      markMode = mode;
+      for (const o of ['m-count', 'm-marks', 'm-none']) $(o).setAttribute('aria-pressed', String(o === id));
+      cellHtml = [];
+      paint();
+    });
+  }
+
+  document.addEventListener('keydown', ev => {
+    if (ev.target.tagName === 'INPUT' || ev.metaKey || ev.ctrlKey || ev.altKey) return;
+    const k = ev.key.toLowerCase();
+    if (k === ' ') { ev.preventDefault(); single(); }
+    else if (k === 'v') { ev.preventDefault(); toBranch(); }
+    else if (k === 'a') { ev.preventDefault(); toggleAuto(); }
+    else if (k === 'r') { ev.preventDefault(); reset(); }
+  });
+
+  buildPicker();
+  reset();
+})();
+</script>
+</body>
+</html>

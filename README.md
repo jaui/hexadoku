@@ -12,7 +12,17 @@ The original C++ brute-force/constraint solver is kept for reference in
 A write-up of every problem hit while building this and how it was
 solved is in [`docs/werkstattbericht.html`](docs/werkstattbericht.html)
 (German): solver data layout, the PDF toolchain dead end, grid detection
-in scans, and how the puzzle/solution pairing was derived from the data.
+in scans, how the puzzle/solution pairing was derived from the data, and
+the two Hexamurai arrangements.
+
+[`docs/suchbaum.html`](docs/suchbaum.html) (German) steps through the
+search interactively: candidates per cell, which cell falls as a naked
+and which as a hidden single, the MRV cell picked as the branch point
+with the candidate histogram that explains the choice, contradictions,
+and the decision path with its discarded branches. Same algorithm as
+`solver.go`, reimplemented in JavaScript; the branch counts match the Go
+version on all four built-in puzzles. Open it from a local web server
+(`file://` works in most browsers but Chrome is restrictive).
 
 Algorithm
 ---------
