@@ -1,5 +1,8 @@
 # Elektor Hexadoku 2013-09 (p. 74), 120 clues
-# transcribed visually from the scan; tesseract could not read this page
+# transcribed visually from the scan; tesseract could not read this page.
+# Confirmed independently of any solution grid: the grey answer cells are
+# r1c1-c5, and this transcription's solution puts 569E8 there - exactly
+# what issue 11/2013 p. 76 announces as the September 2013 solution.
 .....1.F4.C.....
 .F.A92....7EB.6.
 ..0.6.D35F.8.2..

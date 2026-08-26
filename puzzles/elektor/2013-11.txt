@@ -1,0 +1,19 @@
+# Elektor Hexadoku 2013-11 (p. 76), 106 clues
+# transcribed visually from the scan; the grid lines are printed so pale
+# that no lattice detection finds them, so the crop was cut by hand
+..B...0.6...7A3F
+..9..F71.B..8..2
+...7.4B....3.0.9
+....2..3.87.4.1E
+....B..2EC96.F..
+.3F.C7.04..8A...
+....9......D1.4.
+.8AC....0.12...B
+7.C8.0.9..F1B.5.
+F...71.......92D
+.9..E.3B..A..4F.
+A.24.C5..D890...
+B.490..7A....C..
+...D1..E8.0...75
+.....8..1.6.....
+1..05.FA........

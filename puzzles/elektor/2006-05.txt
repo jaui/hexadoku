@@ -1,0 +1,19 @@
+# Elektor Hexadoku 2006-05 (p. 77), 119 clues
+# transcribed visually from the scan; the page is skewed and has no usable
+# text layer, so the crop was cut by hand
+0..35..A8E24.DC.
+D4.............0
+B516..2.F.9.8...
+.....7.860.D2..B
+E0..A937.6......
+.1.C.F..0..5E...
+4F..C2.1A....6D.
+.6.2..0D7...AB54
+..6.1.80C9.....F
+.C.76A.E...832.D
+8B497...EF...06.
+3...94.F2...71..
+..E.D.A....16.0C
+.9.4...C.2.0.83.
+..B.....D.AE..F1
+A..1F...376.B5E.
