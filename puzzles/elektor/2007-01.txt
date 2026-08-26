@@ -1,0 +1,18 @@
+# Elektor Hexadoku 2007-01 (p. 77), 119 clues
+# transcribed visually from the scan; no lattice detection possible
+F7E.8.2..5...D..
+1.....3E...B..AC
+2D3..7....985.B.
+9.5C0D.1.4E.837.
+8.A0....C2.3...D
+.52...EB798.4C3.
+79..3..2.BF..608
+...D.C....1..B2.
+02.F..7DB3..CE5A
+B..7...5.CD.0.F.
+E31AF.6..0.9....
+....E.........1.
+..B.7..80A.D..E9
+..03.....8B.17..
+.E85...0F...3...
+C.7.56F......8D0

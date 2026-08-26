@@ -1,6 +1,9 @@
 # Elektor Hexadoku 2006-05 (p. 77), 119 clues
 # transcribed visually from the scan; the page is skewed and has no usable
-# text layer, so the crop was cut by hand
+# text layer, so the crop was cut by hand.
+# Confirmed independently: the Dutch edition of the same month (Elektuur
+# 511, p. 72) prints the same puzzle, and the mask detected there matches
+# this reading cell for cell in all 16 rows.
 0..35..A8E24.DC.
 D4.............0
 B516..2.F.9.8...
