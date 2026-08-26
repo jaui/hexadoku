@@ -19,9 +19,9 @@ PASS 2009-03 (unique; matches the OCR-damaged solution grid of 2009-05 in 231/25
 PASS 2009-04 (unique, solution printed in issue 2009-06)
 WARN 2009-05 (unique, but no printed solution matches - unverified)
 PASS 2009-06 (unique; matches the OCR-damaged solution grid of 2009-09 in 221/256 cells)
-FAIL 2009-07_08 : multiple solutions
+SPEC 2009-07_08 (special format, not a single 16x16 grid)
 PASS 2009-09 (unique; matches the OCR-damaged solution grid of 2009-11 in 212/256 cells)
-FAIL 2009-10 : not solvable
+PASS 2009-10 (unique; matches the OCR-damaged solution grid of 2009-12 in 215/256 cells)
 PASS 2009-11 (unique; matches the OCR-damaged solution grid of 2010-01 in 217/256 cells)
 WARN 2009-12 (unique, but no printed solution matches - unverified)
 PASS 2010-01 (unique; matches the OCR-damaged solution grid of 2010-03 in 205/256 cells)
@@ -30,9 +30,9 @@ WARN 2010-03 (unique, but no printed solution matches - unverified)
 WARN 2010-06 (unique, but no printed solution matches - unverified)
 PASS 2010-10 (unique; matches the OCR-damaged solution grid of 2010-12 in 212/256 cells)
 WARN 2010-12 (unique, but no printed solution matches - unverified)
-FAIL 2011-03 : multiple solutions
-FAIL 2011-05 : not solvable
-FAIL 2011-07_08 : multiple solutions
+SPEC 2011-03 (special format, not a single 16x16 grid)
+WARN 2011-05 (unique, but no printed solution matches - unverified)
+SPEC 2011-07_08 (special format, not a single 16x16 grid)
 PASS 2011-12 (unique, solution printed in issue 2012-02)
 PASS 2012-02 (unique, solution printed in issue 2012-04)
 PASS 2012-03 (unique, solution printed in issue 2012-05)
@@ -43,16 +43,16 @@ PASS 2013-03 (unique, solution printed in issue 2013-05)
 PASS 2013-04 (unique, solution printed in issue 2013-06)
 PASS 2013-12 (unique, solution printed in issue 2014-03)
 PASS 2014-01_02 (unique, solution printed in issue 2014-04)
-FAIL 2015-01_02 : not solvable
+WARN 2015-01_02 (unique, but no printed solution matches - unverified)
 PASS 2015-03_04 (unique, solution printed in issue 2015-05_06)
 PASS 2015-05_06 (unique, solution printed in issue 2015-07_08)
 PASS 2015-07_08 (unique, solution printed in issue 2015-09_10)
 PASS 2015-09_10 (unique, solution printed in issue 2015-11_12)
-FAIL 2015-11_12 : not solvable
+WARN 2015-11_12 (unique, but no printed solution matches - unverified)
 WARN 2016-01_02 (unique, but no printed solution matches - unverified)
 PASS 2016-03_04 (unique, solution printed in issue 2016-05_06)
 PASS 2016-05_06 (unique, solution printed in issue 2016-08)
 PASS 2016-08 (unique, solution printed in issue 2016-09_10)
 PASS 2016-09_10 (unique, solution printed in issue 2016-11_12)
-FAIL 2016-11_12 : not solvable
-validation: 40 verified, 9 unverified, 8 fail
+WARN 2016-11_12 (unique, but no printed solution matches - unverified)
+validation: 41 verified, 13 unverified, 0 fail, 3 special format

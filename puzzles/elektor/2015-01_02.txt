@@ -1,9 +1,9 @@
-# Elektor Hexadoku 2015-01_02 (106 clues)
-# digits from tesseract OCR only (no matching printed solution found); 2 OCR conflicts NOT repairable (2 damaged cells, remainder not uniquely solvable)
+# Elektor Hexadoku 2015-01_02 (p. 124), 106 clues
+# transcribed visually from the page
 .3..E9.2.56..CF.
 9..........F23.6
 ...6....3D9.A4E0
-..BC.....E..9D5.
+..8C.....E..9D5.
 A...56...7E...1.
 0...F..C4.A6.5.D
 ......9..F.08A.3

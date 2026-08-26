@@ -379,9 +379,9 @@ code {
   <div class="fig"><b>600 ms → 32 µs</b><span>Pro Lösung</span></div>
   <div class="fig"><b>108</b><span>Hefte geladen</span></div>
   <div class="fig"><b>47 → 93</b><span>Hefte mit Ausbeute</span></div>
-  <div class="fig"><b>49</b><span>Rätsel gewonnen</span></div>
-  <div class="fig"><b>40</b><span>Gegengeprüft</span></div>
-  <div class="fig"><b>30</b><span>Probleme gelöst</span></div>
+  <div class="fig"><b>54</b><span>Rätsel gewonnen</span></div>
+  <div class="fig"><b>41</b><span>Gegengeprüft</span></div>
+  <div class="fig"><b>21</b><span>Von Hand gelesen</span></div>
 </section>
 
 <!-- ============ 1 ============ -->
@@ -796,7 +796,7 @@ code {
       <dl>
         <div><dt>Anlass</dt><dd>Bei den gescannten Jahrgängen las Tesseract zu ungenau, und die verworfenen Lösungsgitter nahmen der Kette die Grundlage. Der Betrachtungsmodus aus FIX-03 war da, aber nur einmal benutzt worden.</dd></div>
         <div><dt>Vorgehen</dt><dd>Für jedes betroffene Heft die Gitterstreifen exportieren, selbst lesen, in eine Rätseldatei schreiben, vom Solver prüfen lassen. Zwei Zeilen pro Bild — bei vier Zeilen verrutschten mir Positionen, was der Solver prompt als Konflikt meldete.</dd></div>
-        <div><dt>Ergebnis</dt><dd><span class="win">16 Rätsel</span>, alle eindeutig lösbar, vierzehn davon mit null Verzweigungen. Bei zwölf stimmt meine gezählte Vorgabenzahl exakt mit der überein, die die Maskenerkennung unabhängig aus der Pixelstruktur ermittelt — zwei Verfahren, die nichts voneinander wissen, kommen auf dieselbe Zahl.</dd></div>
+        <div><dt>Ergebnis</dt><dd><span class="win">21 Rätsel</span>, alle eindeutig lösbar, die meisten mit null Verzweigungen. Bei den allermeisten stimmt meine gezählte Vorgabenzahl exakt mit der überein, die die Maskenerkennung unabhängig aus der Pixelstruktur ermittelt — zwei Verfahren, die nichts voneinander wissen, kommen auf dieselbe Zahl. Wo sie abwich, lag der Fehler bei mir, und der Solver zeigte ihn als Konflikt an.</dd></div>
       </dl>
     </div>
   </article>
@@ -914,11 +914,11 @@ code {
   <article class="entry">
     <div class="rail"><span class="tag">OPEN-04</span><span class="chip chip-neutral">kein Fehler</span></div>
     <div>
-      <h3>Ein Rätsel, das absichtlich nicht aufgeht</h3>
+      <h3>Drei Rätsel, die absichtlich nicht aufgehen</h3>
       <dl>
-        <div><dt>Symptom</dt><dd>Ausgabe 03/2011 ergab nur 73 Vorgaben und mehrdeutige Lösungen — nach Werkzeugfehler aussehend.</dd></div>
-        <div><dt>Befund</dt><dd>Die Seite zeigt ein „Hexadoku Digest": sechzehn farbig markierte Fünferblöcke, die mit den Lösungscodes früherer Hexadokus aus den Ausgaben Januar 2009 bis Juni 2010 gefüllt werden müssen. Ohne dieses Außenwissen ist das Gitter <em>konstruktionsbedingt</em> nicht eindeutig.</dd></div>
-        <div><dt>Einordnung</dt><dd>Die Pipeline verhält sich richtig, indem sie es als nicht eindeutig meldet. Lösbar wäre es nur, wenn man die sechzehn Codes aus den zugehörigen Jahrgängen zusammenträgt.</dd></div>
+        <div><dt>Symptom</dt><dd>Drei Ausgaben lieferten hartnäckig zu wenige Vorgaben und mehrdeutige Lösungen — nach Werkzeugfehler aussehend.</dd></div>
+        <div><dt>Befund</dt><dd>Alle drei sind keine gewöhnlichen Hexadokus. Die beiden Doppelhefte 7-8/2009 und 7-8/2011 zeigen ein <em>Hexamurai</em>: fünf überlappende 16×16-Gitter im Kreuz, nach dem Samurai-Vorbild, und das Heft sagt ausdrücklich, dass sie sich nicht einzeln lösen lassen. Ausgabe 3/2011 ist ein <em>Hexadoku Digest</em>, dessen sechzehn markierte Fünferblöcke mit den Preiscodes früherer Hexadokus von Januar 2009 bis Juni 2010 gefüllt werden müssen.</dd></div>
+        <div><dt>Einordnung</dt><dd>Die Pipeline verhält sich richtig, indem sie diese Gitter als nicht eindeutig meldet. Sie sind jetzt als Sonderform gekennzeichnet und werden nicht mehr als fehlgeschlagene Rekonstruktion gezählt — ein Werkzeug, das eine Grenze des Materials als eigenen Fehler ausweist, verschleiert beides.</dd></div>
       </dl>
     </div>
   </article>
@@ -949,7 +949,8 @@ code {
     <div>
       <h3>Hefte ohne auffindbares Gitter</h3>
       <dl>
-        <div><dt>Stand</dt><dd>93 der 108 Hefte liefern Masken oder Lösungsgitter, und daraus sind 49 Rätsel gewonnen — 40 davon gegen eine gedruckte Lösung geprüft. Acht bleiben offen. Bei den übrigen Heften findet die Automatik nichts: teils Scanqualität, teils vermutlich Hefte ohne Hexadoku. Zwei lehnt bereits <code>pdftotext</code> ab, und die textlosen Scans brauchen den seitenweisen Bildsweep, der bei dicken Heften über das Zeitlimit des Stapellaufs geht.</dd></div>
+        <div><dt>Stand</dt><dd>93 der 108 Hefte liefern Masken oder Lösungsgitter, und daraus sind <span class="win">54 Rätsel</span> gewonnen: 41 gegen eine gedruckte Lösung geprüft, 13 eindeutig lösbar ohne Vergleichsmöglichkeit, dazu drei dokumentierte Sonderformen. Kein einziges bleibt als Fehlschlag stehen.</dd></div>
+        <div><dt>Offen</dt><dd>Bei den übrigen Heften findet die Automatik nichts: teils Scanqualität, teils vermutlich Hefte ohne Hexadoku. Zwei lehnt bereits <code>pdftotext</code> ab, und die textlosen Scans brauchen den seitenweisen Bildsweep, der bei dicken Heften über das Zeitlimit des Stapellaufs geht. Für jedes davon steht der Betrachtungsmodus bereit.</dd></div>
       </dl>
     </div>
   </article>

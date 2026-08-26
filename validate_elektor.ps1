@@ -39,9 +39,14 @@ function Best-Match([string[]]$mine) {
 
 $puzzles = Get-ChildItem "$Dir\20??-*.txt" |
     Where-Object { $_.Name -match '^\d{4}-[\d_]+\.txt$' } | Sort-Object Name
-$pass = 0; $warn = 0; $fail = 0
+$pass = 0; $warn = 0; $fail = 0; $special = 0
 foreach ($p in $puzzles) {
     $key = $p.BaseName
+    if ((Get-Content $p.FullName -Raw) -match 'not a standalone puzzle') {
+        Write-Host "SPEC $key (special format, not a single 16x16 grid)"
+        $special++
+        continue
+    }
     $mine = .\hexadoku.exe -compact $p.FullName 2>$null | Where-Object { $_ -match '^[0-9A-F]{16}$' }
     if ($LASTEXITCODE -ne 0 -or $mine.Count -ne 16) {
         Write-Host "FAIL $key : not solvable"; $fail++; continue
@@ -64,4 +69,4 @@ foreach ($p in $puzzles) {
         $warn++
     }
 }
-Write-Host "validation: $pass verified, $warn unverified, $fail fail"
+Write-Host "validation: $pass verified, $warn unverified, $fail fail, $special special format"

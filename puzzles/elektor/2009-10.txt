@@ -1,18 +1,19 @@
-# Elektor Hexadoku 2009-10 (182 clues)
-# digits from tesseract OCR only (no matching printed solution found); 141 OCR conflicts NOT repairable (141 damaged cells, remainder not uniquely solvable)
-B5.FE9C....8..84
-3C....4F5926EAE0
-50.09.8132BF6E5D
-F1...E679C000518
-60.5.28CBFD31...
-B3....0EA58492.C
-AEB8FC2570A9E3.1
-F7.51B6.B4.7C..3
-B6.0ED3.1.584..7
-B0A974...C0681F5
-CB94653...1CFA7E
-....E10..8.08A.6
-.7..0A4E.9D5B2.F
-.10.A105.4.E2638
-.5..ED61.FA798.4
-....3095....4.CE
+# Elektor Hexadoku 2009-10 (p. 74), 120 clues
+# transcribed visually from the scan; the automatic grid detection
+# latched onto the Hexamurai solution printed beside the puzzle
+12..B.A8C..FE63.
+E..B.F....D579..
+.0D..45..A6.8F2.
+..3.C9.E4..B....
+.9F368..0B1.CE..
+....9..1....D.7.
+4.E6.C07..A2B.F9
+.C..........0..1
+.7..EA..F8.6..1.
+8D.41...5.2..0BF
+A........7.96.84
+6F.1.B...40A.7..
+0A6.2.9.....4B.3
+B...437......8..
+D.1..680..3.9.5.
+3.785...AE.D.20.
