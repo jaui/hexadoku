@@ -365,7 +365,8 @@ code {
     <h1>Hexadoku</h1>
     <p class="standfirst">
       Vom C++-Brute-Force-Solver zur Go-Fassung mit Bitmasken — und weiter zu einer
-      Pipeline, die 16×16-Rätsel aus zehn Jahrgängen Elektor-Scans zurückgewinnt.
+      Pipeline, die 16×16-Rätsel aus zehn Jahrgängen Elektor-Scans zurückgewinnt,
+      und zuletzt zum Hexamurai aus fünf verschränkten Gittern.
       Dies ist die Liste dessen, was dabei schiefging, und wie es gelöst wurde.
     </p>
   </div>
@@ -382,6 +383,7 @@ code {
   <div class="fig"><b>54</b><span>Rätsel gewonnen</span></div>
   <div class="fig"><b>41</b><span>Gegengeprüft</span></div>
   <div class="fig"><b>21</b><span>Von Hand gelesen</span></div>
+  <div class="fig"><b>1216</b><span>Zellen im Hexamurai</span></div>
 </section>
 
 <!-- ============ 1 ============ -->
@@ -919,6 +921,7 @@ code {
         <div><dt>Symptom</dt><dd>Drei Ausgaben lieferten hartnäckig zu wenige Vorgaben und mehrdeutige Lösungen — nach Werkzeugfehler aussehend.</dd></div>
         <div><dt>Befund</dt><dd>Alle drei sind keine gewöhnlichen Hexadokus. Die beiden Doppelhefte 7-8/2009 und 7-8/2011 zeigen ein <em>Hexamurai</em>: fünf überlappende 16×16-Gitter im Kreuz, nach dem Samurai-Vorbild, und das Heft sagt ausdrücklich, dass sie sich nicht einzeln lösen lassen. Ausgabe 3/2011 ist ein <em>Hexadoku Digest</em>, dessen sechzehn markierte Fünferblöcke mit den Preiscodes früherer Hexadokus von Januar 2009 bis Juni 2010 gefüllt werden müssen.</dd></div>
         <div><dt>Einordnung</dt><dd>Die Pipeline verhält sich richtig, indem sie diese Gitter als nicht eindeutig meldet. Sie sind jetzt als Sonderform gekennzeichnet und werden nicht mehr als fehlgeschlagene Rekonstruktion gezählt — ein Werkzeug, das eine Grenze des Materials als eigenen Fehler ausweist, verschleiert beides.</dd></div>
+        <div><dt>Nachtrag</dt><dd>Das Hexamurai ist inzwischen kein Sonderfall mehr, sondern eine eigene Geometrie im Solver — siehe Kapitel XI. Der Digest bleibt es: er verlangt Preiscodes aus achtzehn Heften, keine Gitterregel.</dd></div>
       </dl>
     </div>
   </article>
@@ -951,6 +954,91 @@ code {
       <dl>
         <div><dt>Stand</dt><dd>93 der 108 Hefte liefern Masken oder Lösungsgitter, und daraus sind <span class="win">54 Rätsel</span> gewonnen: 41 gegen eine gedruckte Lösung geprüft, 13 eindeutig lösbar ohne Vergleichsmöglichkeit, dazu drei dokumentierte Sonderformen. Kein einziges bleibt als Fehlschlag stehen.</dd></div>
         <div><dt>Offen</dt><dd>Bei den übrigen Heften findet die Automatik nichts: teils Scanqualität, teils vermutlich Hefte ohne Hexadoku. Zwei lehnt bereits <code>pdftotext</code> ab, und die textlosen Scans brauchen den seitenweisen Bildsweep, der bei dicken Heften über das Zeitlimit des Stapellaufs geht. Für jedes davon steht der Betrachtungsmodus bereit.</dd></div>
+      </dl>
+    </div>
+  </article>
+</section>
+
+<!-- ============ 11 ============ -->
+<section class="chapter">
+  <div class="chapter-head">
+    <span class="num">XI</span>
+    <h2>Fünf Gitter auf einmal</h2>
+    <p>Das Hexamurai aus den Doppelheften 7-8/2009 und 7-8/2011 stand bis zuletzt
+       als Sonderform in der Liste. Es nachzurüsten hieß nicht, einen zweiten Solver
+       zu schreiben, sondern den vorhandenen von seiner Geometrie zu trennen —
+       1216 Zellen in 236 Einheiten statt 256 in 48.</p>
+  </div>
+
+  <article class="entry">
+    <div class="rail"><span class="tag">MUR-01</span><span class="chip chip-ok">gelöst</span></div>
+    <div>
+      <h3>Die Geometrie steckte im Code, nicht in den Daten</h3>
+      <dl>
+        <div><dt>Symptom</dt><dd>Der schnelle Kern kennt genau drei Einheiten pro Zelle und rechnet sie aus dem Index: Zeile ist <code>k&gt;&gt;4</code>, Spalte <code>k&amp;15</code>. Bei fünf überlappenden Gittern liegt eine Zelle in bis zu fünf Einheiten, und keine davon lässt sich ausrechnen.</dd></div>
+        <div><dt>Lösung</dt><dd>Ein <em>Variant</em> beschreibt die Aufgabe als reine Datenstruktur: Zellen, Werte und eine Liste von Einheiten — Gruppen, die jeden Wert genau einmal enthalten müssen. Zeilen, Spalten und Blöcke eines Gitters sind Einheiten; beim Samurai werden die Einheiten aller fünf Gitter über <em>einem</em> Zellvorrat angemeldet. Damit gehört eine Zelle in der Überlappung schlicht zu zwei Zeilen, zwei Spalten und einem gemeinsamen Block.</dd></div>
+        <div><dt>Wirkung</dt><dd>Im Solver steht keine einzige Sonderbehandlung für Überlappungen. Die Constraint-Propagation läuft über Einheiten und überquert die Nahtstellen von selbst — genau das, was das Heft meint, wenn es sagt, die Gitter ließen sich nicht einzeln lösen.</dd></div>
+      </dl>
+    </div>
+  </article>
+
+  <article class="entry">
+    <div class="rail"><span class="tag">MUR-02</span><span class="chip chip-ok">gelöst</span></div>
+    <div>
+      <h3>Der Wächtereintrag, der sich vollschrieb</h3>
+      <dl>
+        <div><dt>Symptom</dt><dd>Zell→Einheit-Listen unterschiedlicher Länge kosten im heißesten Pfad eine Schleife mit variabler Grenze. Der übliche Ausweg — auf feste Länge mit einem leeren Wächtereintrag auffüllen — geht hier nicht: Das Setzen einer Zahl schreibt in <em>alle</em> Einheiten der Zelle, also auch in den Wächter, der damit nach dem ersten Zug nicht mehr leer ist und alle Kandidaten vergiftet.</dd></div>
+        <div><dt>Lösung</dt><dd>Aufgefüllt wird stattdessen mit der <em>ersten Einheit der Zelle selbst</em>. Beide Operationen falten die Liste mit ODER, und ODER ist idempotent: Der Duplikateintrag ändert weder die Kandidatenmenge noch den Belegungsstand. Sechs feste Registerzugriffe, keine Schleife, kein Sonderfall.</dd></div>
+      </dl>
+    </div>
+  </article>
+
+  <article class="entry">
+    <div class="rail"><span class="tag">MUR-03</span><span class="chip chip-ok">gelöst</span></div>
+    <div>
+      <h3>Der Eindeutigkeitsbeweis kostet mehr als das Lösen</h3>
+      <dl>
+        <div><dt>Symptom</dt><dd>Der Generator entfernt Vorgaben, solange die Lösung eindeutig bleibt — pro Zelle ein Beweis. Beim 9×9-Samurai dauert das 0,3 Sekunden, beim Hexamurai lief derselbe Lauf nach zwanzig Minuten noch.</dd></div>
+        <div><dt>Ursache</dt><dd>Eine Lösung zu <em>finden</em> ist billig; zu zeigen, dass es keine zweite gibt, heißt den Rest des Baums auszuschöpfen. Bei 1216 Zellen kippt genau dieser Rest gelegentlich ins Kombinatorische.</dd></div>
+        <div><dt>Lösung</dt><dd>Ein Knotenbudget pro Beweis. Wer nicht innerhalb von 20 000 Verzweigungen entschieden ist, gilt als „nicht entfernbar“ — die Vorgabe bleibt stehen. Das Ergebnis ist damit weiterhin ein korrektes, eindeutiges Rätsel, nur minimal <em>bezogen auf das Budget</em>. Laufzeit: 2,5 Minuten statt unbekannt, und die Kopfzeile sagt genau das, statt Minimalität zu behaupten.</dd></div>
+      </dl>
+    </div>
+  </article>
+
+  <article class="entry">
+    <div class="rail"><span class="tag">MUR-04</span><span class="chip chip-ok">gelöst</span></div>
+    <div>
+      <h3>Das Abbruch-Flag, das sich selbst löschte</h3>
+      <dl>
+        <div><dt>Symptom</dt><dd>Das erste mit Budget erzeugte Hexamurai meldete beim Nachprüfen <em>mehrere Lösungen</em> — obwohl der Generator Eindeutigkeit als Invariante führt.</dd></div>
+        <div><dt>Ursache</dt><dd>Die Budgetfunktion setzte ihre Zustandsvariablen zurück und las das Abbruch-Flag danach: <code>budgetHit</code> war zum Zeitpunkt der Rückgabe immer schon wieder <code>false</code>. Jeder abgebrochene Beweis galt als vollständig, und wenn er bis dahin genau eine Lösung gesehen hatte, wurde die Vorgabe fälschlich entfernt.</dd></div>
+        <div><dt>Lösung</dt><dd>Wert vor dem Zurücksetzen sichern. Dazu zwei Netze, damit dieselbe Klasse Fehler nicht stumm bleibt: Der Generator prüft sein fertiges Rätsel einmal <em>ohne</em> Budget nach, und ein Test erzeugt bei jedem Lauf einen 9×9-Samurai und verlangt genau eine Lösung.</dd></div>
+        <div><dt>Anmerkung</dt><dd>Aufgefallen ist der Fehler nur, weil <code>-unique</code> gegen das Erzeugnis lief. Ein Generator, der sein eigenes Ergebnis nicht prüft, produziert genau so lange Unsinn, bis es jemand anderes tut.</dd></div>
+      </dl>
+    </div>
+  </article>
+
+  <article class="entry">
+    <div class="rail"><span class="tag">MUR-05</span><span class="chip chip-neutral">Prämisse korrigiert</span></div>
+    <div>
+      <h3>Ein Test, der das Falsche bewies</h3>
+      <dl>
+        <div><dt>Vorhaben</dt><dd>Die Aussage des Hefts prüfbar machen: Ein Hexamurai mit eindeutiger Lösung bleibt mehrdeutig, sobald man das Mittelgitter herausschneidet und allein löst. Erst das zeigt, dass die Kopplung wirklich trägt.</dd></div>
+        <div><dt>Symptom</dt><dd>Der Test schlug fehl — das herausgeschnittene Mittelgitter war für sich genommen eindeutig.</dd></div>
+        <div><dt>Ursache</dt><dd>Nicht der Solver, sondern die Testdaten. Ein zufällig zur Hälfte gefülltes Gitter bekommt rund 128 eigene Vorgaben; ein echtes Hexadoku braucht etwa 110. Das Mittelgitter war schlicht überversorgt.</dd></div>
+        <div><dt>Lösung</dt><dd>Vorgaben nach Lage verteilen: das Mittelgitter dünn, die vier Außengitter dicht, und zum Erreichen der Eindeutigkeit werden zuerst Außenzellen nachgelegt. Damit hält die Prämisse — und der Test misst, was er behauptet.</dd></div>
+      </dl>
+    </div>
+  </article>
+
+  <article class="entry">
+    <div class="rail"><span class="tag">MUR-06</span><span class="chip chip-ok">gelöst</span></div>
+    <div>
+      <h3>Zwei Kerne, ein Ergebnis</h3>
+      <dl>
+        <div><dt>Frage</dt><dd>Der allgemeine Kern kann auch ein einzelnes Gitter beschreiben. Rechnet er dasselbe wie der handgeschriebene 16×16-Kern?</dd></div>
+        <div><dt>Prüfstein</dt><dd>Alle 54 rekonstruierten Elektor-Rätsel werden bei jedem Testlauf von beiden Kernen gelöst und Zelle für Zelle verglichen. Der allgemeine Kern muss zusätzlich für jede Einheit belegen, dass sie eine Permutation aller sechzehn Werte ist.</dd></div>
+        <div><dt>Preis der Allgemeinheit</dt><dd>Rund 17 % gegenüber dem spezialisierten Kern — wenig, aber genug, um die beiden Einzelgittergrößen bei ihrem eigenen Code zu belassen. Die Aufteilung ist damit gemessen statt vermutet, so wie schon bei der Trennung von 9×9 und 16×16.</dd></div>
       </dl>
     </div>
   </article>

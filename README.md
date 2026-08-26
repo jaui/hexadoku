@@ -1,7 +1,8 @@
 hexadoku
 ========
 
-Hexadoku (16x16 Sudoku) solver in Go — solves classic 9x9 Sudoku too.
+Hexadoku (16x16 Sudoku) solver in Go — solves classic 9x9 Sudoku, and the
+five-grid samurai layouts of both sizes (Elektor's *Hexamurai*) as well.
 Hexadokus were published as reader puzzles in the Elektor magazine:
 each row, column and 4x4 box must contain the hex digits 0-F exactly once.
 
@@ -46,6 +47,48 @@ hexadoku (`extra3.txt`) ~3.8 ms; Norvig's `top95` hard-sudoku collection
 and 16x16 (`solver.go`), which gains another ~13% on hard hexadokus
 compared to one size-generic core.
 
+Samurai layouts (Hexamurai)
+---------------------------
+
+Elektor's double issues 7-8/2009 and 7-8/2011 printed a **Hexamurai**
+(designer Claude Ghyselen): five 16x16 grids in a cross, each corner grid
+sharing one 4x4 box with the grid in the middle — 5·256 − 4·16 = 1216
+cells in 236 units. The magazine states the grids cannot be solved
+separately, and that is literally true: the middle grid on its own is
+ambiguous, and only what reaches it through the shared boxes pins it
+down. The same construction with 9 values is the classic samurai sudoku
+(369 cells).
+
+Both are handled by the same code with `n` as the only difference:
+
+| file | role |
+| --- | --- |
+| `chars.go` | value ↔ character encoding, shared by every variant |
+| `variant.go` | geometry: cells, units, and the text raster they sit on |
+| `general.go` | solver core driven by a `variant` (any unit list) |
+| `murai.go` | the samurai cross, the single-grid variant, CLI glue |
+| `solver.go` | the hand-written 9x9 / 16x16 cores (unchanged) |
+
+The abstraction is the *unit*: a group of `n` cells that must contain
+every value exactly once. Rows, columns and boxes of a plain grid are
+units; in a samurai the units of all five grids are declared over one
+shared cell pool, so a cell in an overlap simply belongs to two rows, two
+columns and one (shared) box. Propagation crosses the seams by itself —
+there is no special case for the overlaps anywhere in the solver.
+
+The general core costs about 17% over the specialized 16x16 core on a
+plain hexadoku (`go test -bench Cores`), which is why the single-grid
+sizes keep theirs. `go test` cross-checks the two cores against each
+other on all 54 reconstructed Elektor puzzles.
+
+Samurai puzzles are recognized by their cell count and are written on a
+character raster — one line per row, blanks where no grid covers the
+position, so the blanks carry meaning:
+
+    hexadoku.exe puzzles\hexamurai_generated.txt
+    hexadoku.exe -gen hexamurai -count 1     # minimal, takes a while
+    hexadoku.exe -gen samurai                # 9x9 version, ~0.3 s
+
 Build
 -----
 
@@ -66,6 +109,8 @@ Usage
     hexadoku.exe -bench 1000 file      timing statistics
     hexadoku.exe -gen 16 -count 3      generate minimal hexadoku puzzles
     hexadoku.exe -gen 9 -tries 300     generate hard minimal sudokus
+    hexadoku.exe -gen samurai          generate a 9x9 samurai
+    hexadoku.exe -gen hexamurai        generate a 16x16 hexamurai
 
 Puzzle file format (auto-detected):
 
@@ -74,6 +119,8 @@ Puzzle file format (auto-detected):
 - 9x9: digits `1-9`, empty cells `0` `.` `*` `_` (81 cells total)
 - collections: one complete puzzle per line (e.g. Norvig's `top95.txt`)
 - 16x16 letter format `a-p` (some puzzle collections) is auto-detected
+- samurai: 1216 cells (hexamurai) or 369 cells (9x9 samurai) on a
+  character raster, blanks between the grids
 
 The generator (`-gen`) produces *minimal* puzzles: clues are removed in
 random order while the solution stays unique, so in the result removing

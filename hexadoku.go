@@ -133,15 +133,7 @@ func (b *board) Compact() string {
 	return sb.String()
 }
 
-func valChar(v uint8) byte {
-	if size == 9 {
-		return '1' + v // 9x9: bits 0-8 represent values 1-9
-	}
-	if v < 10 {
-		return '0' + v
-	}
-	return 'A' + v - 10
-}
+func valChar(v uint8) byte { return charOf(size, v) }
 
 // parse reads a puzzle from text and auto-detects its size.
 // Formats:
@@ -181,35 +173,44 @@ func parse(s string) (*board, error) {
 			}
 		}
 	} else {
+		// collect the cell characters first: '0' means "empty" in a 9x9
+		// sudoku but is a value in a 16x16 hexadoku, so the size has to be
+		// known before the characters can be decoded
+		var chars []byte
 		for i := 0; i < len(s); i++ {
-			switch ch := s[i]; {
-			case ch >= '0' && ch <= '9':
-				toks = append(toks, int8(ch-'0'))
-			case ch >= 'a' && ch <= 'f':
-				toks = append(toks, int8(ch-'a'+10))
-			case ch >= 'A' && ch <= 'F':
-				toks = append(toks, int8(ch-'A'+10))
-			case ch == '.' || ch == '*' || ch == '_':
-				toks = append(toks, -1)
+			if valueOf(maxSize, s[i]) != chNone {
+				chars = append(chars, s[i])
 			}
 		}
-	}
-
-	switch len(toks) {
-	case maxCells:
-		initGeometry(maxSize)
-	case 81:
-		initGeometry(9)
-		for i, t := range toks {
-			if t > 9 {
-				return nil, fmt.Errorf("value %c is not valid in a 9x9 sudoku", valChar(uint8(t)))
-			}
-			toks[i] = t - 1 // 1-9 -> bits 0-8, '0' (now -1) = empty
+		switch len(chars) {
+		case maxCells:
+			initGeometry(maxSize)
+		case 81:
+			initGeometry(9)
+		default:
+			return nil, fmt.Errorf("expected 256 (hexadoku) or 81 (sudoku) cells, got %d", len(chars))
 		}
-	default:
-		return nil, fmt.Errorf("expected 256 (hexadoku) or 81 (sudoku) cells, got %d", len(toks))
+		for _, ch := range chars {
+			t := valueOf(size, ch)
+			if t == chNone {
+				return nil, fmt.Errorf("value %c is not valid in a %dx%d puzzle", ch, size, size)
+			}
+			toks = append(toks, int8(t))
+		}
+		return buildBoard(toks)
 	}
 
+	if len(toks) != maxCells {
+		return nil, fmt.Errorf("expected 256 (hexadoku) cells, got %d", len(toks))
+	}
+	initGeometry(maxSize)
+
+	return buildBoard(toks)
+}
+
+// buildBoard turns decoded tokens (value, or -1 for empty) into a board.
+// initGeometry must have been called for the matching size.
+func buildBoard(toks []int8) (*board, error) {
 	b := newBoard()
 	for k, t := range toks {
 		if t < 0 {
@@ -358,6 +359,12 @@ const defaultPuzzle = "E......A...6.F8..65...E.18.F.0.A3.7B..65.D...2..8....." +
 var compact bool // -compact: print only the solution in compact form
 
 func run(name, text string, bench int, checkUnique bool) bool {
+	// samurai layout? (detected by its total cell count; the cells sit on
+	// a character raster, so it needs the geometry-driven core)
+	if v := variantFor(countAllTokens(text)); v != nil {
+		return runVariant(name, v, text, bench, checkUnique)
+	}
+
 	// collection file? (several lines that each hold a complete puzzle)
 	var puzzleLines []string
 	for _, l := range strings.Split(stripComments(text), "\n") {
@@ -429,7 +436,7 @@ func main() {
 	bench := flag.Int("bench", 0, "additionally solve n times and report the average time")
 	unique := flag.Bool("unique", false, "check whether the solution is unique")
 	flag.BoolVar(&compact, "compact", false, "print only the solution in compact 16-line form")
-	gen := flag.Int("gen", 0, "generate puzzles instead of solving: 9 (sudoku) or 16 (hexadoku)")
+	gen := flag.String("gen", "", "generate puzzles instead of solving: 9, 16, samurai or hexamurai")
 	count := flag.Int("count", 3, "with -gen: number of puzzles to generate")
 	tries := flag.Int("tries", 8, "with -gen: attempts per puzzle, the hardest is kept")
 	seed := flag.Uint64("seed", 0, "with -gen: random seed (0 = time-based)")
@@ -440,9 +447,20 @@ func main() {
 	}
 	flag.Parse()
 
-	if *gen != 0 {
-		if *gen != 9 && *gen != 16 {
-			fmt.Fprintln(os.Stderr, "-gen must be 9 or 16")
+	if *gen != "" {
+		var v *variant
+		var n int
+		switch *gen {
+		case "9":
+			n = 9
+		case "16":
+			n = maxSize
+		case "samurai":
+			v = samuraiVariant(9)
+		case "hexamurai", "murai":
+			v = samuraiVariant(maxSize)
+		default:
+			fmt.Fprintln(os.Stderr, "-gen must be 9, 16, samurai or hexamurai")
 			os.Exit(2)
 		}
 		if *seed == 0 {
@@ -450,16 +468,24 @@ func main() {
 		}
 		rng := rand.New(rand.NewPCG(*seed, 0x9e3779b97f4a7c15))
 		for i := 0; i < *count; i++ {
+			if v != nil {
+				pz, d := generateVariant(v, rng)
+				fmt.Printf("# %s puzzle %d: %d clues, difficulty %d branch nodes, unique, minimal up to a %d node budget per removal, seed %d\n",
+					v.name, i+1, v.ncells-int(pz.free), d, genBudget, *seed)
+				fmt.Print(v.render(pz))
+				fmt.Println()
+				continue
+			}
 			var best *board
 			var bestNodes uint64
 			for t := 0; t < *tries; t++ {
-				pz, d := generate(*gen, rng)
+				pz, d := generate(n, rng)
 				if best == nil || d > bestNodes {
 					best, bestNodes = pz, d
 				}
 			}
 			fmt.Printf("# %dx%d puzzle %d: %d clues, difficulty %d branch nodes, minimal (removing any clue loses uniqueness), seed %d\n",
-				*gen, *gen, i+1, ncells-int(best.free), bestNodes, *seed)
+				n, n, i+1, ncells-int(best.free), bestNodes, *seed)
 			fmt.Print(best.Compact())
 			fmt.Println()
 		}

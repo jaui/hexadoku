@@ -1,0 +1,184 @@
+// Samurai layouts: five grids arranged in a cross, each corner grid
+// sharing one box with the grid in the middle.
+//
+//	+--------+     +--------+       origins are multiples of n-b, so all
+//	|  TL    |     |   TR   |       five grids sit on one common box
+//	|      +-+-----+-+      |       lattice; the shaded 4x4 (3x3) blocks
+//	+------+-|     |-+------+       belong to two grids at once
+//	       | |  C  | |
+//	+------+-|     |-+------+
+//	|      +-+-----+-+      |
+//	|  BL    |     |   BR   |
+//	+--------+     +--------+
+//
+// With 16 values this is Elektor's Hexamurai (5*256 - 4*16 = 1216 cells,
+// 236 units); with 9 values the classic samurai sudoku (369 cells).
+// Elektor states explicitly that the five grids cannot be solved
+// separately - the middle grid on its own is ambiguous, and only the
+// clues reaching it through the shared boxes pin it down. That is exactly
+// what the general core does: a shared cell lies in the units of both
+// grids, so propagation crosses the seam by itself.
+package main
+
+import (
+	"fmt"
+	"math/rand/v2"
+	"os"
+	"strings"
+	"time"
+)
+
+// samuraiVariant builds the cross for n=16 (hexamurai) or n=9 (samurai).
+func samuraiVariant(n int) *variant {
+	b, name := 3, "samurai"
+	if n == maxSize {
+		b, name = 4, "hexamurai"
+	}
+	d := n - b // grid origins step by one grid minus the shared box
+	span := 2*d + n
+	origins := [][2]int{{0, 0}, {0, 2 * d}, {d, d}, {2 * d, 0}, {2 * d, 2 * d}}
+	v := newVariant(name, n, span, span)
+	v.layout(origins, n, b)
+	return v
+}
+
+// gridVariant describes a single nxn grid. The specialized cores in
+// solver.go handle these much faster and are what the CLI uses; this
+// exists so the general core can be cross-checked against them.
+func gridVariant(n int) *variant {
+	b, name := 3, "sudoku"
+	if n == maxSize {
+		b, name = 4, "hexadoku"
+	}
+	v := newVariant(name, n, n, n)
+	v.layout([][2]int{{0, 0}}, n, b)
+	v.tokens = true // a plain grid may be written with separators
+	return v
+}
+
+// variantFor returns the layout whose cell count matches n, or nil.
+func variantFor(ncells int) *variant {
+	switch ncells {
+	case 5*maxSize*maxSize - 4*4*4: // 1216
+		return samuraiVariant(maxSize)
+	case 5*9*9 - 4*3*3: // 369
+		return samuraiVariant(9)
+	}
+	return nil
+}
+
+// countAllTokens counts the puzzle cells in a whole text.
+func countAllTokens(text string) int {
+	n := 0
+	for _, l := range strings.Split(stripComments(text), "\n") {
+		n += countTokens(l)
+	}
+	return n
+}
+
+func runVariant(name string, v *variant, text string, bench int, checkUnique bool) bool {
+	g, err := v.parse(text)
+	if err != nil {
+		fmt.Fprintf(os.Stderr, "%s: %v\n", name, err)
+		return false
+	}
+	if !compact {
+		fmt.Printf("=== %s (%s, %d cells, %d clues)\n%s\n",
+			name, v.name, v.ncells, v.ncells-int(g.free), v.render(g))
+	}
+
+	nodes = 0
+	work := *g
+	start := time.Now()
+	ok := v.solve(&work)
+	elapsed := time.Since(start)
+
+	if !ok {
+		fmt.Printf("no solution (%v, %d branch nodes)\n\n", elapsed, nodes)
+		return false
+	}
+	fmt.Print(v.render(&work))
+	if compact {
+		return true
+	}
+	fmt.Printf("solved in %v, %d branch nodes\n", elapsed, nodes)
+
+	if checkUnique {
+		check := *g
+		if n := v.count(&check, 2); n > 1 {
+			fmt.Println("warning: solution is not unique")
+		} else {
+			fmt.Println("solution is unique")
+		}
+	}
+
+	if bench > 0 {
+		start = time.Now()
+		for i := 0; i < bench; i++ {
+			work = *g
+			v.solve(&work)
+		}
+		elapsed = time.Since(start)
+		fmt.Printf("bench: %d runs, %v total, %v per solve\n", bench, elapsed, elapsed/time.Duration(bench))
+	}
+	fmt.Println()
+	return true
+}
+
+// budget per uniqueness proof while generating. Deciding that a samurai
+// has a second solution can take far longer than solving it; a clue whose
+// removal cannot be decided within the budget is kept, so the result stays
+// a correct puzzle and is minimal up to that budget.
+const genBudget = 20000
+
+// generateVariant creates a minimal samurai puzzle the same way generate()
+// does for a single grid: fill at random, then drop clues in random order
+// as long as the solution stays unique.
+func generateVariant(v *variant, rng *rand.Rand) (*gboard, uint64) {
+	full := v.newBoard()
+	v.fillRand(full, rng)
+
+	keep := make([]bool, v.ncells)
+	for k := range keep {
+		keep[k] = true
+	}
+	build := func() *gboard {
+		g := v.newBoard()
+		for k := 0; k < v.ncells; k++ {
+			if keep[k] {
+				v.assign(g, k, full.grid[k])
+			}
+		}
+		return g
+	}
+	start := time.Now()
+	for i, k := range rng.Perm(v.ncells) {
+		keep[k] = false
+		if n, done := v.countBudget(build(), 2, genBudget); !done || n != 1 {
+			keep[k] = true
+		}
+		if (i+1)%64 == 0 {
+			left := 0
+			for _, b := range keep {
+				if b {
+					left++
+				}
+			}
+			fmt.Fprintf(os.Stderr, "\r%s: %d/%d cells tried, %d clues left, %v elapsed   ",
+				v.name, i+1, v.ncells, left, time.Since(start).Round(time.Second))
+		}
+	}
+	fmt.Fprintln(os.Stderr)
+
+	pz := build()
+	// The removal loop keeps uniqueness as an invariant, but a budget was
+	// involved, so verify it once without one.
+	check := *pz
+	if n := v.count(&check, 2); n != 1 {
+		fmt.Fprintf(os.Stderr, "%s: generated puzzle has %d solutions\n", v.name, n)
+	}
+	nodes = 0
+	work := *pz
+	v.solve(&work)
+	return pz, nodes
+}
