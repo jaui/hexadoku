@@ -229,6 +229,29 @@ clue (the *mask*). The printed previous-issue solution comes from the
 PDF text layer on born-digital issues; on scanned ones the same lattice
 detection finds the dense grid and tesseract reads it.
 
+Scans need four things a born-digital page does not:
+
+- **Deskew** (`deskew.go`). Half a degree off square is invisible in
+  print but fatal for a detector looking for the longest dark run inside
+  one pixel row. The angle comes from the sharpness of the horizontal ink
+  profile — scored *smoothed*, because only at zero degrees is the shift
+  exactly nothing, and an unsmoothed score hands "do not rotate" a bonus
+  no real angle can earn.
+- **A rigid comb** (`bestComb`). Some of the 17 row lines print too faint
+  for any per-line threshold. A hexadoku cell is square, so the row pitch
+  must equal the column pitch of the lattice already found: place the 17
+  rows as one comb and search only its offset, scored by its second
+  weakest line.
+- **Thresholds fitted to the page** (`raiseThresholds`, Otsu) when the
+  fixed ones find no ink at all, and a **tiled retry** for pages so bowed
+  that no single angle squares them.
+- **`-page N`** to work from a page identified elsewhere, for scans whose
+  text layer is too poor for the sweep.
+
+Where automation still fails, `-crops` exports magnified bands for
+reading by eye; five issues were recovered that way, and the masks
+re-detected afterwards match those readings cell for cell.
+
 Phase B pairs each mask with the solution that belongs to it. Elektor
 prints a puzzle's solution about two issues later, but the lag varies,
 so the pairing is found by *content*: the tesseract reading of a puzzle
@@ -240,7 +263,34 @@ provably correct whenever the remainder is uniquely solvable.
 
 Validation is end-to-end (`validate_elektor.ps1`): every reconstructed
 puzzle must be uniquely solvable *and* its solution must equal a
-solution actually printed in some issue.
+solution actually printed in some issue. Current state over 110 PDFs:
+**67 verified against a printed solution, 15 uniquely solvable but
+without one to compare to, 4 documented special formats.**
+
+Uniqueness alone is not enough to trust a reconstruction. A faint
+printed *solution* grid can lose enough cells to the ink probe to pose as
+a puzzle — and then validate, because a subset of the right solution is
+uniquely solvable and matches what was printed. Two issues had passed
+that way. Real Elektor puzzles hold 104 to 144 clues, so a mask past 160
+is now rejected outright.
+
+The July/August double issues are mostly not hexadokus at all, and each
+is documented as such in `puzzles/elektor/<issue>.txt`:
+
+| issue | what it prints |
+| --- | --- |
+| 7-8/2007 | *Alphanumski*, overlapping grids over a much larger symbol set |
+| 7-8/2008 | *AlphaSudoku*, 25x25 |
+| 7-8/2009 | *Hexamurai*, five grids in a pinwheel (solved, see above) |
+| 7-8/2010 | *Hexadocube*, six grids on the faces of an unfolded cube |
+| 7-8/2011 | *Hexamurai*, five grids in a plus (solved, see above) |
+| 3/2011 | *Hexadoku Digest*, needs prize codes from 18 earlier issues |
+
+Two English originals are damaged on archive.org and stay damaged after
+re-downloading (6/2011 is mostly null bytes, 12/2014 has a broken xref).
+The Dutch edition carries the same puzzle: `Elektuur2011-06.pdf` and
+`Elektuur2014-12.pdf` were fetched from the `elektuur-572-2011-6_202005`
+and `elektuur-614-2014-12` items and read cleanly.
 
 For anything the automation cannot resolve, `-crops` exports the
 detected grids as readable PNG bands for visual transcription -

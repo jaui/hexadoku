@@ -1,0 +1,3 @@
+# Elektor 2008-07_08 - not a standalone puzzle
+# The double issue prints an AlphaSudoku (25x25, p. 118) instead of a
+# hexadoku; p. 119 only announces the winners of the previous one.

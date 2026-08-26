@@ -1,0 +1,7 @@
+# Elektor 2010-7_8 - not a standalone puzzle
+# "Hexadocube" (p. 60): six hexadoku grids on the faces of a cube, shown
+# unfolded, each linked to its four neighbours through the boxes along the
+# folds. The magazine states that solving a single grid on its own is
+# impossible. The 84-clue mask is one face and is meaningless on its own.
+# The clues are a graphic here, not text, so reading it would take the
+# visual route over six grids.

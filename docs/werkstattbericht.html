@@ -378,11 +378,11 @@ code {
 
 <section class="figures">
   <div class="fig"><b>600 ms → 32 µs</b><span>Pro Lösung</span></div>
-  <div class="fig"><b>108</b><span>Hefte geladen</span></div>
-  <div class="fig"><b>47 → 93</b><span>Hefte mit Ausbeute</span></div>
-  <div class="fig"><b>56</b><span>Rätsel gewonnen</span></div>
-  <div class="fig"><b>41</b><span>Gegengeprüft</span></div>
-  <div class="fig"><b>21</b><span>Von Hand gelesen</span></div>
+  <div class="fig"><b>110</b><span>Hefte geladen</span></div>
+  <div class="fig"><b>47 → 98</b><span>Hefte mit Ausbeute</span></div>
+  <div class="fig"><b>86</b><span>Rätsel gewonnen</span></div>
+  <div class="fig"><b>67</b><span>Gegengeprüft</span></div>
+  <div class="fig"><b>26</b><span>Von Hand gelesen</span></div>
   <div class="fig"><b>1088 · 768</b><span>Zellen der zwei Hexamurai</span></div>
 </section>
 
@@ -952,8 +952,9 @@ code {
     <div>
       <h3>Hefte ohne auffindbares Gitter</h3>
       <dl>
-        <div><dt>Stand</dt><dd>93 der 108 Hefte liefern Masken oder Lösungsgitter, und daraus sind <span class="win">56 Rätsel</span> gewonnen: 41 gegen eine gedruckte Lösung geprüft, 13 eindeutig lösbar ohne Vergleichsmöglichkeit, dazu die beiden Hexamurai. Als Sonderform bleibt nur der Digest. Kein einziges bleibt als Fehlschlag stehen.</dd></div>
-        <div><dt>Offen</dt><dd>Bei den übrigen Heften findet die Automatik nichts: teils Scanqualität, teils vermutlich Hefte ohne Hexadoku. Zwei lehnt bereits <code>pdftotext</code> ab, und die textlosen Scans brauchen den seitenweisen Bildsweep, der bei dicken Heften über das Zeitlimit des Stapellaufs geht. Für jedes davon steht der Betrachtungsmodus bereit.</dd></div>
+        <div><dt>Stand</dt><dd>98 der 110 Hefte liefern Masken oder Lösungsgitter, und daraus sind <span class="win">86 Rätsel</span> gewonnen: 67 gegen eine gedruckte Lösung geprüft, 15 eindeutig lösbar ohne Vergleichsmöglichkeit, dazu vier dokumentierte Sonderformen: Alphanumski, AlphaSudoku, Hexadocube und der Digest. Die beiden Hexamurai zählen nicht mehr dazu, sie sind gelöst.</dd></div>
+        <div><dt>Offen</dt><dd>Vier Hefte liefern weiterhin kein Rätselgitter, nur das daneben gedruckte Lösungsgitter: 4/2006, 5/2006, 1/2007 und 11/2013. Alles blasse Scans der frühen Jahrgänge. Die Seite ist jeweils bekannt, für sie steht der Betrachtungsmodus bereit — das ist Ablesearbeit, kein offenes Verfahren mehr.</dd></div>
+        <div><dt>Korrektur</dt><dd>Die frühere Vermutung, es liege an der Rechenzeit des seitenweisen Bildsweeps, war falsch. Es waren vier voneinander unabhängige Fehler in der Erkennung, alle in Kapitel XII.</dd></div>
       </dl>
     </div>
   </article>
@@ -1089,6 +1090,103 @@ code {
         <div><dt>Beobachtung</dt><dd>Die beiden Rätsel unterscheiden sich im Aufwand um fünf Größenordnungen: 65 Verzweigungsknoten gegen 3 364 151.</dd></div>
         <div><dt>Erklärung</dt><dd>Sie stand schon in der Einheitentabelle. Beim Plus von 2011 überlappt das Mittelgitter jedes Außengitter um eine ganze Hälfte, und dadurch fällt <em>jede</em> seiner Zeilen, Spalten und Blöcke mit einer Einheit eines Außengitters zusammen. Fünf angemeldete Gitter ergeben 176 verschiedene Einheiten — genau so viele, wie die vier Außengitter allein beitragen. Das Mittelgitter fügt keine einzige Regel hinzu.</dd></div>
         <div><dt>Folge</dt><dd>Übrig bleiben vier nur paarweise gekoppelte Gitter bei 30 % Vorgabendichte. Die Propagation kommt schnell an ihr Ende, und der Rest ist Suche. Dass die Einheiten-Entdopplung diesen Befund nebenbei ausrechnet, ist ein Nebeneffekt der Modellierung: Wer Geometrie als Daten führt, kann sie auch auszählen.</dd></div>
+      </dl>
+    </div>
+  </article>
+</section>
+
+<!-- ============ 12 ============ -->
+<section class="chapter">
+  <div class="chapter-head">
+    <span class="num">XII</span>
+    <h2>Die letzten fünfzehn Hefte</h2>
+    <p>Fünfzehn Hefte lieferten überhaupt kein Gitter. Sie waren nicht eine Frage
+       der Rechenzeit, wie vermutet, sondern vier voneinander unabhängige Fehler in
+       der Bilderkennung — jeder davon auf gestochen scharfen Seiten. Ausbeute
+       danach: <span class="win">86 statt 56 Rätsel</span>, gegengeprüft 67 statt 41.</p>
+  </div>
+
+  <article class="entry">
+    <div class="rail"><span class="tag">SCAN-01</span><span class="chip chip-ok">gelöst</span></div>
+    <div>
+      <h3>Ein halbes Grad genügt</h3>
+      <dl>
+        <div><dt>Symptom</dt><dd>„Kein 17×17-Gitter gefunden" auf einer Seite, deren Gitter bei 300 dpi tadellos aussieht.</dd></div>
+        <div><dt>Ursache</dt><dd>Der Scan liegt ein halbes Grad schief. Im Druck unsichtbar, für einen Sucher, der die längste dunkle Strecke <em>innerhalb einer Pixelzeile</em> misst, tödlich: über die Breite eines Hexadokus wandert die Linie um zehn Pixel, und keine Zeile sieht mehr als ein Bruchstück.</dd></div>
+        <div><dt>Lösung</dt><dd>Vor dem Suchen geradedrehen. Der Winkel kommt aus der Schärfe des waagerechten Tintenprofils: Steht die Seite gerade, fällt jede Textzeile und jede Gitterlinie in genau einen Eimer, und die Quadratsumme belohnt das.</dd></div>
+      </dl>
+    </div>
+  </article>
+
+  <article class="entry">
+    <div class="rail"><span class="tag">SCAN-02</span><span class="chip chip-ok">gelöst</span></div>
+    <div>
+      <h3>Der Bonus, den nur der Nullwinkel bekommt</h3>
+      <dl>
+        <div><dt>Symptom</dt><dd>Die frisch gebaute Entzerrung meldete auf genau der Seite, für die sie gebaut war, stur <code>+0,00°</code>.</dd></div>
+        <div><dt>Ursache</dt><dd>Zwei fast gleich hohe Maxima, −1,0° und 0,0°, letzteres um ein Tausendstel vorn. Der Grund ist ein Artefakt des Verfahrens: Die Verschiebung je Spalte wird auf ganze Pixel gerundet, und <em>nur bei Winkel null ist diese Verschiebung exakt nichts</em>. Bei jedem anderen Winkel zerfällt eine Linie durch das Runden auf zwei Eimer und verliert Punkte. „Gar nicht drehen" bekommt damit einen Bonus, den kein echter Winkel erreichen kann — und auf einer Seite, deren Text gerade steht und deren Gitter schief sitzt, reicht das zum Sieg.</dd></div>
+        <div><dt>Lösung</dt><dd>Das Profil vor der Bewertung glätten, dann zählt eine auf zwei Eimer verteilte Linie fast so viel wie eine getroffene. Danach: −0,90° erkannt, Gitter gefunden, 114 Vorgaben.</dd></div>
+        <div><dt>Lehre</dt><dd>Ein Gütemaß darf den Ruhezustand nicht bevorzugen. Wo eine Kandidatenmenge einen Kandidaten enthält, der ohne Verlustrechnung auskommt, misst man nicht mehr die Sache, sondern das Verfahren.</dd></div>
+      </dl>
+    </div>
+  </article>
+
+  <article class="entry">
+    <div class="rail"><span class="tag">SCAN-03</span><span class="chip chip-ok">gelöst</span></div>
+    <div>
+      <h3>Zellen sind quadratisch — das ist eine Information</h3>
+      <dl>
+        <div><dt>Symptom</dt><dd>Alle 17 senkrechten Linien gefunden, aber nur elf der siebzehn waagerechten: sechs sind im Druck zu blass für jede Schwelle, die Zeile für Zeile entscheidet.</dd></div>
+        <div><dt>Lösung</dt><dd>Nicht jede Linie einzeln suchen, sondern alle siebzehn als <em>starren Kamm</em>. Eine Hexadoku-Zelle ist quadratisch, also ist der Zeilenabstand gleich dem bereits gemessenen Spaltenabstand; gesucht wird nur noch der Versatz. Bewertet wird der Kamm nach seiner <em>zweitschwächsten</em> Linie — dasselbe Kriterium, das schon bei der Fensterwahl die Mittelwerte ersetzt hat, aus demselben Grund: Ein Maß, das mittelt, verzeiht einer Linie, ganz woanders zu liegen.</dd></div>
+      </dl>
+    </div>
+  </article>
+
+  <article class="entry">
+    <div class="rail"><span class="tag">SCAN-04</span><span class="chip chip-ok">gelöst</span></div>
+    <div>
+      <h3>Das verschwundene B</h3>
+      <dl>
+        <div><dt>Symptom</dt><dd>Von Hand abgelesene Rätsel hatten mehr Vorgaben als die zugehörige Maske — 121 gegen 114, 120 gegen 115, 117 gegen 114. Und jede einzelne Abweichung war eine Zelle mit einem <code>B</code>.</dd></div>
+        <div><dt>Ursache</dt><dd>Die Zellenprüfung verwarf alles über 45 % Tintenanteil. Diese Obergrenze war einmal gegen die grau hinterlegten Preiszellen eingezogen worden. Auf den kräftiger gedruckten Scans des Jahrgangs 2010 überschreitet aber das dichteste Zeichen des Vorrats genau diese Grenze — und wird stillschweigend zur leeren Zelle.</dd></div>
+        <div><dt>Lösung</dt><dd>Grenze auf 70 %. Die Rechtfertigung kam nicht aus dem Gefühl, sondern aus Bodenwahrheit: Drei unabhängig abgelesene Hefte lagen vor, und nach der Korrektur stimmen die neu erkannten Masken mit ihnen <em>zellengenau</em> überein. Zwei Wege, ein Ergebnis.</dd></div>
+        <div><dt>Nebenwirkung</dt><dd>Zwei weitere Hefte, deren Maske vorher unplausibel niedrig lag, kamen dadurch mit dazu.</dd></div>
+      </dl>
+    </div>
+  </article>
+
+  <article class="entry">
+    <div class="rail"><span class="tag">SCAN-05</span><span class="chip chip-open">Prüflücke</span></div>
+    <div>
+      <h3>Ein Lösungsgitter, das die Prüfung bestand</h3>
+      <dl>
+        <div><dt>Befund</dt><dd>Ausgabe 10/2007 galt als gegengeprüft — war aber gar nicht das Rätsel, sondern das daneben gedruckte <em>Lösungsgitter</em>. Dessen blasse Ziffern verlieren im Scan genug Zellen, um unter der Schwelle für „dicht" zu bleiben und als Rätsel durchzugehen: 200 statt 118 Vorgaben.</dd></div>
+        <div><dt>Warum die Prüfung nichts merkte</dt><dd>Weil eine Teilmenge der richtigen Lösung eindeutig lösbar ist <em>und</em> zur gedruckten Lösung passt. Beide Prüfsteine des Projekts bestanden also — sie messen Konsistenz, nicht Herkunft. Ein zweites Heft wäre auf demselben Weg durchgerutscht.</dd></div>
+        <div><dt>Abhilfe</dt><dd>Ein Prüfstein, der die Herkunft misst: Über alle gegengeprüften Elektor-Rätsel liegt die Vorgabenzahl zwischen 104 und 144. Was darüber liegt, ist kein Rätsel. Obergrenze von 200 auf 160.</dd></div>
+      </dl>
+    </div>
+  </article>
+
+  <article class="entry">
+    <div class="rail"><span class="tag">SCAN-06</span><span class="chip chip-ok">gelöst</span></div>
+    <div>
+      <h3>Beschädigt an der Quelle</h3>
+      <dl>
+        <div><dt>Symptom</dt><dd>Zwei Hefte ließen sich von keinem Werkzeug öffnen: 6/2011 besteht fast vollständig aus Nullbytes, 12/2014 hat eine zerstörte Querverweistabelle.</dd></div>
+        <div><dt>Befund</dt><dd>Erneutes Herunterladen half nicht — die Dateien sind auf archive.org selbst beschädigt, nicht beim Übertragen kaputtgegangen.</dd></div>
+        <div><dt>Lösung</dt><dd>Andere Ausgabe desselben Hefts. Das Hexadoku ist in allen Sprachausgaben dasselbe Gitter; die niederländische <em>Elektuur</em> liegt vollständig auf archive.org und ließ sich fehlerfrei verarbeiten. Zwei Hefte gerettet, ohne eine Zeile Erkennungscode zu ändern.</dd></div>
+      </dl>
+    </div>
+  </article>
+
+  <article class="entry">
+    <div class="rail"><span class="tag">SCAN-07</span><span class="chip chip-neutral">kein Fehler</span></div>
+    <div>
+      <h3>Die Doppelhefte spielen nie mit</h3>
+      <dl>
+        <div><dt>Befund</dt><dd>Was von den hartnäckigen Fällen übrig blieb, waren zum guten Teil gar keine Hexadokus. Die Sommer-Doppelhefte drucken jedes Jahr etwas anderes: 7-8/2007 ein <em>Alphanumski</em> über einen weit größeren Zeichenvorrat, 7-8/2008 ein <em>AlphaSudoku</em> in 25×25, 7-8/2010 einen <em>Hexadocube</em> — sechs Gitter auf den Flächen eines abgewickelten Würfels, über die Faltkanten verbunden —, dazu die beiden bekannten Hexamurai.</dd></div>
+        <div><dt>Erkennungsmerkmal</dt><dd>Im ersten Band des Ausschnitts standen <code>V</code>, <code>S</code>, <code>T</code>, <code>Q</code>, <code>W</code>. Zeichen, die es in einem Hexadoku nicht gibt, sind der schnellste Beweis, dass man das falsche Rätsel vor sich hat.</dd></div>
+        <div><dt>Konsequenz</dt><dd>Alle als Sonderform dokumentiert und gegen Überschreiben geschützt. Der Hexadocube wäre mit der neuen Geometrie-Beschreibung lösbar — seine Vorgaben stehen aber als Grafik auf der Seite, das bliebe Handarbeit über sechs Gitter.</dd></div>
       </dl>
     </div>
   </article>

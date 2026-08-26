@@ -1,18 +1,5 @@
-# Elektor Hexadoku 2007-07_08 (86 clues)
-# digits from tesseract OCR only (no matching printed solution found); 31 OCR conflicts NOT repairable (31 damaged cells, remainder not uniquely solvable)
-9...........016.
-A0.5.4........B.
-...1.E.C4.....C.
-E..........8C.4.
-.....5...9.6..D.
-....A3....746..8
-....C.D........C
-8F7.220...2..59.
-25.76.E.0.C.....
-B3......6...C1.F
-1...6...73F0E8.A
-..940.31F.A25...
-............2...
-.A..250.....1..B
-...7...9..C...4.
-2.....5..B...A..
+# Elektor 2007-07_08 - not a standalone puzzle
+# "Alphanumski" (p. 141): overlapping grids over a much larger symbol set
+# than 0-F - the page shows V, S, T, Q, O, W, U, J, G, N and more. Not a
+# hexadoku. The 160-clue mask for this issue is a 16x16 window cut out of
+# that larger lattice and is meaningless on its own.

@@ -6,17 +6,17 @@
 //
 // This allows a nearly OCR-free chain reconstruction:
 //
-//  phase A (default mode, per PDF):
-//    1. find the page mentioning "Hexadoku"
-//    2. extract the printed previous-issue solution from the text glyphs
-//       (16x16 lattice of hex digits) -> <key>_prevsolution.txt
-//    3. render the page with pdftoppm and detect the puzzle grid's
-//       *mask* - which cells contain ink - by finding the 17+17 grid
-//       lines and probing each cell -> <key>_mask.txt
+//	phase A (default mode, per PDF):
+//	  1. find the page mentioning "Hexadoku"
+//	  2. extract the printed previous-issue solution from the text glyphs
+//	     (16x16 lattice of hex digits) -> <key>_prevsolution.txt
+//	  3. render the page with pdftoppm and detect the puzzle grid's
+//	     *mask* - which cells contain ink - by finding the 17+17 grid
+//	     lines and probing each cell -> <key>_mask.txt
 //
-//  phase B (-chain):
-//    the puzzle of issue N is mask(N) filled with digits from
-//    prevsolution(N+1) -> <key>.txt
+//	phase B (-chain):
+//	  the puzzle of issue N is mask(N) filled with digits from
+//	  prevsolution(N+1) -> <key>.txt
 //
 // Every reconstructed puzzle can then be validated end-to-end with the
 // solver: it must be uniquely solvable and reproduce the printed
@@ -150,7 +150,6 @@ func parseKey(key string) (issueDate, bool) {
 	}
 	return issueDate{y, m1, m2}, true
 }
-
 
 // ---------- phase A: page text via poppler pdftotext -bbox ----------
 
@@ -1336,7 +1335,11 @@ func chain(outDir, solver string) error {
 		// 1088-cell puzzle with a wrong 256-cell one.
 		pf := filepath.Join(outDir, mk+".txt")
 		if b, err := os.ReadFile(pf); err == nil {
-			for _, marker := range []string{"transcribed visually", "muraiextract"} {
+			for _, marker := range []string{
+				"transcribed visually",    // read by eye and checked
+				"muraiextract",            // one of the hexamurai
+				"not a standalone puzzle", // a documented special format
+			} {
 				if strings.Contains(string(b), marker) {
 					fmt.Printf("keep %s: %s, left untouched\n", mk, marker)
 					b = nil
