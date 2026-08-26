@@ -5,6 +5,7 @@ import (
 	"os"
 	"path/filepath"
 	"regexp"
+	"strings"
 	"testing"
 )
 
@@ -30,7 +31,13 @@ func TestGeneralCoreMatchesSpecialized(t *testing.T) {
 		}
 		text := string(data)
 		if countAllTokens(text) != 256 {
-			continue // marker file for a special format
+			continue // marker file, or one of the samurai layouts
+		}
+		if strings.Contains(text, "NOT repairable") {
+			// the pipeline itself flags this reconstruction as broken;
+			// it is kept as raw material for a visual reading, not as a
+			// puzzle. Core equivalence is not what it would test.
+			continue
 		}
 		b, err := parse(text)
 		if err != nil {

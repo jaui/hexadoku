@@ -84,7 +84,7 @@ func exportCrops(pdfPath string, page int, pdftoppm, pdftotext, outDir string, d
 			if strings.Contains(strings.ToLower(all.String()), "hexadoku") {
 				if img, err := renderPage(pdftoppm, pdfPath, i+1, 100, tmpDir); err == nil {
 					_, sb := solutionFromWords(words)
-					_, merr := maskFromImage(img, 100, sb)
+					_, merr := maskFromImage(img, 100, sb, false)
 					os.Remove(img)
 					if merr == nil {
 						page = i + 1
@@ -106,7 +106,7 @@ func exportCrops(pdfPath string, page int, pdftoppm, pdftotext, outDir string, d
 	if err != nil {
 		return err
 	}
-	det, err := maskFromImage(img, dpi, solBox)
+	det, err := maskFromImage(img, dpi, solBox, true)
 	if err != nil {
 		return err
 	}

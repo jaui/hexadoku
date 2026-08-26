@@ -1,0 +1,18 @@
+# Elektor Hexadoku 2010-11 (p. 75), 120 clues
+# transcribed visually from the scan; tesseract could not read this page
+F....1.2D..A..0C
+6....9751..3AF2E
+D.A2E.0..89B56..
+4....A..6..C.D3.
+..BE..30C.D.65..
+0D....14E.28.A9.
+..2.5.9.3.7FB0E4
+938.C6A...B5.7..
+5..DF82.........
+..1......F60.4..
+C7.84.6...3...AD
+.F6A13.7..4.2.B.
+.C...5.....2....
+.B..8.DC0.....5.
+.5F..2.6A.1..C..
+.A7..4F..9..38.B

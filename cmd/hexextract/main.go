@@ -165,6 +165,8 @@ type word struct {
 	s    string
 }
 
+var forcePage int // -page: examine only this page
+
 var wordRe = regexp.MustCompile(`<word xMin="([0-9.]+)" yMin="([0-9.]+)" xMax="([0-9.]+)" yMax="([0-9.]+)">([^<]*)</word>`)
 
 // pdfWords extracts per-word text with coordinates for every page.
@@ -302,6 +304,48 @@ const (
 type bitmap struct {
 	w, h int
 	lum  []uint8
+	// Thresholds start at the constants above, which fit every
+	// born-digital page and most scans. A faint scan prints its "black"
+	// well above them; raiseThresholds fits them to that page instead.
+	ink, line uint8
+}
+
+// raiseThresholds refits the ink/paper split to this page with Otsu's
+// method and reports whether that actually moved. It only ever raises:
+// lowering the bar on a page that simply has no lattice would invent one.
+func (bm *bitmap) raiseThresholds() bool {
+	var hist [256]int
+	for _, v := range bm.lum {
+		hist[v]++
+	}
+	total := len(bm.lum)
+	var sum float64
+	for i, c := range hist {
+		sum += float64(i) * float64(c)
+	}
+	var wB, sumB float64
+	bestVar, bestT := -1.0, 0
+	for t := 0; t < 256; t++ {
+		wB += float64(hist[t])
+		if wB == 0 {
+			continue
+		}
+		wF := float64(total) - wB
+		if wF == 0 {
+			break
+		}
+		sumB += float64(t) * float64(hist[t])
+		mB, mF := sumB/wB, (sum-sumB)/wF
+		if v := wB * wF * (mB - mF) * (mB - mF); v > bestVar {
+			bestVar, bestT = v, t
+		}
+	}
+	if bestT <= thrInk+10 || bestT > 245 {
+		return false
+	}
+	bm.ink = uint8(bestT)
+	bm.line = uint8(min(bestT+(thrLine-thrInk), 250))
+	return true
 }
 
 func loadBitmap(path string) (*bitmap, error) {
@@ -315,7 +359,7 @@ func loadBitmap(path string) (*bitmap, error) {
 		return nil, err
 	}
 	b := img.Bounds()
-	bm := &bitmap{w: b.Dx(), h: b.Dy(), lum: make([]uint8, b.Dx()*b.Dy())}
+	bm := &bitmap{w: b.Dx(), h: b.Dy(), lum: make([]uint8, b.Dx()*b.Dy()), ink: thrInk, line: thrLine}
 	for y := b.Min.Y; y < b.Max.Y; y++ {
 		for x := b.Min.X; x < b.Max.X; x++ {
 			r, g, bl, _ := img.At(x, y).RGBA()
@@ -442,13 +486,62 @@ type detection struct {
 	vg, hg []float64
 	bm     *bitmap
 	dense  *detection // the nearly full lattice on the same page, if any
+	skew   float64    // degrees the page was rotated back before detection
 }
 
-func maskFromImage(imgPath string, dpi int, solBox *ptRect) (*detection, error) {
+func maskFromImage(imgPath string, dpi int, solBox *ptRect, deep bool) (*detection, error) {
 	bm, err := loadBitmap(imgPath)
 	if err != nil {
 		return nil, err
 	}
+	// Straighten scans before looking for straight lines. Only pages
+	// without a text layer are candidates: where the solution grid's
+	// position comes from the PDF text, rotating the image would put the
+	// two coordinate systems out of step - and such pages are born-digital
+	// and square anyway.
+	var skew float64
+	if solBox == nil {
+		skew = bm.deskew()
+	}
+	det, err := detectLattice(bm, dpi, solBox, skew)
+	// A pale scan prints its darkest ink lighter than the fixed
+	// thresholds, so nothing is ink and no line exists. Refit the
+	// ink/paper split to this page and look again.
+	if det == nil && bm.raiseThresholds() {
+		if d2, e2 := detectLattice(bm, dpi, solBox, skew); d2 != nil {
+			det, err = d2, e2
+		}
+	}
+	// Last resort: a bowed scan has no single angle that squares it, but
+	// each region on its own is nearly straight. Only for pages without a
+	// text layer - elsewhere the solution box is in page coordinates and a
+	// tile would put it out of step.
+	if det == nil && solBox == nil && deep {
+		tw, th := bm.tileSize()
+		for _, p := range bm.tiles() {
+			tile := bm.crop(p.X, p.Y, tw, th)
+			// start from the standard thresholds: a page-wide refit is
+			// tuned to the whole page's ink, which over a single tile
+			// turns background texture into ink and drowns the skew signal
+			tile.ink, tile.line = thrInk, thrLine
+			a := tile.deskew()
+			d2, e2 := detectLattice(tile, dpi, nil, a)
+			if d2 == nil && tile.raiseThresholds() {
+				d2, e2 = detectLattice(tile, dpi, nil, a)
+			}
+			if os.Getenv("HEXDEBUG") != "" {
+				fmt.Fprintf(os.Stderr, "  tile %d,%d %dx%d skew %+.2f: %v %v\n",
+					p.X, p.Y, tw, th, a, d2 != nil, e2)
+			}
+			if d2 != nil {
+				return d2, nil
+			}
+		}
+	}
+	return det, err
+}
+
+func detectLattice(bm *bitmap, dpi int, solBox *ptRect, skew float64) (*detection, error) {
 	// the printed solution grid's position is known exactly from the
 	// PDF text; windows overlapping it are never the puzzle
 	var excl *ptRect // in image pixels
@@ -470,7 +563,7 @@ func maskFromImage(imgPath string, dpi int, solBox *ptRect) (*detection, error) 
 	}
 
 	minVLen := bm.h / 5
-	vlines := lineCenters(bm.longestRun(true, 0, bm.h, thrInk), minVLen)
+	vlines := lineCenters(bm.longestRun(true, 0, bm.h, bm.ink), minVLen)
 
 	var best, dense *detection
 	var bandY0, bandY1 int
@@ -488,33 +581,44 @@ func maskFromImage(imgPath string, dpi int, solBox *ptRect) (*detection, error) 
 			bandY0, bandY1 = int(hg[0]), int(hg[16])
 		}
 		m := probeCells(bm, vg, hg)
+		if os.Getenv("HEXDEBUG") != "" {
+			fmt.Fprintf(os.Stderr, "  lattice x %.0f-%.0f y %.0f-%.0f: %d cells inked, plausible=%v\n",
+				vg[0], vg[16], hg[0], hg[16], m.filled, plausibleMask(m))
+		}
 		// a nearly full lattice is the printed previous-issue solution
 		// (interesting on scanned issues, where it exists only as an
 		// image and is later read via OCR)
 		if m.filled >= 230 {
 			if dense == nil || m.filled > dense.m.filled {
-				dense = &detection{m: m, vg: vg, hg: hg, bm: bm}
+				dense = &detection{m: m, vg: vg, hg: hg, bm: bm, skew: skew}
 			}
 			return
 		}
 		if overlapsSolution(vg, hg) {
 			return
 		}
-		if m.filled < 60 || m.filled > 200 {
+		// A printed solution grid whose digits are faint - red ink on a
+		// scan - loses enough cells to the ink probe to slip under the
+		// "dense" bar and pose as a puzzle. It then even validates,
+		// because a subset of the right solution is uniquely solvable and
+		// matches the printed one. The real range across every verified
+		// Elektor puzzle is 104 to 144 clues, so anything past 160 is a
+		// solution grid, not a puzzle.
+		if m.filled < 60 || m.filled > 160 {
 			return
 		}
 		if !plausibleMask(m) {
 			return
 		}
 		if best == nil || m.filled > best.m.filled {
-			best = &detection{m: m, vg: vg, hg: hg, bm: bm}
+			best = &detection{m: m, vg: vg, hg: hg, bm: bm, skew: skew}
 		}
 	}
 
 	for _, vg := range evenWindows(vlines) {
 		x0, x1 := int(vg[0]), int(vg[16])
 		minHLen := (x1 - x0) * 8 / 10
-		for _, hg := range evenWindows(lineCenters(bm.longestRun(false, x0, x1+1, thrInk), minHLen)) {
+		for _, hg := range evenWindows(lineCenters(bm.longestRun(false, x0, x1+1, bm.ink), minHLen)) {
 			tryLattice(vg, hg)
 		}
 	}
@@ -531,7 +635,7 @@ func maskFromImage(imgPath string, dpi int, solBox *ptRect) (*detection, error) 
 	for x := 0; x < bm.w; x++ {
 		n := 0
 		for y := 0; y < bm.h; y++ {
-			if bm.at(x, y, thrLine) {
+			if bm.at(x, y, bm.line) {
 				n++
 			}
 		}
@@ -543,7 +647,7 @@ func maskFromImage(imgPath string, dpi int, solBox *ptRect) (*detection, error) 
 		for y := 0; y < bm.h; y++ {
 			n := 0
 			for x := x0; x <= x1 && x < bm.w; x++ {
-				if bm.at(x, y, thrLine) {
+				if bm.at(x, y, bm.line) {
 					n++
 				}
 			}
@@ -560,6 +664,42 @@ func maskFromImage(imgPath string, dpi int, solBox *ptRect) (*detection, error) 
 		best.dense = dense
 		return best, nil
 	}
+
+	// Pass 2b: in a scan the thin cell lines print unevenly - some come
+	// out solid, others too faint for any per-line threshold, so the rows
+	// are never all found at once even though the columns are. But a
+	// hexadoku cell is square: the row pitch must equal the column pitch
+	// of the vertical lattice that *was* found. So the 17 rows are placed
+	// as one rigid comb and only its offset and a little pitch tolerance
+	// are searched - scored, as everywhere here, by its second weakest
+	// line, because a criterion that averages tolerates one line lying
+	// somewhere else entirely.
+	vwins := evenWindows(vlines)
+	vwins = append(vwins, evenWindows(lineCenters(colDark, bm.h/4))...)
+	for _, vg := range vwins {
+		x0, x1 := int(vg[0]), int(vg[16])
+		rowDark := make([]int, bm.h)
+		for y := 0; y < bm.h; y++ {
+			n := 0
+			for x := x0; x <= x1 && x < bm.w; x++ {
+				if bm.at(x, y, bm.line) {
+					n++
+				}
+			}
+			rowDark[y] = n
+		}
+		if hg := bestComb(rowDark, (vg[16]-vg[0])/16, (x1-x0)*6/10); hg != nil {
+			tryLattice(vg, hg)
+		}
+	}
+	if best != nil {
+		if dense == nil {
+			dense = savedDense
+		}
+		best.dense = dense
+		return best, nil
+	}
+
 	if bandY0 == 0 {
 		return nil, fmt.Errorf("no 17x17 lattice found at all")
 	}
@@ -571,7 +711,7 @@ func maskFromImage(imgPath string, dpi int, solBox *ptRect) (*detection, error) 
 	for x := 0; x < bm.w; x++ {
 		n := 0
 		for y := bandY0; y <= bandY1; y++ {
-			if bm.at(x, y, thrLine) {
+			if bm.at(x, y, bm.line) {
 				n++
 			}
 		}
@@ -584,7 +724,7 @@ func maskFromImage(imgPath string, dpi int, solBox *ptRect) (*detection, error) 
 		for y := max(0, bandY0-h/10); y <= bandY1+h/10 && y < bm.h; y++ {
 			n := 0
 			for x := x0; x <= x1; x++ {
-				if bm.at(x, y, thrLine) {
+				if bm.at(x, y, bm.line) {
 					n++
 				}
 			}
@@ -619,7 +759,7 @@ func maskFromImage(imgPath string, dpi int, solBox *ptRect) (*detection, error) 
 				n, dark := 0, 0
 				for y := int(hg[0]); y <= int(hg[16]); y++ {
 					n++
-					if bm.at(int(x)-1, y, thrLine) || bm.at(int(x), y, thrLine) || bm.at(int(x)+1, y, thrLine) {
+					if bm.at(int(x)-1, y, bm.line) || bm.at(int(x), y, bm.line) || bm.at(int(x)+1, y, bm.line) {
 						dark++
 					}
 				}
@@ -653,7 +793,7 @@ func maskFromImage(imgPath string, dpi int, solBox *ptRect) (*detection, error) 
 					continue
 				}
 				bestScore = s
-				best = &detection{m: m, vg: vg, hg: hg, bm: bm}
+				best = &detection{m: m, vg: vg, hg: hg, bm: bm, skew: skew}
 			}
 		}
 	}
@@ -692,6 +832,50 @@ func plausibleMask(m *mask) bool {
 // latticeIsReal checks that the candidate's 17+17 positions carry
 // actual lines: at a real grid line most pixels along it are dark,
 // while a lattice accidentally fitted over text has no such contrast.
+// bestComb slides a rigid comb of 17 equally spaced lines over a darkness
+// profile and returns the best placement, or nil if even the best one has
+// a second weakest line below minDark. The pitch is taken from the
+// lattice already found in the other direction and varied by +-1.2%, which
+// covers scanner stretch without letting the comb drift a whole cell.
+func bestComb(dark []int, pitch float64, minDark int) []float64 {
+	bestScore := 0
+	var best []float64
+	for k := -6; k <= 6; k++ {
+		p := pitch * (1 + float64(k)*0.002)
+		last := float64(len(dark)-1) - 16*p
+		for y0 := 0.0; y0 < last; y0++ {
+			var vals [17]int
+			for i := 0; i <= 16; i++ {
+				y := min(int(y0+float64(i)*p+0.5), len(dark)-1)
+				d := dark[y]
+				// one pixel of jitter, as elsewhere: a scanned line is
+				// not perfectly straight even on a square page
+				if y > 0 && dark[y-1] > d {
+					d = dark[y-1]
+				}
+				if y+1 < len(dark) && dark[y+1] > d {
+					d = dark[y+1]
+				}
+				vals[i] = d
+			}
+			s := vals[:]
+			sort.Ints(s)
+			if s[1] > bestScore {
+				bestScore = s[1]
+				lines := make([]float64, 17)
+				for i := range lines {
+					lines[i] = y0 + float64(i)*p
+				}
+				best = lines
+			}
+		}
+	}
+	if bestScore < minDark {
+		return nil
+	}
+	return best
+}
+
 func latticeIsReal(bm *bitmap, vlines, hlines []float64) bool {
 	frac := func(vertical bool, at float64, lo, hi float64) float64 {
 		p := int(at)
@@ -702,9 +886,9 @@ func latticeIsReal(bm *bitmap, vlines, hlines []float64) bool {
 			hit := false
 			for d := -1; d <= 1 && !hit; d++ {
 				if vertical {
-					hit = bm.at(p+d, q, thrLine)
+					hit = bm.at(p+d, q, bm.line)
 				} else {
-					hit = bm.at(q, p+d, thrLine)
+					hit = bm.at(q, p+d, bm.line)
 				}
 			}
 			if hit {
@@ -744,15 +928,19 @@ func probeCells(bm *bitmap, vlines, hlines []float64) *mask {
 			ink := 0
 			for y := py0; y <= py1; y++ {
 				for x := px0; x <= px1; x++ {
-					if bm.at(x, y, thrInk) {
+					if bm.at(x, y, bm.ink) {
 						ink++
 					}
 				}
 			}
 			area := (px1 - px0 + 1) * (py1 - py0 + 1)
-			// a digit covers a few percent of the cell; near-total
-			// coverage is a shaded (always empty) prize cell
-			if ink*100 >= area*3 && ink*100 <= area*45 && ink >= 6 {
+			// A digit covers a few percent of the probed area; near-total
+			// coverage is a shaded (always empty) prize cell. The upper
+			// bound used to sit at 45%, which on the heavier 2010 scans
+			// threw away every cell holding a B - the densest glyph of the
+			// set - and silently shortened those masks. Ground truth from
+			// three visually read issues puts B at well under 70%.
+			if ink*100 >= area*3 && ink*100 <= area*70 && ink >= 6 {
 				m.given[r][c] = true
 				m.filled++
 			}
@@ -789,6 +977,11 @@ func processPDF(path, outDir, pdftoppm, pdftotext, tesseract string, dpi int, ve
 			candidates = append(candidates, i+1)
 		}
 	}
+	if forcePage > 0 {
+		// the page was identified elsewhere, typically by OCR of a scan
+		// that has no text layer for the sweep to work from
+		candidates = []int{forcePage}
+	}
 	sweep := len(candidates) == 0
 	if sweep {
 		for p := len(pages); p >= 1; p-- {
@@ -809,8 +1002,24 @@ func processPDF(path, outDir, pdftoppm, pdftotext, tesseract string, dpi int, ve
 		var det *detection
 		if img, rerr := renderPage(pdftoppm, path, pageNo, dpi, tmpDir); rerr == nil {
 			var merr error
-			det, merr = maskFromImage(img, dpi, solBox)
-			if merr != nil && verbose {
+			det, merr = maskFromImage(img, dpi, solBox, !sweep)
+			// On a scan the thin cell lines can fall below one pixel at
+			// the working resolution and disappear into the paper. That
+			// is a sampling problem, not a detection one, so a page that
+			// was named by the text layer is worth a second look at the
+			// resolution the crops use anyway.
+			if det == nil && !sweep && dpi < 300 {
+				if hi, herr := renderPage(pdftoppm, path, pageNo, 300, tmpDir); herr == nil {
+					if d2, e2 := maskFromImage(hi, 300, solBox, true); d2 != nil {
+						det, merr = d2, e2
+						if verbose {
+							fmt.Printf("  %s p.%d: found only at 300 dpi\n", key, pageNo)
+						}
+					}
+					os.Remove(hi)
+				}
+			}
+			if merr != nil && det == nil && verbose {
 				fmt.Printf("  %s p.%d mask: %v\n", key, pageNo, merr)
 			}
 			os.Remove(img)
@@ -818,7 +1027,11 @@ func processPDF(path, outDir, pdftoppm, pdftotext, tesseract string, dpi int, ve
 			fmt.Printf("  %s p.%d render: %v\n", key, pageNo, rerr)
 		}
 		if verbose {
-			fmt.Printf("  %s p.%d: solution=%v mask=%v\n", key, pageNo, sol != nil, det != nil)
+			skew := ""
+			if det != nil && det.skew != 0 {
+				skew = fmt.Sprintf(", deskewed by %+.2f deg", det.skew)
+			}
+			fmt.Printf("  %s p.%d: solution=%v mask=%v%s\n", key, pageNo, sol != nil, det != nil, skew)
 		}
 		if sweep {
 			// Without a text layer the page has to be identified from
@@ -863,7 +1076,7 @@ func processPDF(path, outDir, pdftoppm, pdftotext, tesseract string, dpi int, ve
 	const ocrDpi = 300
 	if bestDet != nil {
 		if img, rerr := renderPage(pdftoppm, path, bestPage, ocrDpi, tmpDir); rerr == nil {
-			if d, merr := maskFromImage(img, ocrDpi, bestSolBox); merr == nil {
+			if d, merr := maskFromImage(img, ocrDpi, bestSolBox, true); merr == nil {
 				// Always prefer the high-resolution detection. Comparing
 				// clue counts across resolutions is wrong: a lattice
 				// fitted to the wrong thing can carry MORE "clues" than
@@ -1116,11 +1329,23 @@ func chain(outDir, solver string) error {
 
 	built, skipped := 0, 0
 	for _, mk := range maskKeys {
-		// never overwrite a hand-checked transcription
+		// Never overwrite a puzzle that did not come from this chain: a
+		// hand-checked transcription, or one of the Hexamurai, whose page
+		// also carries something that looks like a plain 16x16 lattice -
+		// rebuilding that from a mask would silently replace a correct
+		// 1088-cell puzzle with a wrong 256-cell one.
 		pf := filepath.Join(outDir, mk+".txt")
-		if b, err := os.ReadFile(pf); err == nil && strings.Contains(string(b), "transcribed visually") {
-			fmt.Printf("keep %s: visually transcribed, left untouched\n", mk)
-			continue
+		if b, err := os.ReadFile(pf); err == nil {
+			for _, marker := range []string{"transcribed visually", "muraiextract"} {
+				if strings.Contains(string(b), marker) {
+					fmt.Printf("keep %s: %s, left untouched\n", mk, marker)
+					b = nil
+					break
+				}
+			}
+			if b == nil {
+				continue
+			}
 		}
 		mask := masks[mk]
 		solKey, matched := assigned[mk], true
@@ -1251,6 +1476,7 @@ func main() {
 	pdftotext := flag.String("pdftotext", "", "path to poppler's pdftotext (default: next to pdftoppm)")
 	tesseract := flag.String("tesseract", "", "path to tesseract for independent digit OCR (empty = skip)")
 	solver := flag.String("solver", "./hexadoku.exe", "path to the hexadoku solver, used to repair OCR damage")
+	flag.IntVar(&forcePage, "page", 0, "examine only this page (for scans whose page was identified elsewhere)")
 	verbose := flag.Bool("v", false, "verbose diagnostics")
 	flag.Parse()
 	if *pdftotext == "" {

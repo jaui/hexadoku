@@ -1,18 +1,18 @@
-# Elektor Hexadoku 2007-07_08 (169 clues)
-# digits from 2008-02_prevsolution (pairing confirmed by unique solvability)
-57..E.0F4A1.9..3
-..8...BD5C0F1E6.
-0CF251736ED9..A4
-.9..4A.8..2B0D.5
-1.2.F.4BD9..653.
-A3.8C0.1F....72.
-CF.D95.6E.A2.401
-9.B...A7.3.1FCE.
-...37BD..6E5..9.
-..0.3F..9.4D7.B6
-7B.56489.23.E..F
-2D69AC1..BF.5340
-4A9FB.651.CE..82
-B5.7.E..2F..46.D
-E...1D..7094AF.B
-.21083F4B56AC9.E
+# Elektor Hexadoku 2007-07_08 (86 clues)
+# digits from tesseract OCR only (no matching printed solution found); 31 OCR conflicts NOT repairable (31 damaged cells, remainder not uniquely solvable)
+9...........016.
+A0.5.4........B.
+...1.E.C4.....C.
+E..........8C.4.
+.....5...9.6..D.
+....A3....746..8
+....C.D........C
+8F7.220...2..59.
+25.76.E.0.C.....
+B3......6...C1.F
+1...6...73F0E8.A
+..940.31F.A25...
+............2...
+.A..250.....1..B
+...7...9..C...4.
+2.....5..B...A..

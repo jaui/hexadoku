@@ -1,8 +1,8 @@
-# clue mask of the Elektor 2010-03 Hexadoku (PDF page 74), 119 clues
+# clue mask of the Elektor 2010-03 Hexadoku (PDF page 74), 120 clues
 #...#.##.###....
 ...##.#.##.####.
 #.####....####..
-##...###..#.#...
+###..###..#.#...
 ##...###...##.##
 .#.##.#.#.###..#
 #..#.#.....##.#.

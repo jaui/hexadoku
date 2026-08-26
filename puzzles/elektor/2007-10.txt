@@ -1,18 +1,18 @@
-# Elektor Hexadoku 2007-10 (200 clues)
-# digits from 2008-02_prevsolution (pairing confirmed by unique solvability)
-57.BE60F4A1.92C3
-348A29BD5C0.1E67
-0CF2.1..6E..8.A.
-6.E14AC8372B.DF5
-.....84BD97C653A
-A358C.E.F4.6D..9
-CF7D9....8A2B401
-96B4.2A70351FCE8
-F1437.D.A.E52.9C
-8E.C..52.14D7A.6
-7B.5648.C230E.DF
-2D.9AC1E.BF..340
-4.9FB7651D..308.
-B5C70E9.2F.3461D
-E836.D2C.094AF5.
-D21083F..5.AC9.E
+# Elektor Hexadoku 2007-10 (p. 76), 118 clues
+# transcribed visually from the scan; tesseract could not read this page
+...54....72F.6.E
+..0.A...D.C.3F.2
+4D.19.3....A07B.
+F6.2...D1..4..C.
+59F..8...C32....
+1B..39F.0DE...8.
+CA.3.B.......D76
+..7.1.E.F5....3.
+7...638.CE..B..0
+B.9.5F274.A1C...
+.5...A9......4..
+601C..4E2.9...A.
+..8B.7...AD..E..
+.F..2..9.4.C..D3
+D.....AB59.E...C
+0...D.13..68.B.F

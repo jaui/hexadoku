@@ -25,7 +25,7 @@ func ocrGrid(det *detection, tesseract, tmpDir string) (*grid, error) {
 	for y := 0; y < h; y++ {
 		for x := 0; x < w; x++ {
 			v := uint8(255)
-			if bm.at(x0+x, y0+y, thrInk) {
+			if bm.at(x0+x, y0+y, bm.ink) {
 				v = 0
 			}
 			img.SetGray(x, y, color.Gray{Y: v})

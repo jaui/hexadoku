@@ -1,4 +1,4 @@
-# Elektor Hexadoku 2010-10 (118 clues)
+# Elektor Hexadoku 2010-10 (119 clues)
 # digits from tesseract OCR only (no matching printed solution found)
 ...B4.C01..3F...
 ...8..D6...EC5B3
@@ -14,5 +14,5 @@ C7B1..2..ED58A04
 2..4.6..E..9D..7
 ..2....4.C8.3..0
 941.0..2.....CD8
-...7C.FA.0.D.9.5
+.B.7C.FA.0.D.9.5
 .0C..31..29...E.

@@ -1,0 +1,20 @@
+# Elektor Hexadoku 2010-05 (p. 77), 117 clues
+# transcribed visually from the scan; tesseract could not read this page.
+# The geometric mask found only 114 of the clues - three cells (r4c8,
+# r10c13, r11c4) are in the grid but were missed by the ink probe.
+32..5.04E.......
+.7.F.A1....D50.2
+.5EA.....1.8.74.
+40.16..B...2F...
+D.....3AC0.5.E..
+6.AE...0.21.D87.
+CB9.........A3F.
+..40..C.3.8E9...
+1..4.7B.A.E.C...
+..36...C.59.B..8
+.95BAE4.0C..763.
+F.7C93.1B.2..A..
+..1..B....5....6
+..B7.2ED1....C8.
+94.8.5F..E.0..A.
+A.F.1....46....3
