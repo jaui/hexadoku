@@ -457,10 +457,12 @@ func main() {
 			n = maxSize
 		case "samurai":
 			v = samuraiVariant(9)
-		case "hexamurai", "murai":
+		case "hexa-samurai":
 			v = samuraiVariant(maxSize)
+		case "hexamurai", "murai":
+			v = hexamuraiVariant()
 		default:
-			fmt.Fprintln(os.Stderr, "-gen must be 9, 16, samurai or hexamurai")
+			fmt.Fprintln(os.Stderr, "-gen must be 9, 16, samurai, hexa-samurai or hexamurai")
 			os.Exit(2)
 		}
 		if *seed == 0 {

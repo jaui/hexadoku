@@ -28,11 +28,46 @@ import (
 	"time"
 )
 
-// samuraiVariant builds the cross for n=16 (hexamurai) or n=9 (samurai).
+// hexamuraiVariant is the layout Elektor actually printed in the double
+// issues 7-8/2009 and 7-8/2011: not a symmetric cross but a pinwheel, and
+// each outer grid shares a whole 4x12 strip - three boxes - with the one
+// in the middle, not a single box. 5*256 - 4*48 = 1088 cells in 228 units.
+// The grid corners below were read off the clue positions of the printed
+// puzzle; the layout is confirmed by the puzzles solving uniquely.
+//
+//	         cols 0    8   12  16      24      39
+//	row  0        +----A----+
+//	row  8        |    |    +---B---+
+//	row 12        | +--+----+       |
+//	row 16   +----+-|  D    |       |
+//	row 24   |  C   +-+--+--+---+---+
+//	row 32   +------+ |  E      |
+//	row 39            +---------+
+func hexamuraiVariant() *variant {
+	v := newVariant("hexamurai (pinwheel)", maxSize, 40, 40)
+	v.layout([][2]int{{0, 8}, {8, 24}, {16, 0}, {12, 12}, {24, 16}}, maxSize, 4)
+	return v
+}
+
+// hexamuraiPlusVariant is the arrangement of 7-8/2011: a plus, with the
+// middle grid overlapping each of the four outer ones by a whole 8x16
+// half. 5*256 - 4*128 = 768 cells. The middle grid adds no constraint of
+// its own - each of its rows, columns and boxes is already a unit of an
+// outer grid - which the unit table shows by itself: declaring five grids
+// yields 176 distinct units, exactly what the four outer ones contribute.
+func hexamuraiPlusVariant() *variant {
+	v := newVariant("hexamurai (plus)", maxSize, 32, 32)
+	v.layout([][2]int{{0, 8}, {8, 0}, {8, 8}, {8, 16}, {16, 8}}, maxSize, 4)
+	return v
+}
+
+// samuraiVariant builds the classic samurai cross, where each corner grid
+// shares exactly one box with the middle one: n=9 is the usual samurai
+// sudoku, n=16 its 16-valued counterpart.
 func samuraiVariant(n int) *variant {
 	b, name := 3, "samurai"
 	if n == maxSize {
-		b, name = 4, "hexamurai"
+		b, name = 4, "hexa-samurai"
 	}
 	d := n - b // grid origins step by one grid minus the shared box
 	span := 2*d + n
@@ -59,7 +94,11 @@ func gridVariant(n int) *variant {
 // variantFor returns the layout whose cell count matches n, or nil.
 func variantFor(ncells int) *variant {
 	switch ncells {
-	case 5*maxSize*maxSize - 4*4*4: // 1216
+	case 5*maxSize*maxSize - 4*128: // 768, Elektor's plus
+		return hexamuraiPlusVariant()
+	case 5*maxSize*maxSize - 4*3*4*4: // 1088, Elektor's pinwheel
+		return hexamuraiVariant()
+	case 5*maxSize*maxSize - 4*4*4: // 1216, symmetric cross
 		return samuraiVariant(maxSize)
 	case 5*9*9 - 4*3*3: // 369
 		return samuraiVariant(9)

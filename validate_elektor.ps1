@@ -42,9 +42,25 @@ $puzzles = Get-ChildItem "$Dir\20??-*.txt" |
 $pass = 0; $warn = 0; $fail = 0; $special = 0
 foreach ($p in $puzzles) {
     $key = $p.BaseName
-    if ((Get-Content $p.FullName -Raw) -match 'not a standalone puzzle') {
+    $raw = Get-Content $p.FullName -Raw
+    if ($raw -match 'not a standalone puzzle') {
         Write-Host "SPEC $key (special format, not a single 16x16 grid)"
         $special++
+        continue
+    }
+    # Hexamurai: five overlapping grids on a wide raster. There is no
+    # printed solution grid to compare against, so uniqueness is the whole
+    # check - a wrong arrangement would not be uniquely solvable.
+    # (2011 needs a couple of minutes for the proof.)
+    if ($raw -match 'Hexamurai') {
+        $u = .\hexadoku.exe -unique $p.FullName 2>$null
+        if ($u | Select-String 'solution is unique') {
+            Write-Host "PASS $key (hexamurai, uniquely solvable)"
+            $pass++
+        } else {
+            Write-Host "FAIL $key : hexamurai not uniquely solvable"
+            $fail++
+        }
         continue
     }
     $mine = .\hexadoku.exe -compact $p.FullName 2>$null | Where-Object { $_ -match '^[0-9A-F]{16}$' }

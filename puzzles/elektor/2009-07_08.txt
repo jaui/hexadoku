@@ -1,4 +1,42 @@
-# Elektor 2009-07_08 - not a standalone puzzle
-# Hexamurai: five overlapping 16x16 grids in a cross (Elektor 7-8/2009, p. 124, designer Claude Ghyselen). The magazine states outright that the grids cannot be solved separately, so no single grid is uniquely solvable.
-# transcribed visually: nothing to transcribe, kept as a marker so the
-# pipeline does not keep reporting it as a failed reconstruction.
+# Elektor Hexamurai from Elektornonlinear.ir2009-07_08.pdf p. 124, 409 clues
+# read from the PDF text layer by cmd/muraiextract (exact, not OCR)
+        .D2.53....8.0..9                
+        .........4B3.D..                
+        ..482F..5.......                
+        B.1.....E...F5.8                
+        8.7EB..4F9.1A.5.                
+        ..0........6.8C.                
+        ..AF9C.0.5.E63..                
+        .......A.8..7...                
+        .F.40.5..2.C.9.....1A..34..B..5.
+        AB..1.62.3....F.DA6....C5...8...
+        .2.......0DA4.B....B.F.5E......9
+        .1..78DB......E.E...6D1.C.382...
+        .A5.C...8........D...27.F.1..9.6
+        2...3BA......0.......9..D.73B...
+        .E6.4......D.1.769..43CF2.B..7..
+        C7..6D1F..A5....B...D..A..8..5.E
+...D9.015.............E.4..............0
+9......4.CF7...6.8..D...0..9..61..DF..4C
+A.1B5F.7.48....3.9.A....C..6.B..9..E53..
+.....E.6.2.0.9...3D...8......7..1....B8.
+...71..8.........2.8..FA.....5..8.F....3
+..6.......34B2...F..7......4..3B...19...
+1.FADC..6.2..3.0......5B2F........9.6DE.
+........7.E..C..1..74E.6....1.ED..C740..
+.F..87..3.1..0................2.        
+.52CB4.9..08FA....8B62........DA        
+.A8..3C...........2..8.0.A..6E..        
+..93E...2B..1...7.0..B......84.C        
+..79AD.3..6.4B2.8.E..9..........        
+..C.48.0A....D1...A7CE..B.9406..        
+34.F.......56.095......FA.0..7..        
+D1B279...E..C5....1.36....2F49.B        
+                .3C.9D.2.....1..        
+                .4F...8...A27C.9        
+                .E....5A4......0        
+                689...E..D..5.A.        
+                ....4.CE25.D.A.6        
+                ........7...C8..        
+                .95.....0..8...4        
+                .2D..F93....1.7.        

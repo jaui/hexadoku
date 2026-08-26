@@ -88,11 +88,14 @@ func benchCores(b *testing.B, text string) {
 func BenchmarkHexadokuCores(b *testing.B) { benchCores(b, defaultPuzzle) }
 
 func BenchmarkHexamurai(b *testing.B) {
-	data, err := os.ReadFile(filepath.Join("puzzles", "hexamurai_generated.txt"))
+	data, err := os.ReadFile(filepath.Join("puzzles", "elektor", "2009-07_08.txt"))
 	if err != nil {
 		b.Skip("no hexamurai puzzle available")
 	}
-	v := samuraiVariant(16)
+	v := variantFor(countAllTokens(string(data)))
+	if v == nil {
+		b.Fatal("no layout matches the puzzle")
+	}
 	pz, err := v.parse(string(data))
 	if err != nil {
 		b.Fatal(err)
@@ -105,11 +108,24 @@ func BenchmarkHexamurai(b *testing.B) {
 }
 
 func TestSamuraiGeometry(t *testing.T) {
-	for _, tc := range []struct{ n, b, cells, units int }{
-		{9, 3, 5*81 - 4*9, 5*27 - 4},
-		{16, 4, 5*256 - 4*16, 5*48 - 4},
+	for _, tc := range []struct {
+		v            *variant
+		b            int
+		cells, units int
+		shared       int // cells belonging to more than one grid
+	}{
+		// classic cross: each corner grid shares one box with the middle
+		{samuraiVariant(9), 3, 5*81 - 4*9, 5*27 - 4, 4 * 9},
+		{samuraiVariant(16), 4, 5*256 - 4*16, 5*48 - 4, 4 * 16},
+		// Elektor 7-8/2009: pinwheel, a 4x12 strip (three boxes) shared
+		{hexamuraiVariant(), 4, 5*256 - 4*48, 5*48 - 4*3, 4 * 48},
+		// Elektor 7-8/2011: plus, the middle grid shares an 8x16 half with
+		// each outer grid. Its rows, columns and boxes then coincide with
+		// units of the outer grids, so it adds no unit of its own: 176 is
+		// exactly what the four outer grids contribute.
+		{hexamuraiPlusVariant(), 4, 5*256 - 4*128, 4*48 - 4*4, 256},
 	} {
-		v := samuraiVariant(tc.n)
+		v := tc.v
 		if v.ncells != tc.cells || v.nunits != tc.units {
 			t.Fatalf("%s: %d cells / %d units, want %d / %d", v.name, v.ncells, v.nunits, tc.cells, tc.units)
 		}
@@ -135,8 +151,8 @@ func TestSamuraiGeometry(t *testing.T) {
 				t.Fatalf("%s: cell %d lies in %d units", v.name, k, v.ncu[k])
 			}
 		}
-		if want := 4 * tc.b * tc.b; shared != want {
-			t.Fatalf("%s: %d shared cells, want %d", v.name, shared, want)
+		if shared != tc.shared {
+			t.Fatalf("%s: %d shared cells, want %d", v.name, shared, tc.shared)
 		}
 	}
 }
@@ -193,6 +209,50 @@ func TestSamuraiSolve(t *testing.T) {
 		}
 		if *back != *pz {
 			t.Fatalf("%s: render/parse round trip changed the board", v.name)
+		}
+	}
+}
+
+// The two Hexamurai puzzles Elektor actually printed, read out of the PDF
+// text layer by cmd/muraiextract. Both must be uniquely solvable - that is
+// what proves the arrangement was read correctly, since a wrong one would
+// place clues into conflict or leave the puzzle ambiguous.
+func TestElektorHexamurai(t *testing.T) {
+	for _, tc := range []struct {
+		file  string
+		cells int
+		clues int
+		slow  bool
+	}{
+		{"puzzles/elektor/2009-07_08.txt", 1088, 409, false},
+		{"puzzles/elektor/2011-07_08.txt", 768, 231, true}, // ~3.4M branch nodes
+	} {
+		data, err := os.ReadFile(tc.file)
+		if err != nil {
+			t.Skipf("%s not available", tc.file)
+		}
+		v := variantFor(countAllTokens(string(data)))
+		if v == nil || v.ncells != tc.cells {
+			t.Fatalf("%s: no layout matches the puzzle", tc.file)
+		}
+		g, err := v.parse(string(data))
+		if err != nil {
+			t.Fatalf("%s: %v", tc.file, err)
+		}
+		if clues := v.ncells - int(g.free); clues != tc.clues {
+			t.Fatalf("%s: %d clues, want %d", tc.file, clues, tc.clues)
+		}
+		if tc.slow && testing.Short() {
+			continue
+		}
+		work := *g
+		if !v.solve(&work) {
+			t.Fatalf("%s: no solution", tc.file)
+		}
+		checkFull(t, v, &work)
+		work = *g
+		if n := v.count(&work, 2); n != 1 {
+			t.Fatalf("%s: %d solutions, want exactly one", tc.file, n)
 		}
 	}
 }

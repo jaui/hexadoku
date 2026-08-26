@@ -51,30 +51,48 @@ Samurai layouts (Hexamurai)
 ---------------------------
 
 Elektor's double issues 7-8/2009 and 7-8/2011 printed a **Hexamurai**
-(designer Claude Ghyselen): five 16x16 grids in a cross, each corner grid
-sharing one 4x4 box with the grid in the middle — 5·256 − 4·16 = 1216
-cells in 236 units. The magazine states the grids cannot be solved
-separately, and that is literally true: the middle grid on its own is
-ambiguous, and only what reaches it through the shared boxes pins it
-down. The same construction with 9 values is the classic samurai sudoku
-(369 cells).
+(designer Claude Ghyselen): five 16x16 grids overlapping in a cross. The
+magazine states the grids cannot be solved separately, and that is
+literally true — the middle grid on its own is ambiguous, and only what
+reaches it through the shared cells pins it down.
 
-Both are handled by the same code with `n` as the only difference:
+The two issues do not use the same arrangement, and neither is the
+textbook cross. Both were read off the printed clue positions and are
+confirmed by the puzzles solving uniquely:
+
+| arrangement | raster | shared per pair | cells | units | clues | solves in |
+| --- | --- | --- | --- | --- | --- | --- |
+| 7-8/2009, pinwheel | 40×40 | 4×12 (three boxes) | 1088 | 228 | 409 | 2.2 ms, 65 nodes |
+| 7-8/2011, plus | 32×32 | 8×16 (half a grid) | 768 | 176 | 231 | 43 s, 3 364 151 nodes |
+| classic cross (`samurai`) | 21×21 / 40×40 | one box | 369 / 1216 | 131 / 236 | — | — |
+
+The 2011 layout has a curious property the unit table shows by itself:
+every row, column and box of its middle grid coincides with a unit of an
+outer grid, so declaring five grids yields 176 distinct units — exactly
+what the four outer grids contribute on their own. The middle grid adds
+no constraint, which leaves four only pairwise coupled grids at 30% clue
+density, and that is why it costs five orders of magnitude more search
+than the 2009 one.
+
+All of them are handled by the same code, with the grid corners as the
+only difference:
 
 | file | role |
 | --- | --- |
 | `chars.go` | value ↔ character encoding, shared by every variant |
 | `variant.go` | geometry: cells, units, and the text raster they sit on |
 | `general.go` | solver core driven by a `variant` (any unit list) |
-| `murai.go` | the samurai cross, the single-grid variant, CLI glue |
+| `murai.go` | the five-grid arrangements, single-grid variant, CLI glue |
 | `solver.go` | the hand-written 9x9 / 16x16 cores (unchanged) |
 
 The abstraction is the *unit*: a group of `n` cells that must contain
 every value exactly once. Rows, columns and boxes of a plain grid are
 units; in a samurai the units of all five grids are declared over one
 shared cell pool, so a cell in an overlap simply belongs to two rows, two
-columns and one (shared) box. Propagation crosses the seams by itself —
-there is no special case for the overlaps anywhere in the solver.
+columns and one (shared) box. Units with identical cell sets are merged,
+which is what makes the redundancy of the 2011 middle grid visible.
+Propagation crosses the seams by itself — there is no special case for
+the overlaps anywhere in the solver.
 
 The general core costs about 17% over the specialized 16x16 core on a
 plain hexadoku (`go test -bench Cores`), which is why the single-grid
@@ -85,9 +103,27 @@ Samurai puzzles are recognized by their cell count and are written on a
 character raster — one line per row, blanks where no grid covers the
 position, so the blanks carry meaning:
 
-    hexadoku.exe puzzles\hexamurai_generated.txt
+    hexadoku.exe puzzles\elektor\2009-07_08.txt
     hexadoku.exe -gen hexamurai -count 1     # minimal, takes a while
     hexadoku.exe -gen samurai                # 9x9 version, ~0.3 s
+
+**`cmd/muraiextract`** reads a Hexamurai out of a PDF. Unlike the normal
+Hexadoku pages, where the puzzle is a graphic, these two pages carry
+every clue as a text glyph, so the transcription is exact rather than
+OCR: the glyph positions form one regular lattice across all five grids,
+and fitting that lattice maps each glyph to its cell. The fit has to be
+robust — the article text on the same page contains "0 to F" and "4x4",
+which look exactly like clues — so the pitch is taken as the *median*
+neighbour distance, the anchor as the median position, and only the block
+of consecutive lattice lines holding the most glyphs is kept. The
+arrangement itself is not assumed: every known one is tried at every
+offset that fits, and one must place all clues on real cells without
+breaking a rule.
+
+    go build -o muraiextract.exe ./cmd/muraiextract
+    muraiextract.exe -pdftotext <poppler>\pdftotext.exe -page 124 ^
+                     -solver hexadoku.exe -o puzzles\elektor\2009-07_08.txt ^
+                     elektor_pdfs\Elektornonlinear.ir2009-07_08.pdf
 
 Build
 -----
@@ -139,8 +175,11 @@ Puzzles
 - `supersudoku.txt` — from [MarcoVad/anydoku-sudoku-solver](https://github.com/MarcoVad/anydoku-sudoku-solver)
 - `top95.txt`, `hardest.txt` — 9x9 benchmark collections from [norvig.com](https://norvig.com/sudoku.html)
 - `inkala2012.txt` — Arto Inkala's "world's hardest sudoku" (2012)
-- `generated_sudoku.txt`, `generated_hexadoku.txt` — hard minimal
-  puzzles produced by `-gen` (this solver)
+- `generated_sudoku.txt`, `generated_hexadoku.txt`,
+  `samurai_generated.txt`, `hexasamurai_generated.txt` — hard puzzles
+  produced by `-gen` (this solver)
+- `elektor/2009-07_08.txt`, `elektor/2011-07_08.txt` — the two genuine
+  Elektor Hexamurai, read exactly from the PDF text layer
 - `elektor_2012_06.txt` — the genuine Elektor Hexadoku from the
   June 2012 issue (p. 76), transcribed from the archive.org scan
   ([ElektorMagazine collection](https://archive.org/details/ElektorMagazine));

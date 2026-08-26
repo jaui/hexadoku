@@ -380,10 +380,10 @@ code {
   <div class="fig"><b>600 ms → 32 µs</b><span>Pro Lösung</span></div>
   <div class="fig"><b>108</b><span>Hefte geladen</span></div>
   <div class="fig"><b>47 → 93</b><span>Hefte mit Ausbeute</span></div>
-  <div class="fig"><b>54</b><span>Rätsel gewonnen</span></div>
+  <div class="fig"><b>56</b><span>Rätsel gewonnen</span></div>
   <div class="fig"><b>41</b><span>Gegengeprüft</span></div>
   <div class="fig"><b>21</b><span>Von Hand gelesen</span></div>
-  <div class="fig"><b>1216</b><span>Zellen im Hexamurai</span></div>
+  <div class="fig"><b>1088 · 768</b><span>Zellen der zwei Hexamurai</span></div>
 </section>
 
 <!-- ============ 1 ============ -->
@@ -921,7 +921,7 @@ code {
         <div><dt>Symptom</dt><dd>Drei Ausgaben lieferten hartnäckig zu wenige Vorgaben und mehrdeutige Lösungen — nach Werkzeugfehler aussehend.</dd></div>
         <div><dt>Befund</dt><dd>Alle drei sind keine gewöhnlichen Hexadokus. Die beiden Doppelhefte 7-8/2009 und 7-8/2011 zeigen ein <em>Hexamurai</em>: fünf überlappende 16×16-Gitter im Kreuz, nach dem Samurai-Vorbild, und das Heft sagt ausdrücklich, dass sie sich nicht einzeln lösen lassen. Ausgabe 3/2011 ist ein <em>Hexadoku Digest</em>, dessen sechzehn markierte Fünferblöcke mit den Preiscodes früherer Hexadokus von Januar 2009 bis Juni 2010 gefüllt werden müssen.</dd></div>
         <div><dt>Einordnung</dt><dd>Die Pipeline verhält sich richtig, indem sie diese Gitter als nicht eindeutig meldet. Sie sind jetzt als Sonderform gekennzeichnet und werden nicht mehr als fehlgeschlagene Rekonstruktion gezählt — ein Werkzeug, das eine Grenze des Materials als eigenen Fehler ausweist, verschleiert beides.</dd></div>
-        <div><dt>Nachtrag</dt><dd>Das Hexamurai ist inzwischen kein Sonderfall mehr, sondern eine eigene Geometrie im Solver — siehe Kapitel XI. Der Digest bleibt es: er verlangt Preiscodes aus achtzehn Heften, keine Gitterregel.</dd></div>
+        <div><dt>Nachtrag</dt><dd>Die beiden Hexamurai sind inzwischen keine Sonderfälle mehr, sondern eigene Geometrien im Solver, exakt aus der PDF-Textebene eingelesen und beide als eindeutig lösbar bestätigt — siehe Kapitel XI. Sonderform bleibt allein der Digest: er verlangt Preiscodes aus achtzehn Heften, keine Gitterregel.</dd></div>
       </dl>
     </div>
   </article>
@@ -952,7 +952,7 @@ code {
     <div>
       <h3>Hefte ohne auffindbares Gitter</h3>
       <dl>
-        <div><dt>Stand</dt><dd>93 der 108 Hefte liefern Masken oder Lösungsgitter, und daraus sind <span class="win">54 Rätsel</span> gewonnen: 41 gegen eine gedruckte Lösung geprüft, 13 eindeutig lösbar ohne Vergleichsmöglichkeit, dazu drei dokumentierte Sonderformen. Kein einziges bleibt als Fehlschlag stehen.</dd></div>
+        <div><dt>Stand</dt><dd>93 der 108 Hefte liefern Masken oder Lösungsgitter, und daraus sind <span class="win">56 Rätsel</span> gewonnen: 41 gegen eine gedruckte Lösung geprüft, 13 eindeutig lösbar ohne Vergleichsmöglichkeit, dazu die beiden Hexamurai. Als Sonderform bleibt nur der Digest. Kein einziges bleibt als Fehlschlag stehen.</dd></div>
         <div><dt>Offen</dt><dd>Bei den übrigen Heften findet die Automatik nichts: teils Scanqualität, teils vermutlich Hefte ohne Hexadoku. Zwei lehnt bereits <code>pdftotext</code> ab, und die textlosen Scans brauchen den seitenweisen Bildsweep, der bei dicken Heften über das Zeitlimit des Stapellaufs geht. Für jedes davon steht der Betrachtungsmodus bereit.</dd></div>
       </dl>
     </div>
@@ -966,8 +966,8 @@ code {
     <h2>Fünf Gitter auf einmal</h2>
     <p>Das Hexamurai aus den Doppelheften 7-8/2009 und 7-8/2011 stand bis zuletzt
        als Sonderform in der Liste. Es nachzurüsten hieß nicht, einen zweiten Solver
-       zu schreiben, sondern den vorhandenen von seiner Geometrie zu trennen —
-       1216 Zellen in 236 Einheiten statt 256 in 48.</p>
+       zu schreiben, sondern den vorhandenen von seiner Geometrie zu trennen — und
+       dann zu lernen, dass die beiden Hefte nicht einmal dieselbe Anordnung drucken.</p>
   </div>
 
   <article class="entry">
@@ -1039,6 +1039,56 @@ code {
         <div><dt>Frage</dt><dd>Der allgemeine Kern kann auch ein einzelnes Gitter beschreiben. Rechnet er dasselbe wie der handgeschriebene 16×16-Kern?</dd></div>
         <div><dt>Prüfstein</dt><dd>Alle 54 rekonstruierten Elektor-Rätsel werden bei jedem Testlauf von beiden Kernen gelöst und Zelle für Zelle verglichen. Der allgemeine Kern muss zusätzlich für jede Einheit belegen, dass sie eine Permutation aller sechzehn Werte ist.</dd></div>
         <div><dt>Preis der Allgemeinheit</dt><dd>Rund 17 % gegenüber dem spezialisierten Kern — wenig, aber genug, um die beiden Einzelgittergrößen bei ihrem eigenen Code zu belassen. Die Aufteilung ist damit gemessen statt vermutet, so wie schon bei der Trennung von 9×9 und 16×16.</dd></div>
+      </dl>
+    </div>
+  </article>
+
+  <article class="entry">
+    <div class="rail"><span class="tag">MUR-07</span><span class="chip chip-ok">gelöst</span></div>
+    <div>
+      <h3>Die Vorgaben stehen in der Textebene</h3>
+      <dl>
+        <div><dt>Ausgangslage</dt><dd>Für die beiden echten Hexamurai stand die Sichtprüfung an — 1216 beziehungsweise 768 Zellen, etwa das Fünffache eines Hexadokus.</dd></div>
+        <div><dt>Befund</dt><dd>Erst nachsehen, dann abschreiben: <code>pdftotext</code> liefert für diese Seiten die Ziffern als echten Text. Anders als auf den gewöhnlichen Hexadoku-Seiten, wo das Rätsel eine Grafik ist, sind hier alle Vorgaben Textglyphen mit Koordinaten. Statt Sichtprüfung also eine <em>exakte</em> Übernahme — kein OCR, keine Lesefehlerklasse.</dd></div>
+        <div><dt>Verfahren</dt><dd>Die Glyphenmittelpunkte aller fünf Gitter liegen auf <em>einem</em> regelmäßigen Raster. <code>cmd/muraiextract</code> passt dieses Raster an und ordnet jede Glyphe ihrer Zelle zu.</dd></div>
+      </dl>
+    </div>
+  </article>
+
+  <article class="entry">
+    <div class="rail"><span class="tag">MUR-08</span><span class="chip chip-ok">gelöst</span></div>
+    <div>
+      <h3>„0 to F" im Fließtext sieht aus wie eine Vorgabe</h3>
+      <dl>
+        <div><dt>Symptom</dt><dd>Die erste Rasteranpassung ergab einen Abstand von 12,02 statt 12,76 Punkt und ließ fast alle Vorgaben als „nicht auf dem Raster" durchfallen.</dd></div>
+        <div><dt>Ursache</dt><dd>Der Erklärtext über dem Rätsel enthält einzelne Zeichen, die von einer Vorgabe nicht zu unterscheiden sind: <code>0</code> und <code>F</code> aus „the hexadecimal figures from 0 to F", die <code>4</code> aus „4×4 boxes". Der Schätzer nahm den <em>kleinsten</em> wiederkehrenden Abstand — und den lieferte ein Paar dieser Fremdzeichen.</dd></div>
+        <div><dt>Lösung</dt><dd>Jeder Schritt gegen eine Minderheit falscher Punkte robust gemacht: Abstand als <em>Median</em> statt Minimum, Anker als Medianposition statt Randposition (der Rand ist genau dort, wo die Ausreißer sitzen), und zum Schluss bleibt nur der zusammenhängende Block von Rasterlinien stehen, der die meisten Glyphen trägt. Der Fließtext fällt damit von selbst heraus.</dd></div>
+        <div><dt>Merksatz</dt><dd>Dieselbe Lehre wie bei der Gittererkennung im Bild: Ein Schätzer, der auf das Extremum schaut, ist der Ausreißer-Empfindlichste, den man wählen kann.</dd></div>
+      </dl>
+    </div>
+  </article>
+
+  <article class="entry">
+    <div class="rail"><span class="tag">MUR-09</span><span class="chip chip-neutral">Annahme widerlegt</span></div>
+    <div>
+      <h3>Kein Kreuz, und zweimal nicht dasselbe</h3>
+      <dl>
+        <div><dt>Annahme</dt><dd>Ein Hexamurai sei das Samurai-Kreuz mit 16 Werten: fünf Gitter, jedes Eckgitter teilt einen 4×4-Block mit der Mitte, 1216 Zellen. So stand es sogar schon in diesem Bericht.</dd></div>
+        <div><dt>Symptom</dt><dd>Mit dieser Geometrie landete die erste Vorgabe außerhalb jedes Gitters. Keine Verschiebung half.</dd></div>
+        <div><dt>Befund</dt><dd>Die Anordnung wurde nicht angenommen, sondern aus den Vorgabepositionen abgelesen — welche Spalten in welchen Zeilen überhaupt belegt sind, verrät die Gitterecken. Heft 7-8/2009 druckt ein <em>Windrad</em>: Ecken bei (0,8), (8,24), (16,0), (12,12), (24,16), Überlappung je ein 4×12-Streifen aus drei Blöcken, 1088 Zellen in 228 Einheiten. Heft 7-8/2011 druckt ein <em>Plus</em> auf 32×32: Überlappung je ein halbes Gitter, 768 Zellen in 176 Einheiten. Beide Male bestätigt die Sichtprüfung der Seite die abgelesenen Ecken.</dd></div>
+        <div><dt>Prüfstein</dt><dd>Wie überall im Projekt entscheidet der Gegenstand: Bei falscher Geometrie stünden Vorgaben im Widerspruch oder das Rätsel bliebe mehrdeutig. Beide sind eindeutig lösbar — 2009 in 2,2 ms, 2011 in 43 Sekunden.</dd></div>
+      </dl>
+    </div>
+  </article>
+
+  <article class="entry">
+    <div class="rail"><span class="tag">MUR-10</span><span class="chip chip-neutral">Befund</span></div>
+    <div>
+      <h3>Das Mittelgitter von 2011 ist regelfrei</h3>
+      <dl>
+        <div><dt>Beobachtung</dt><dd>Die beiden Rätsel unterscheiden sich im Aufwand um fünf Größenordnungen: 65 Verzweigungsknoten gegen 3 364 151.</dd></div>
+        <div><dt>Erklärung</dt><dd>Sie stand schon in der Einheitentabelle. Beim Plus von 2011 überlappt das Mittelgitter jedes Außengitter um eine ganze Hälfte, und dadurch fällt <em>jede</em> seiner Zeilen, Spalten und Blöcke mit einer Einheit eines Außengitters zusammen. Fünf angemeldete Gitter ergeben 176 verschiedene Einheiten — genau so viele, wie die vier Außengitter allein beitragen. Das Mittelgitter fügt keine einzige Regel hinzu.</dd></div>
+        <div><dt>Folge</dt><dd>Übrig bleiben vier nur paarweise gekoppelte Gitter bei 30 % Vorgabendichte. Die Propagation kommt schnell an ihr Ende, und der Rest ist Suche. Dass die Einheiten-Entdopplung diesen Befund nebenbei ausrechnet, ist ein Nebeneffekt der Modellierung: Wer Geometrie als Daten führt, kann sie auch auszählen.</dd></div>
       </dl>
     </div>
   </article>

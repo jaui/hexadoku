@@ -1,4 +1,4 @@
-# hexamurai puzzle 1: 426 clues, difficulty 18171 branch nodes, unique, minimal up to a 20000 node budget per removal, seed 5
+# hexa-samurai puzzle 1: 426 clues, difficulty 18171 branch nodes, unique, minimal up to a 20000 node budget per removal, seed 5
 ....C...E.......        .....D.6.C.9F...
 .E.63F9...D...5.        A..9.0..2...CE3.
 .......4.C...29.        ..C01.B9..3...7.
