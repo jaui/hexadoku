@@ -1,0 +1,19 @@
+# Elektor Hexadoku 2006-04 (Elektuur 510, p. 70), 111 clues
+# transcribed visually; the english scan on archive.org is missing the
+# puzzle page, so the dutch edition of the same month was used
+C.2..6.A..B.ED58
+3...5.B.1.C.F4..
+.9.F3D.E..5....B
+5.AD.4C1..8.29.6
+8.4..9.5.0..6.D.
+.51.....7...9E..
+F...1.D...A3....
+DAECB7....9....3
+.E3..0.........2
+...62........B4D
+....6..F.5..8.E.
+..78AE5..9F.C.0.
+..65..A4987.DC..
+E0...2..A..C..9.
+.....5074.DF3.6.
+.D.....9.BE5.1.F
