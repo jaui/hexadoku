@@ -1,4 +1,4 @@
-# clue mask of the Elektor 2007-09 Hexadoku (PDF page 76), 117 clues
+# clue mask of the Elektor 2007-09 Hexadoku (PDF page 67), 117 clues
 .#.#...#.##.####
 .#.#..##..##....
 #.##.#..#.#...#.

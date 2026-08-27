@@ -1,4 +1,4 @@
-# solution of the previous issue's Hexadoku, printed in Elektor 2011-04 (PDF page 75)
+# solution of the previous issue's Hexadoku, printed in Elektor 2011-04 (PDF page 78)
 71FB3548CDE2690A
 D208AC96BF34E175
 356ABDE089714CF2

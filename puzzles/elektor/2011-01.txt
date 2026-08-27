@@ -1,0 +1,21 @@
+# Elektor Hexadoku 2011-01, 116 clues
+# The puzzle page carries all 256 digits of its own solution in the
+# PDF text layer, with only the clue cells actually inked. Puzzle =
+# that solution masked by the detected clue cells; the solver then
+# has to reproduce the other 140 digits, which is the check.
+F...605..19D...E
+.D.4........9.3.
+..2.D.8..6.3.7..
+9568.F3..A0.1C2D
+.FA.7C....61.20.
+58..1A....74..E9
+.67....D3....FB.
+0..B..6..C..D..7
+1..5..4..8..6..3
+.9D....64....E5.
+40..9D....57..FA
+.AF.C5....BE.48.
+835D.6B..EC.4172
+..E.5.7..4.8.D..
+.1.9........A.6.
+7...41D..526...B

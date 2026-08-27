@@ -1,4 +1,4 @@
-# clue mask of the Elektor 2006-06 Hexadoku (PDF page 77), 126 clues
+# clue mask of the Elektor 2006-06 Hexadoku (PDF page 71), 126 clues
 #.#.##.#.##..#.#
 .#####....#.##..
 .##..###.#...#.#

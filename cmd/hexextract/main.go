@@ -503,6 +503,18 @@ func maskFromImage(imgPath string, dpi int, solBox *ptRect, deep bool) (*detecti
 		skew = bm.deskew()
 	}
 	det, err := detectLattice(bm, dpi, solBox, skew)
+	// Windows overlapping the printed solution are normally not the
+	// puzzle - but on some born-digital pages the layout is the other way
+	// round: the *puzzle* carries the text, holding all 256 digits of its
+	// own solution with only the clues actually inked, while the previous
+	// issue's solution is the graphic. There the exclusion zone sits on
+	// top of the puzzle and throws away the only correct window. So if
+	// nothing was found, look again without it.
+	if det == nil && solBox != nil {
+		if d2, e2 := detectLattice(bm, dpi, nil, skew); d2 != nil {
+			det, err = d2, e2
+		}
+	}
 	// A pale scan prints its darkest ink lighter than the fixed
 	// thresholds, so nothing is ink and no line exists. Refit the
 	// ink/paper split to this page and look again.

@@ -1,4 +1,4 @@
-# solution of the previous issue's Hexadoku, printed in Elektor 2012-07_08 (PDF page 139)
+# solution of the previous issue's Hexadoku, printed in Elektor 2012-07_08 (PDF page 141)
 07829EFD65A4C31B
 9ACF01258B37D4E6
 5B41368CF9ED702A
