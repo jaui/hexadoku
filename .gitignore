@@ -1,3 +1,4 @@
 *.exe
 elektor_pdfs/
 *~
+*.tmp
