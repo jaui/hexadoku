@@ -1,0 +1,19 @@
+# Elektor Hexadoku 2006-02 (Elektuur, p. 69), 125 clues
+# transcribed visually from labelled cell contact sheets; before 11/2007
+# Elektor printed no solution grid, only a 5-character prize code
+..E2...3.D..8.A6
+3..42...5A96F.7.
+B8.76.D91.4F3...
+5C.F.1A.7.2.49D.
+F..8..5D..B..A.C
+0975...4.C..E.B.
+.....6B8..0D...5
+..3....7...A..6F
+..F..A8E4..9D.2.
+6.5E4.....A..C37
+2.095.CB3.E76.8.
+1.8.F.7...DC9.5A
+D.C.E.2..6.8B30.
+.3...70...FE..4.
+E...893A...5C..D
+..4.C..5....A...

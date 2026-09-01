@@ -1485,6 +1485,8 @@ func main() {
 	outDir := flag.String("out", "puzzles/elektor", "output directory")
 	doChain := flag.Bool("chain", false, "combine masks and next-issue solutions into puzzles")
 	crops := flag.Int("crops", 0, "export grid crops of this PDF page as PNG for visual reading (-1 = auto-detect page)")
+	cells := flag.Int("cells", 0, "export the clue cells of this page as numbered contact sheets, so reading supplies only the glyphs and never their position")
+	assemble := flag.String("assemble", "", "with the order file of -cells: rebuild the grid from the glyphs given as the argument")
 	bands := flag.Int("bands", 4, "with -crops: split each grid into this many horizontal bands")
 	dpi := flag.Int("dpi", 150, "render resolution for mask detection")
 	pdftoppm := flag.String("pdftoppm", "pdftoppm", "path to poppler's pdftoppm")
@@ -1517,6 +1519,35 @@ func main() {
 			fmt.Fprintln(os.Stderr, err)
 			os.Exit(1)
 		}
+		return
+	}
+	if *cells != 0 {
+		if flag.NArg() != 1 {
+			fmt.Fprintln(os.Stderr, "-cells needs exactly one PDF")
+			os.Exit(2)
+		}
+		if err := exportCells(flag.Arg(0), *cells, *pdftoppm, *pdftotext, *outDir, 300); err != nil {
+			fmt.Fprintln(os.Stderr, err)
+			os.Exit(1)
+		}
+		return
+	}
+	if *assemble != "" {
+		order, err := os.ReadFile(*assemble)
+		if err != nil {
+			fmt.Fprintln(os.Stderr, err)
+			os.Exit(1)
+		}
+		if flag.NArg() != 1 {
+			fmt.Fprintln(os.Stderr, "-assemble needs the glyphs read off the sheets as its argument")
+			os.Exit(2)
+		}
+		g, err := gridFromCells(strings.Fields(string(order)), flag.Arg(0))
+		if err != nil {
+			fmt.Fprintln(os.Stderr, err)
+			os.Exit(1)
+		}
+		fmt.Print(g)
 		return
 	}
 	ok, fail := 0, 0

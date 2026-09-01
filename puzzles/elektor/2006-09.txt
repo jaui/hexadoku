@@ -1,0 +1,22 @@
+# Elektor Hexadoku 2006-09 (p. 77), 115 clues
+# transcribed visually from labelled cell contact sheets; before 11/2007
+# Elektor printed no solution grid, only a 5-character prize code.
+# Confirmed by that code: the grey cells (r16c2-c6) of this solution
+# give 0EBAD, which Elektuur 11/2006 announces as the september result
+# (printed there as OEBAD - a rendered zero).
+2..C...B.6..4.85
+645..A.8....0D.3
+..B1.EC.7.0..F.9
+0...17..4.D...C.
+..67E...B..D2..4
+..0382..F9..C5.7
+B...7..53C4..A1E
+.1C5..0.....8.FD
+.C...8..D.A...EF
+.5..B4.783...0..
+8.....DE...9B6..
+.BA69.5..4..7C38
+.2...58F.B7.....
+.7D.0.....5.3..2
+..3..B42AD..F7..
+F.......C2...4.6

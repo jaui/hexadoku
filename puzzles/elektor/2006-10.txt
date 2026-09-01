@@ -1,4 +1,6 @@
 # Elektor Hexadoku 2006-10 (p. 77), 120 clues
+# Confirmed by prize code: the grey cells (r5c5-c9) of this solution give
+# 754C1, which Elektuur 12/2006 announces as the october 2006 result.
 # transcribed visually from the scan; tesseract could not read this page
 F...2.85..910...
 8.5....1C67F4E.9

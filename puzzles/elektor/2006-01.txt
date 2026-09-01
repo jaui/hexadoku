@@ -1,0 +1,24 @@
+# Elektor Hexadoku 2006-01 (Elektuur 507, p. 68), 122 clues
+# transcribed visually; before 11/2007 Elektor printed no solution grid,
+# only a 5-character prize code, so there is nothing to chain from.
+# Cross-check: the puzzle hardcoded in the original cpp/hexadoku.cpp is
+# this very grid, but typed in with 7 clues missing (115 of 122) - and
+# is therefore not uniquely solvable. All 115 of its clues agree with
+# this reading in position and value; the 7 it lacks are r1c11, r2c15,
+# r5c8, r6c1, r7c4, r16c15, r16c16. This reading solves uniquely.
+E......A..56.F8.
+.65...E.18.F.03A
+3.7B..65.D...2..
+8.....B..34...5.
+...07..19.....2.
+9B...2.0F7.8D..6
+5.E7..FBD16.C...
+.D.6.3..2.0..A.7
+....D.....C.287.
+73BE..9C0A82..6.
+..A..1....7E.B9.
+29....0.64D...A.
+476..F.....A0..2
+B.C3A.5480...EF.
+DE9.0C2.4.F5..18
+F..5.B....19.4D3

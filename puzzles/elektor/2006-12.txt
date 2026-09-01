@@ -1,0 +1,21 @@
+# Elektor Hexadoku 2006-12 (Elektuur 518, p. 89), 127 clues
+# transcribed visually from labelled cell contact sheets; before 11/2007
+# Elektor printed no solution grid, only a 5-character prize code.
+# Confirmed by that code: the grey cells (r16c7-c11) of this solution
+# give 87E46, which Elektuur 2/2007 announces as the december result.
+234.1..0CA8.D.5.
+..B.C3..7..4..81
+.569F...0DE.B3..
+8....4..5..BE.72
+.....5.46.A798.E
+..58..2.9.F3.4D.
+3A.0.FB..1.8.6.7
+6.9D.A..2.C...1.
+E7.1.9C.3.0A.2F8
+9.AF0...4.5C..B6
+..34.6..1....D.C
+...B2....8D.1A95
+B..34C1..5.F....
+.E.C.2....90..4.
+40..B.FE.C.28.39
+..F5.......D.1C.
