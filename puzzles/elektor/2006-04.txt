@@ -1,6 +1,9 @@
 # Elektor Hexadoku 2006-04 (Elektuur 510, p. 70), 111 clues
 # transcribed visually; the english scan on archive.org is missing the
-# puzzle page, so the dutch edition of the same month was used
+# puzzle page, so the dutch edition of the same month was used.
+# Confirmed by prize code: the grey cells (r9c8-c12) of this solution give
+# CDA48, which Elektor Electronics 6/2006 announces as the april result -
+# which also shows the substitute edition carried the same puzzle.
 C.2..6.A..B.ED58
 3...5.B.1.C.F4..
 .9.F3D.E..5....B

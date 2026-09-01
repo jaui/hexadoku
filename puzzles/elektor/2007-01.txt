@@ -1,5 +1,7 @@
 # Elektor Hexadoku 2007-01 (p. 77), 119 clues
-# transcribed visually from the scan; no lattice detection possible
+# transcribed visually from the scan; no lattice detection possible.
+# Confirmed by prize code: the grey cells (r12c7-c11) of this solution give
+# 038FA, which Elektor Electronics 3/2007 announces as the january result.
 F7E.8.2..5...D..
 1.....3E...B..AC
 2D3..7....985.B.

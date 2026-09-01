@@ -80,9 +80,29 @@ foreach ($p in $puzzles) {
     if ($m[1] -ge 200) {
         Write-Host ("PASS $key (unique; matches the OCR-damaged solution grid of {0} in {1}/256 cells)" -f $m[0], $m[1])
         $pass++
-    } else {
-        Write-Host "WARN $key (unique, but no printed solution matches - unverified)"
-        $warn++
+        continue
     }
+    # Before 11/2007 no solution grid was printed at all, only the five
+    # characters of the grey answer cells, announced two issues later.
+    # Where the reading reproduces that code it is proven just as firmly
+    # as by a solution grid - the code names five specific cells out of
+    # 256, so agreement by chance is about one in a million.
+    # Match the claim wherever it sits in the header and however it is
+    # worded: what matters is the cell range and the code, not the prose.
+    $flat = ($raw -replace '[\r\n#]', ' ')
+    if ($flat -match 'r(\d+)c(\d+)\s*-\s*c(\d+).{0,80}?\b([0-9A-F]{5})\b') {
+        $row = [int]$Matches[1]; $col = [int]$Matches[2]; $code = $Matches[4]
+        $got = $mine[$row - 1].Substring($col - 1, 5)
+        if ($got -eq $code) {
+            Write-Host "PASS $key (unique; the grey cells give $code, the prize code the magazine announced)"
+            $pass++
+        } else {
+            Write-Host "FAIL $key : grey cells r${row}c$col give $got, but the header claims the announced code is $code"
+            $fail++
+        }
+        continue
+    }
+    Write-Host "WARN $key (unique, but no printed solution matches - unverified)"
+    $warn++
 }
 Write-Host "validation: $pass verified, $warn unverified, $fail fail, $special special format"

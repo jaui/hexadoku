@@ -1,0 +1,23 @@
+# Elektor Hexadoku 2007-05 (Elektuur, p. 66), 115 clues
+# transcribed visually from labelled cell contact sheets; before 11/2007
+# Elektor printed no solution grid, only a 5-character prize code
+# Confirmed by prize code: the grey cells (r1c6-c10) of this solution give
+# B789E, which Elektor Electronics 7-8/2007 announces as the may result.
+# So the dutch and english editions carried the same puzzle that month,
+# unlike april, where the two codes genuinely differ.
+...21......D3...
+.6EB.F.4...580D7
+..87....6C.F..B.
+3.0..A.57....9..
+..95FC...4.0...E
+C.A407.DF3.E....
+.7..E..2..B.F3..
+FE2.4.AB5..96D.8
+.96.7...4.3.5...
+7..C..3.E....4..
+..4..1DEB...92..
+E..12....9...C.D
+....B.2.8.96A103
+.AB..61..F..C7..
+68.E.5.F.0..D..9
+.0.3..4AC.7B.F..
