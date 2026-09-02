@@ -10,11 +10,25 @@
 #    only on white - a chequerboard, hence "EUC" for even/uneven
 #    chequerboard
 #
+# The arrangement is not new: measured off the page, the five grid
+# corners are (0,8), (8,24), (16,0), (12,12), (24,16) on a 40x40 raster -
+# exactly the pinwheel of the 2009 Hexamurai, 1088 cells in 228 units.
+# The chequerboard runs across that whole raster and all five origins are
+# even, so it is consistent over the overlaps: a cell is coloured exactly
+# when row+column is even. That phase was read off the render (465
+# coloured cells, no exception) and confirmed against the 4x4 box the
+# article fills in "to illustrate the arrangement of the even/uneven
+# chequerboard".
+#
 # The clues are a graphic, and they spell out "Elektor 2012" plus the
 # logo on the grid. The 256 hex glyphs the page does carry as text are
 # the printed solution of the May 2012 hexadoku, already extracted as
 # 2012-07_08_prevsolution.txt.
 #
-# Solving it would need two things this repo does not have: the parity
-# rule as a per-cell candidate restriction (a small addition to the
-# variant description), and the chequerboard read out of the image.
+# The solver handles this layout since the penta variant was added (see
+# pentaVariant in murai.go); a file asks for it with a "# variant:
+# penta-hexadoku" header, because the cell count alone cannot tell it
+# from the hexamurai it shares its geometry with. See
+# puzzles/penta_generated.txt for a generated example. What is still
+# missing here is only the reading: the clues have to come out of the
+# image, the same visual route the other graphic pages took.

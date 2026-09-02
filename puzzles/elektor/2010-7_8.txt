@@ -1,7 +1,43 @@
 # Elektor 2010-7_8 - not a standalone puzzle
-# "Hexadocube" (p. 60): six hexadoku grids on the faces of a cube, shown
-# unfolded, each linked to its four neighbours through the boxes along the
-# folds. The magazine states that solving a single grid on its own is
-# impossible. The 84-clue mask is one face and is meaningless on its own.
-# The clues are a graphic here, not text, so reading it would take the
-# visual route over six grids.
+# "Hexadocube" (p. 60-61), designer Claude Ghyselen: six hexadoku grids on
+# the faces of a cube, printed unfolded across the double page - what the
+# article calls the development. The magazine states that solving a single
+# grid on its own is impossible.
+#
+# The net, measured off the spread (each box is one 16x16 face):
+#
+#                             +----+
+#                             | 4  |     the four grids of the middle row
+#    +----+----+----+----+----+----+     wrap around the cube, face 4 is
+#    | 0  | 1  | 2  | 3  |               its top and face 5 its bottom
+#    +----+----+----+----+----+
+#                             | 5  |
+#                             +----+
+#
+# Faces 0 and 1 are on p. 60, faces 2, 3, 4 and 5 on p. 61; the strip
+# crosses the gutter, so the puzzle is one figure over two pages.
+#
+# The link is the cells - "cases" in the designer's French - along each
+# cube edge, coloured pale yellow and left empty in the opening situation:
+# they are one cell seen from two faces and must hold the same value on
+# both. The eight cube corners, coloured orange, belong to three faces at
+# once. That leaves 6*256 - 12*16 + 8 = 1352 cells in 6*48 - 12 = 276
+# units, because a boundary line of one face *is* a line of its
+# neighbour. The 84-clue mask in 2010-7_8_mask.txt is one face out of the
+# six and is meaningless on its own.
+#
+# The bright cells inside a face are not part of the rules: they are the
+# clues that spell out the face number in the background, "arranged in
+# such a way that the numbers on opposite faces always add up to 7, just
+# like on a die".
+#
+# The solver handles this layout since the hexadocube variant was added
+# (see cube.go); the six faces are folded onto the surface lattice of a
+# cube and the edge identifications fall out of the coordinates. Use
+#
+#     hexadoku.exe -gen hexadocube
+#
+# for a generated one. What is still missing here is only the reading:
+# the clues are a graphic on a scan, so all six faces have to be
+# transcribed visually, and there is no printed solution grid to check
+# them against - the uniqueness of the whole cube would have to do it.

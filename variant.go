@@ -20,10 +20,12 @@ import (
 )
 
 const (
-	maxGCells = 1216 // hexamurai: 5*256 - 4*16 shared cells
-	maxUnits  = 236  // hexamurai: 5*48 units - 4 shared boxes
+	maxGCells = 1352 // hexadocube: 6*256 - 12*16 shared edges + 8 corners
+	maxUnits  = 276  // hexadocube: 6*48 units - 12 shared boundary lines
 	// A cell inside an overlap belongs to two rows, two columns and one
-	// box (the box is shared by both grids, so it is a single unit).
+	// box (the box is shared by both grids, so it is a single unit). A
+	// cube corner belongs to three faces, but the three lines meeting
+	// there are shared pairwise, which again leaves six units.
 	maxCellUnits = 6
 )
 
@@ -37,6 +39,12 @@ type variant struct {
 	unitCells [maxUnits][maxSize]uint16       // unit -> its nvals cells
 	cellUnits [maxGCells][maxCellUnits]uint16 // cell -> the units containing it
 
+	// Per-cell value restriction, all bits set unless a variant narrows
+	// it (the chequerboard of the EUC penta-hexadoku does). It replaces
+	// the constant "all" in cand, so the rule costs one load and not a
+	// second mask operation.
+	allow [maxGCells]uint16
+
 	// text layout: cells sit on a width x height character raster,
 	// positions that are not part of any grid stay blank
 	width, height int
@@ -46,6 +54,13 @@ type variant struct {
 	// ignore layout. Only correct where every raster position is a cell
 	// (a single grid), but it tolerates separators and spacing.
 	tokens bool
+
+	// Hexadoku digest: sixteen blocks of five cells that take sixteen
+	// given codes, one each. Empty for every other layout; see digest.go.
+	blocks [][]int
+	codes  [][]uint8
+
+	builderr error // a header the layout could not be built from
 
 	ncu  [maxGCells]uint8 // units registered so far, build time only
 	seen map[string]int   // unit dedup by cell set, build time only
@@ -153,6 +168,7 @@ func (v *variant) finish() {
 		for i := int(v.ncu[k]); i < maxCellUnits; i++ {
 			v.cellUnits[k][i] = v.cellUnits[k][0]
 		}
+		v.allow[k] = v.all
 	}
 	v.seen = nil
 }
@@ -161,18 +177,23 @@ func (v *variant) finish() {
 
 // render prints the puzzle on its character raster: one line per row,
 // exactly width characters, blanks where no grid covers the position.
-// The output parses back in unchanged.
+// The output parses back in unchanged. Iterating over the raster and not
+// over the cells matters for the hexadocube, where a cell on a cube edge
+// is drawn once on each of the faces that share it.
 func (v *variant) render(g *gboard) string {
 	buf := make([]byte, v.width*v.height)
 	for i := range buf {
 		buf[i] = ' '
 	}
-	for k := 0; k < v.ncells; k++ {
+	for i, m := range v.at {
+		if m == 0 {
+			continue
+		}
 		ch := byte('.')
-		if g.grid[k] != empty {
+		if k := int(m) - 1; g.grid[k] != empty {
 			ch = charOf(v.nvals, g.grid[k])
 		}
-		buf[v.pos[k]] = ch
+		buf[i] = ch
 	}
 	var sb strings.Builder
 	for r := 0; r < v.height; r++ {
@@ -186,6 +207,9 @@ func (v *variant) render(g *gboard) string {
 // a character are its line and column number, so the blanks between the
 // grids carry meaning and must be preserved.
 func (v *variant) parse(text string) (*gboard, error) {
+	if v.builderr != nil {
+		return nil, v.builderr
+	}
 	g := v.newBoard()
 	if v.tokens {
 		k := 0
@@ -245,7 +269,22 @@ func (v *variant) parse(text string) (*gboard, error) {
 }
 
 func (v *variant) place(g *gboard, k int, val uint8, line, col int) error {
+	// A cell drawn twice - the two sides of a cube edge - must carry the
+	// same clue on both faces; that is the rule the magazine states, and
+	// here it is simply the second copy agreeing with the first.
+	if have := g.grid[k]; have != empty {
+		if have == val {
+			return nil
+		}
+		return fmt.Errorf("clue %c at line %d, column %d contradicts the %c "+
+			"in the same cell on the neighbouring face",
+			charOf(v.nvals, val), line, col, charOf(v.nvals, have))
+	}
 	if v.cand(g, k)&(1<<val) == 0 {
+		if v.allow[k]&(1<<val) == 0 {
+			return fmt.Errorf("clue %c at line %d, column %d is on the wrong "+
+				"colour for the chequerboard", charOf(v.nvals, val), line, col)
+		}
 		return fmt.Errorf("conflicting clue %c at line %d, column %d",
 			charOf(v.nvals, val), line, col)
 	}

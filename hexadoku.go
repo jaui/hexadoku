@@ -359,9 +359,10 @@ const defaultPuzzle = "E......A...6.F8..65...E.18.F.0.A3.7B..65.D...2..8....." +
 var compact bool // -compact: print only the solution in compact form
 
 func run(name, text string, bench int, checkUnique bool) bool {
-	// samurai layout? (detected by its total cell count; the cells sit on
-	// a character raster, so it needs the geometry-driven core)
-	if v := variantFor(countAllTokens(text)); v != nil {
+	// samurai, cube or penta layout? (named in a "# variant:" header or
+	// detected by its total cell count; the cells sit on a character
+	// raster, so it needs the geometry-driven core)
+	if v := variantForText(text); v != nil {
 		return runVariant(name, v, text, bench, checkUnique)
 	}
 
@@ -436,7 +437,7 @@ func main() {
 	bench := flag.Int("bench", 0, "additionally solve n times and report the average time")
 	unique := flag.Bool("unique", false, "check whether the solution is unique")
 	flag.BoolVar(&compact, "compact", false, "print only the solution in compact 16-line form")
-	gen := flag.String("gen", "", "generate puzzles instead of solving: 9, 16, samurai or hexamurai")
+	gen := flag.String("gen", "", "generate puzzles instead of solving: 9, 16, samurai, hexamurai, penta or hexadocube")
 	count := flag.Int("count", 3, "with -gen: number of puzzles to generate")
 	tries := flag.Int("tries", 8, "with -gen: attempts per puzzle, the hardest is kept")
 	seed := flag.Uint64("seed", 0, "with -gen: random seed (0 = time-based)")
@@ -461,8 +462,12 @@ func main() {
 			v = samuraiVariant(maxSize)
 		case "hexamurai", "murai":
 			v = hexamuraiVariant()
+		case "penta", "penta-hexadoku":
+			v = pentaVariant()
+		case "hexadocube", "cube":
+			v = hexadocubeVariant()
 		default:
-			fmt.Fprintln(os.Stderr, "-gen must be 9, 16, samurai, hexa-samurai or hexamurai")
+			fmt.Fprintln(os.Stderr, "-gen must be 9, 16, samurai, hexa-samurai, hexamurai, penta or hexadocube")
 			os.Exit(2)
 		}
 		if *seed == 0 {

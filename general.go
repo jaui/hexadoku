@@ -31,10 +31,13 @@ func (v *variant) newBoard() *gboard {
 	return g
 }
 
+// cand masks with allow[k] rather than the constant all: for every variant
+// but the EUC penta-hexadoku that array holds all, so the per-cell rule is
+// one load in place of one immediate and costs nothing else.
 func (v *variant) cand(g *gboard, k int) uint16 {
 	u := &v.cellUnits[k]
 	return ^(g.placed[u[0]] | g.placed[u[1]] | g.placed[u[2]] |
-		g.placed[u[3]] | g.placed[u[4]] | g.placed[u[5]]) & v.all
+		g.placed[u[3]] | g.placed[u[4]] | g.placed[u[5]]) & v.allow[k]
 }
 
 func (v *variant) assign(g *gboard, k int, val uint8) {
