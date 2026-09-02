@@ -1,0 +1,132 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Hexadoku — Dokumentation</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@500;600;700&family=Source+Serif+4:opsz,wght@8..60,400;8..60,600&family=JetBrains+Mono:wght@400;500;700&display=swap">
+<link rel="stylesheet" href="spezial.css">
+<style>
+.cards {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(19rem, 1fr));
+  gap: 0;
+  border-top: 1px solid var(--rule);
+}
+.card {
+  display: block;
+  text-decoration: none;
+  color: inherit;
+  padding: 1.6rem 1.6rem 1.6rem 0;
+  border-bottom: 1px solid var(--rule-soft);
+  border-right: 1px solid var(--rule-soft);
+}
+.card:hover h2 { color: var(--accent); }
+.card .kicker {
+  font-family: var(--f-mono);
+  font-size: 0.62rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--ink-soft);
+}
+.card h2 {
+  font-family: var(--f-display);
+  font-weight: 600;
+  font-size: 1.25rem;
+  letter-spacing: -0.015em;
+  margin: 0.4rem 0 0.5rem;
+}
+.card p { margin: 0; color: var(--ink-soft); font-size: 0.95rem; max-width: 26rem; }
+.card .meta {
+  margin-top: 0.9rem;
+  font-family: var(--f-mono);
+  font-size: 0.64rem;
+  letter-spacing: 0.06em;
+  color: var(--ink-soft);
+}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<header class="masthead">
+  <p class="eyebrow">Dokumentation · github.com/jaui/hexadoku</p>
+  <h1>Hexadoku</h1>
+  <p class="standfirst">
+    Ein Solver für 16×16-Sudokus in Go — und die Rekonstruktion von zehn
+    Jahrgängen Elektor-Rätseln aus Archivscans. Diese Seiten erklären die
+    Sonderformate, die dabei aufgetaucht sind, und wie der Solver sie
+    beschreibt.
+  </p>
+</header>
+
+<section class="figures">
+  <div class="fig"><b>108</b><span>Hefte mit Rätsel</span></div>
+  <div class="fig"><b>82</b><span>gegengeprüft</span></div>
+  <div class="fig"><b>0</b><span>Fehlschläge</span></div>
+  <div class="fig"><b>4</b><span>Sonderformate offen</span></div>
+</section>
+
+<div class="cards">
+  <a class="card" href="werkstattbericht.html">
+    <span class="kicker">Werkstattbericht</span>
+    <h2>Was schiefging, und wie</h2>
+    <p>Vom C++-Brute-Force zum Go-Solver mit Bitmasken, die PDF-Toolchain,
+       Gittererkennung in Scans, die Paarung von Rätsel und Lösung.</p>
+    <span class="meta">Protokoll · deutsch</span>
+  </a>
+  <a class="card" href="suchbaum.html">
+    <span class="kicker">Suchbaum</span>
+    <h2>Die Suche Schritt für Schritt</h2>
+    <p>Kandidaten je Zelle, naked und hidden singles, die MRV-Zelle als
+       Verzweigungspunkt mit dem Histogramm, das die Wahl erklärt.</p>
+    <span class="meta">Interaktiv · deutsch</span>
+  </a>
+  <a class="card" href="hexamurai.html">
+    <span class="kicker">Elektor 7-8/2009 · 7-8/2011</span>
+    <h2>Hexamurai</h2>
+    <p>Fünf verschränkte Gitter, zwei Anordnungen — und warum die zweite
+       fünf Größenordnungen mehr Suche kostet als die erste.</p>
+    <span class="meta">1088 · 768 Zellen</span>
+  </a>
+  <a class="card" href="hexadocube.html">
+    <span class="kicker">Elektor 7-8/2010</span>
+    <h2>Hexadocube</h2>
+    <p>Sechs Hexadokus auf den Flächen eines Würfels. Statt zwölf
+       Kantentabellen wird das Netz in 3D gefaltet — mit Regler.</p>
+    <span class="meta">1352 Zellen · 276 Units</span>
+  </a>
+  <a class="card" href="penta-hexadoku.html">
+    <span class="kicker">Elektor 7-8/2012</span>
+    <h2>EUC Penta-Hexadoku</h2>
+    <p>Das Windrad von 2009 auf einem Schachbrett: gerade Werte nur auf
+       farbigen Feldern. Eine Regel, die in keine Unit passt.</p>
+    <span class="meta">16 → 8 Kandidaten</span>
+  </a>
+  <a class="card" href="digest.html">
+    <span class="kicker">Elektor 3/2011</span>
+    <h2>Hexadoku &lsquo;Digest&rsquo;</h2>
+    <p>Sechzehn Blöcke nehmen die Preiscodes von sechzehn älteren Rätseln
+       auf. Das Zusatzwissen kam aus dem eigenen Archiv zurück.</p>
+    <span class="meta">16 Verzweigungen</span>
+  </a>
+  <a class="card" href="fremdformate.html">
+    <span class="kicker">Elektor 7-8/2007 · 7-8/2008</span>
+    <h2>Alphanumski &amp; AlphaSudoku</h2>
+    <p>36×36 und 25×25. Geometrisch harmlos — was sie außer Reichweite
+       bringt, ist das Alphabet, nicht das Layout.</p>
+    <span class="meta">36 · 25 Symbole</span>
+  </a>
+</div>
+
+<footer class="colophon">
+  Quellcode und Rätseldaten: <a href="https://github.com/jaui/hexadoku">github.com/jaui/hexadoku</a>.
+  Elektor-Ausgaben aus der
+  <a href="https://archive.org/details/ElektorMagazine">ElektorMagazine-Sammlung</a> auf archive.org.
+</footer>
+
+</div>
+</body>
+</html>

@@ -1,0 +1,320 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Hexamurai — zwei Anordnungen</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@500;600;700&family=Source+Serif+4:opsz,wght@8..60,400;8..60,600&family=JetBrains+Mono:wght@400;500;700&display=swap">
+<link rel="stylesheet" href="spezial.css">
+</head>
+<body>
+<div class="wrap">
+
+<header class="masthead">
+  <p class="eyebrow">Spezialrätsel · Elektor 7-8/2009 und 7-8/2011</p>
+  <h1>Hexamurai</h1>
+  <p class="standfirst">
+    Fünf verschränkte 16×16-Gitter, zweimal gedruckt und beide Male anders
+    angeordnet. Die zweite Anordnung kostet fünf Größenordnungen mehr Suche
+    als die erste — und der Grund steht in der Unit-Tabelle, bevor man
+    einen einzigen Knoten expandiert hat.
+  </p>
+  <nav class="pagenav">
+    <a href="hexamurai.html" aria-current="page">Hexamurai</a>
+    <a href="hexadocube.html">Hexadocube</a>
+    <a href="penta-hexadoku.html">EUC Penta-Hexadoku</a>
+    <a href="digest.html">Hexadoku Digest</a>
+    <a href="fremdformate.html">Alphanumski &amp; AlphaSudoku</a>
+    <a href="werkstattbericht.html">Werkstattbericht</a>
+  </nav>
+</header>
+
+<section class="figures">
+  <div class="fig"><b>1088</b><span>Zellen Pinwheel</span></div>
+  <div class="fig"><b>228</b><span>Units Pinwheel</span></div>
+  <div class="fig"><b>768</b><span>Zellen Plus</span></div>
+  <div class="fig"><b>176</b><span>Units Plus</span></div>
+  <div class="fig"><b>65</b><span>Knoten 2009</span></div>
+  <div class="fig"><b>3 364 151</b><span>Knoten 2011</span></div>
+</section>
+
+<!-- ============ I ============ -->
+<section class="chapter">
+  <div class="chapter-head">
+    <span class="num">I</span>
+    <h2>Zwei Anordnungen, keine davon das Lehrbuchkreuz</h2>
+    <p>Beide Ecken wurden aus den gedruckten Vorgabepositionen abgelesen, nicht
+       angenommen. Bestätigt sind sie dadurch, dass die Rätsel damit eindeutig
+       lösbar sind — bei einer falschen Anordnung lägen Vorgaben im Konflikt
+       oder das Rätsel bliebe mehrdeutig.</p>
+  </div>
+
+  <div class="body">
+    <div class="rail"><span class="chip chip-ok">gelöst</span></div>
+    <p>
+      Das klassische Samurai teilt sich pro Paar genau eine Box. Elektor druckte
+      zweimal etwas anderes: 7-8/2009 ein <b>Windrad</b>, bei dem jedes äußere
+      Gitter einen ganzen 4×12-Streifen — drei Boxen — mit dem mittleren teilt,
+      und 7-8/2011 ein <b>Plus</b>, bei dem das mittlere Gitter mit jedem äußeren
+      eine ganze 8×16-Hälfte teilt.
+    </p>
+
+    <figure>
+      <div class="controls">
+        <span>Anordnung:</span>
+        <button id="btn2009" aria-pressed="true">Windrad 7-8/2009</button>
+        <button id="btn2011" aria-pressed="false">Plus 7-8/2011</button>
+        <button id="btnCross" aria-pressed="false">klassisches Kreuz</button>
+        <span id="rasterInfo"></span>
+      </div>
+      <div class="frame" id="muraiFig"></div>
+      <div class="legend" id="muraiLegend"></div>
+      <figcaption>
+        Die echten Vorgaben, direkt aus <b>puzzles/elektor/2009-07_08.txt</b> und
+        <b>2011-07_08.txt</b> gezeichnet — beide aus der Textebene der PDF-Seiten
+        exakt gelesen, nicht per OCR. Überlappungszellen sind kräftiger getönt:
+        sie gehören zu zwei Gittern gleichzeitig und liegen damit in zwei Zeilen,
+        zwei Spalten und einer geteilten Box. Das klassische Kreuz ist zum
+        Vergleich leer dargestellt; in dieser Form hat Elektor nie gedruckt.
+      </figcaption>
+    </figure>
+
+    <div class="tablewrap"><table>
+      <thead>
+        <tr><th>Anordnung</th><th class="num">Raster</th><th>geteilt je Paar</th>
+            <th class="num">Zellen</th><th class="num">Units</th>
+            <th class="num">Vorgaben</th><th class="num">Knoten</th><th class="num">Zeit</th></tr>
+      </thead>
+      <tbody>
+        <tr><td>7-8/2009, Windrad</td><td class="num">40×40</td><td>4×12, drei Boxen</td>
+            <td class="num">1088</td><td class="num">228</td><td class="num">409</td>
+            <td class="num">65</td><td class="num">2,8 ms</td></tr>
+        <tr><td>7-8/2011, Plus</td><td class="num">32×32</td><td>8×16, halbes Gitter</td>
+            <td class="num">768</td><td class="num">176</td><td class="num">231</td>
+            <td class="num">3 364 151</td><td class="num">1 m 46 s</td></tr>
+        <tr><td>klassisches Kreuz</td><td class="num">40×40</td><td>eine Box</td>
+            <td class="num">1216</td><td class="num">236</td><td class="num">—</td>
+            <td class="num">—</td><td class="num">—</td></tr>
+      </tbody>
+    </table></div>
+  </div>
+</section>
+
+<!-- ============ II ============ -->
+<section class="chapter">
+  <div class="chapter-head">
+    <span class="num">II</span>
+    <h2>Warum das Plus fünf Größenordnungen teurer ist</h2>
+    <p>176 Units für fünf Gitter — genau so viele, wie die vier äußeren allein
+       beitragen. Das mittlere Gitter steuert keine einzige eigene Bedingung bei.</p>
+  </div>
+
+  <div class="body">
+    <div class="rail"><span class="chip chip-neutral">Beobachtung</span></div>
+    <p>
+      Eine Unit ist eine Gruppe von 16 Zellen, die jeden Wert genau einmal
+      enthalten muss. Der Solver legt die Units aller fünf Gitter über einen
+      gemeinsamen Zellvorrat und wirft dabei alle weg, die dieselbe Zellmenge
+      beschreiben. Beim Windrad verschwinden so <code>4×3</code> geteilte Boxen:
+      5·48 − 12 = 228. Beim Plus verschwindet das halbe mittlere Gitter mit:
+      4·48 − 4·4 = 176.
+    </p>
+    <p>
+      Der Grund ist in der Abbildung ablesbar. Jede der 16 Zeilen des mittleren
+      Gitters liegt vollständig in einem äußeren Gitter — die obere Hälfte im
+      Gitter darüber, die untere im Gitter darunter. Dasselbe gilt für die
+      Spalten (links/rechts) und für die Boxen. Das mittlere Gitter ist damit
+      keine eigene Bedingung, sondern nur eine Namensgebung für Zellen, die
+      ohnehin schon in Units liegen.
+    </p>
+
+    <figure>
+      <div class="frame" id="plusFig"></div>
+      <div class="legend">
+        <span><i class="swatch" style="background:var(--g1)"></i>Zeilen aus dem oberen Gitter</span>
+        <span><i class="swatch" style="background:var(--g3)"></i>Zeilen aus dem unteren Gitter</span>
+        <span><i class="swatch" style="background:var(--g2)"></i>Spalten links/rechts</span>
+        <span><i class="swatch" style="background:var(--grid-heavy)"></i>Umriss des mittleren Gitters</span>
+      </div>
+      <figcaption>
+        Das mittlere Gitter des Plus, aufgeteilt nach der Herkunft seiner Units.
+        Oben acht Zeilen, die zugleich Zeilen des Gitters darüber sind, unten acht
+        aus dem Gitter darunter; links und rechts dasselbe für die Spalten.
+        Was übrig bleibt, sind <b>vier nur paarweise gekoppelte Gitter</b> bei
+        30 % Vorgabedichte — und das ist der ganze Unterschied zu 2009.
+      </figcaption>
+    </figure>
+
+    <div class="note">
+      <span class="lbl">Konsequenz</span>
+      <p>
+        Beim Windrad erreicht Information aus jedem äußeren Gitter über einen
+        4×12-Streifen das mittlere und von dort das nächste: 65 Verzweigungen
+        genügen. Beim Plus gibt es keinen solchen Durchgang; die vier äußeren
+        Gitter reden nur über ihre Hälften miteinander, und die Suche braucht
+        3 364 151 Knoten — fünf Größenordnungen mehr, bei <em>weniger</em> Zellen.
+      </p>
+    </div>
+  </div>
+</section>
+
+<!-- ============ III ============ -->
+<section class="chapter">
+  <div class="chapter-head">
+    <span class="num">III</span>
+    <h2>Was kein Hexamurai ist</h2>
+    <p>Ein Fehlalarm, den die Archivprüfung jahrelang mitgeschleppt hat.</p>
+  </div>
+
+  <div class="body">
+    <div class="rail"><span class="chip chip-ok">korrigiert</span></div>
+    <p>
+      Das Prüfskript meldete <code>PASS 2009-10 (hexamurai, uniquely solvable)</code>.
+      Das Heft 10/2009 enthält aber ein ganz gewöhnliches Hexadoku mit 120
+      Vorgaben. Der Grund stand im Kommentar der Datei selbst: neben dem Rätsel
+      war die Lösung des Hexamurai aus 7-8/2009 abgedruckt, die Gittererkennung
+      hatte sich daran festgebissen, und das Skript verzweigte auf das bloße
+      Vorkommen des Wortes <code>Hexamurai</code> irgendwo im Kopf der Datei.
+    </p>
+    <p>
+      Es verzweigt jetzt auf die Zellzahl — dieselbe Größe, nach der auch der
+      Solver seine Geometrie wählt. Damit rutscht 2009-10 in den normalen Pfad
+      und wird gegen ein gedrucktes Lösungsgitter geprüft, statt nur auf
+      Eindeutigkeit.
+    </p>
+  </div>
+</section>
+
+<!-- ============ IV ============ -->
+<section class="chapter">
+  <div class="chapter-head">
+    <span class="num">IV</span>
+    <h2>Wie der Solver das sieht</h2>
+    <p>Kein Sonderfall für Überlappungen — nirgends.</p>
+  </div>
+
+  <div class="body">
+    <div class="rail"><span class="chip chip-neutral">Bauart</span></div>
+    <p>
+      Die Abstraktion ist die Unit. Beim Samurai werden die Units aller fünf
+      Gitter über einem gemeinsamen Zellvorrat deklariert, und eine Zelle in
+      der Überlappung liegt einfach in zwei Zeilen, zwei Spalten und einer
+      Box. Die Propagation läuft über die Naht, ohne dass irgendwo im Solver
+      von einer Naht die Rede wäre. Genau diese Eigenschaft trägt später auch
+      den Hexadocube, wo die geteilten Zellen nicht einmal mehr benachbart auf
+      dem Papier liegen.
+    </p>
+  </div>
+</section>
+
+<footer class="colophon">
+  Gezeichnet aus <code>puzzles/elektor/2009-07_08.txt</code> und
+  <code>2011-07_08.txt</code>; Kennzahlen aus <code>hexadoku.exe</code> und
+  <code>go test -run TestSamuraiGeometry</code>.
+  Quellen: Elektor 7-8/2009 S. 124 und 7-8/2011, Rätselautor Claude Ghyselen.
+</footer>
+
+</div>
+
+<script src="spezial.js"></script>
+<script src="data.js"></script>
+<script>
+(function () {
+  const PIN = [[0,8],[8,24],[16,0],[12,12],[24,16]];
+  const PLUS = [[0,8],[8,0],[8,8],[8,16],[16,8]];
+  const CROSS = [[0,0],[0,24],[12,12],[24,0],[24,24]];
+  const COLORS = ["var(--g1)","var(--g2)","var(--g3)","var(--g4)","var(--g5)"];
+
+  // how many grids cover a raster position
+  function coverage(origins, n, w, h) {
+    const cov = Array.from({length: h}, () => new Array(w).fill(0));
+    for (const [r0, c0] of origins)
+      for (let r = 0; r < n; r++)
+        for (let c = 0; c < n; c++) cov[r0 + r][c0 + c]++;
+    return cov;
+  }
+
+  function blank(w, h, origins, n) {
+    const cov = coverage(origins, n, w, h);
+    return cov.map((row) => row.map((v) => (v ? "." : " ")).join(""));
+  }
+
+  const VIEWS = {
+    "2009": {
+      rows: MURAI2009, origins: PIN, w: 40, h: 40,
+      info: "40×40 · 1088 Zellen · 228 Units · 409 Vorgaben",
+    },
+    "2011": {
+      rows: MURAI2011, origins: PLUS, w: 32, h: 32,
+      info: "32×32 · 768 Zellen · 176 Units · 231 Vorgaben",
+    },
+    cross: {
+      rows: blank(40, 40, CROSS, 16), origins: CROSS, w: 40, h: 40,
+      info: "40×40 · 1216 Zellen · 236 Units · nie gedruckt",
+    },
+  };
+
+  function show(key) {
+    const v = VIEWS[key];
+    const cov = coverage(v.origins, 16, v.w, v.h);
+    const svg = drawRaster({
+      rows: v.rows,
+      cell: v.w > 32 ? 15 : 18,
+      box: 4,
+      title: "Anordnung " + key,
+      tint: (r, c) => (cov[r][c] > 1 ? "var(--accent-bg)" : "var(--cell-bg)"),
+      grids: v.origins.map(([r, c], i) => ({
+        r: r, c: c, n: 16, color: COLORS[i], label: String.fromCharCode(65 + i),
+      })),
+    });
+    mount("muraiFig", svg);
+    document.getElementById("rasterInfo").textContent = v.info;
+    const leg = document.getElementById("muraiLegend");
+    leg.innerHTML =
+      v.origins
+        .map(
+          ([r, c], i) =>
+            `<span><i class="swatch" style="background:${COLORS[i]}"></i>Gitter ${String.fromCharCode(
+              65 + i
+            )} bei Zeile ${r}, Spalte ${c}</span>`
+        )
+        .join("") +
+      '<span><i class="swatch" style="background:var(--accent-bg)"></i>Zelle in zwei Gittern</span>';
+    for (const [id, k] of [["btn2009", "2009"], ["btn2011", "2011"], ["btnCross", "cross"]])
+      document.getElementById(id).setAttribute("aria-pressed", String(k === key));
+  }
+
+  document.getElementById("btn2009").onclick = () => show("2009");
+  document.getElementById("btn2011").onclick = () => show("2011");
+  document.getElementById("btnCross").onclick = () => show("cross");
+  show("2009");
+
+  // --- the plus, coloured by where the middle grid's units come from ---
+  const cov = coverage(PLUS, 16, 32, 32);
+  const rows = blank(32, 32, PLUS, 16);
+  const svg = drawRaster({
+    rows: rows,
+    cell: 18,
+    box: 4,
+    glyphs: false,
+    title: "Units des mittleren Gitters",
+    tint: (r, c) => {
+      const inMid = r >= 8 && r < 24 && c >= 8 && c < 24;
+      if (!inMid) return cov[r][c] ? "var(--cell-bg)" : null;
+      // upper half of the middle grid is shared with the grid above,
+      // lower half with the grid below; left/right likewise for columns
+      const vert = r < 16 ? "var(--g1)" : "var(--g3)";
+      const horiz = "var(--g2)";
+      const nearEdge = c < 12 || c >= 20;
+      return `color-mix(in srgb, ${nearEdge ? horiz : vert} 26%, var(--cell-bg))`;
+    },
+    grids: [{ r: 8, c: 8, n: 16, color: "var(--grid-heavy)" }],
+  });
+  mount("plusFig", svg);
+})();
+</script>
+
+</body>
+</html>

@@ -1,8 +1,10 @@
 hexadoku
 ========
 
-Hexadoku (16x16 Sudoku) solver in Go — solves classic 9x9 Sudoku, and the
-five-grid samurai layouts of both sizes (Elektor's *Hexamurai*) as well.
+Hexadoku (16x16 Sudoku) solver in Go — solves classic 9x9 Sudoku, the
+five-grid samurai layouts of both sizes (Elektor's *Hexamurai*), the six
+grids on the faces of Elektor's *Hexadocube*, and the chequerboard rule of
+its *EUC Penta-Hexadoku* as well.
 Hexadokus were published as reader puzzles in the Elektor magazine:
 each row, column and 4x4 box must contain the hex digits 0-F exactly once.
 
@@ -14,6 +16,18 @@ solved is in [`docs/werkstattbericht.html`](docs/werkstattbericht.html)
 (German): solver data layout, the PDF toolchain dead end, grid detection
 in scans, how the puzzle/solution pairing was derived from the data, and
 the two Hexamurai arrangements.
+
+Five more pages in `docs/` (German) visualise the special puzzles Elektor
+printed instead of, or alongside, a plain hexadoku — the geometry of each
+one drawn from the very files in `puzzles/` that the solver reads:
+[`hexamurai.html`](docs/hexamurai.html) (the two five-grid arrangements),
+[`hexadocube.html`](docs/hexadocube.html) (six faces, with a fold slider
+from the printed net to the cube), [`penta-hexadoku.html`](docs/penta-hexadoku.html)
+(the chequerboard rule), [`digest.html`](docs/digest.html) (the sixteen
+prize codes and where they land) and
+[`fremdformate.html`](docs/fremdformate.html) (the 36x36 Alphanumski and
+the 25x25 AlphaSudoku, both out of reach). [`docs/index.html`](docs/index.html)
+links them all.
 
 [`docs/suchbaum.html`](docs/suchbaum.html) (German) steps through the
 search interactively: candidates per cell, which cell falls as a naked
@@ -92,7 +106,9 @@ only difference:
 | `chars.go` | value ↔ character encoding, shared by every variant |
 | `variant.go` | geometry: cells, units, and the text raster they sit on |
 | `general.go` | solver core driven by a `variant` (any unit list) |
-| `murai.go` | the five-grid arrangements, single-grid variant, CLI glue |
+| `murai.go` | the five-grid arrangements, the chequerboard, CLI glue |
+| `cube.go` | the six faces of the hexadocube, folded up in 3D |
+| `digest.go` | the block/code assignment layer of the 2011 digest |
 | `solver.go` | the hand-written 9x9 / 16x16 cores (unchanged) |
 
 The abstraction is the *unit*: a group of `n` cells that must contain
@@ -135,6 +151,148 @@ breaking a rule.
                      -solver hexadoku.exe -o puzzles\elektor\2009-07_08.txt ^
                      elektor_pdfs\Elektornonlinear.ir2009-07_08.pdf
 
+Hexadocube
+----------
+
+The double issue 7-8/2010 printed a **Hexadocube** (same designer): six
+hexadokus on the faces of a cube, drawn unfolded across pages 60-61 — the
+article calls it the development.
+
+                                +----+
+                                | 4  |     the four grids of the middle
+       +----+----+----+----+----+----+     row wrap around the cube,
+       | 0  | 1  | 2  | 3  |               face 4 is its top and face 5
+       +----+----+----+----+----+          its bottom
+                                | 5  |
+                                +----+
+
+The faces are linked by the cells lying on the cube edge between them —
+`cases` in the designer's French, which the English text renders as
+"boxes". Such a cell is one cell seen from two sides and is drawn once on
+each face, so both drawings must carry the same value; the magazine
+states the rule that way ("a character found on face 1 along the edge
+with face 2 will have to be copied across into the box on face 2 on the
+other side of the boundary"). At each of the eight cube corners three
+faces meet and three drawn cells coincide. The whole border ring is left
+empty in the printed puzzle, which is why a single face is not a hexadoku
+with 84 clues but a fragment.
+
+Rather than tabulate those twelve identifications and the orientation of
+each, `cube.go` folds the net up: every face gets an origin and two axes
+as integer 3D vectors, propagated from its neighbour in the development
+by a quarter turn about the shared edge, and cell `(r, c)` of a face
+lands on the lattice point `O + r*V + c*U` on the surface of a cube of
+side 15. Cells that end up at the same point *are* the same cell — the
+identification falls out of the coordinates, in the right orientation,
+with nothing to get wrong per edge:
+
+| | cells | drawn | units |
+| --- | --- | --- | --- |
+| interior of a face | 6·14·14 = 1176 | once | 3 |
+| on a cube edge | 12·14 = 168 | twice | 5 |
+| a cube corner | 8 | three times | 6 |
+| **total** | **1352** | 1536 characters | **276** |
+
+The 288 units of six grids collapse to 276 for the same reason: a
+boundary line of one face *is* a line of its neighbour, one unit declared
+twice, and `addUnit` merges them — the same dedup that merges the shared
+boxes of a samurai. A cube corner lies in six units and not nine, because
+the three lines meeting there are each shared by two of the three faces,
+so `maxCellUnits` stays at 6.
+
+A generated hexadocube (`-gen hexadocube`, in
+`puzzles/hexadocube_generated.txt`) has 431 clues and solves in 197 ms
+over 10 844 branch nodes.
+
+EUC Penta-Hexadoku
+------------------
+
+The double issue 7-8/2012 printed an **EUC Penta-Hexadoku**, again by
+Ghyselen, and its geometry turns out to be nothing new: measured off the
+page, the five grid corners are (0,8), (8,24), (16,0), (12,12), (24,16)
+on a 40x40 raster — exactly the pinwheel of the 2009 Hexamurai. What is
+new is one rule on top of the hexadoku ones, and it is not a unit at all:
+
+> the even numbers (0,2,4,6,8,A,C,E) only appear on a coloured
+> background, while the uneven numbers (1,3,5,7,9,B,D,F) only appear in
+> white squares
+
+— a chequerboard, hence EUC for even/uneven chequerboard. Put the other
+way round, no two neighbouring cells may hold values of the same parity.
+
+That is a *per-cell* restriction, so it does not fit the unit
+abstraction. It became one array, `variant.allow`, which `cand` masks
+with instead of the constant `all`; for every other layout the array
+holds `all`, so the rule costs one load in place of one immediate and
+nothing else. Every unit has eight coloured and eight white cells, so the
+rule is satisfiable, and it halves the candidates of every cell before
+any propagation runs.
+
+The colouring is consistent over the overlaps because all five origins
+are even: a cell is coloured exactly when row+column is even. That phase
+was read off the page render — 465 coloured cells, no exception — and
+agrees with the 4x4 box the article fills in "to illustrate the
+arrangement of the even/uneven chequerboard".
+
+Since the geometry is shared with the hexamurai, the cell count cannot
+tell the two apart, and a file asks for the layout by name:
+
+    # variant: penta-hexadoku
+
+`puzzles/penta_generated.txt` shows what the rule is worth: its 193 clues
+solve uniquely in 39 ms as a penta-hexadoku, and the same 193 clues read
+as a plain hexamurai are ambiguous.
+
+Hexadoku 'Digest'
+-----------------
+
+Issue 3/2011 printed a **Hexadoku 'Digest'**: an ordinary 16x16 grid with
+73 clues and sixteen marked horizontal blocks of five cells, and one rule
+that is not a rule of sudoku at all — the blocks take the prize codes of
+sixteen earlier Hexadokus, one code each. The article names the set and
+no more:
+
+> Each block takes the solution of a Hexadoku puzzle that appeared in one
+> of 16 editions of Elektor magazine in the period January 2009 to June
+> 2010. The July & August 2009 double edition is excluded.
+
+That double issue carried the Hexamurai, which has no five-cell code, so
+sixteen monthly puzzles remain for sixteen blocks. Which block belongs to
+which month is *not* given — the bijection is part of the puzzle, and the
+extra knowledge is an unordered set of sixteen strings.
+
+All sixteen are recoverable from the archive. Elektor announces each code
+two issues later in the "Prize winners" box, and every one of them also
+turns up as five consecutive cells in the solution this repo reconstructed
+for that issue, which cross-checks the two readings against each other
+(two announcements come out of the scan damaged — `DFBl 2` and `68310'` —
+and the reconstructions settle them as `DFB12` and `6B310`).
+
+A five-cell block matching a whole given string does not fit the unit
+abstraction, so `digest.go` puts one more layer of search around the
+ordinary one: pick the block with the fewest codes still fitting, try
+each, and let propagation between two assignments do the rest — the same
+MRV idea as the cell search, one level up. It is a strong filter, and the
+puzzle falls in **16 branch nodes**.
+
+Three things confirm the result:
+
+- the same 73 clues *without* the block rule have more than one solution,
+  exactly as the article claims;
+- the solved grid agrees with the solution Elektor printed in 5/2011 in
+  237 of 256 cells, the difference being two rows where the OCR of that
+  scan dropped characters;
+- the grey answer cells give `9302F`, and the printed grid shows `9302F`
+  in the same place.
+
+`puzzles/elektor/2011-03.txt` carries the whole thing in its header:
+
+    # variant: digest
+    # codes: 4395C 3097D 813D2 ... C81BA 6B310
+    # block: r1c2-c6
+    # block: r2c8-c12
+    ...
+
 Build
 -----
 
@@ -157,6 +315,8 @@ Usage
     hexadoku.exe -gen 9 -tries 300     generate hard minimal sudokus
     hexadoku.exe -gen samurai          generate a 9x9 samurai
     hexadoku.exe -gen hexamurai        generate a 16x16 hexamurai
+    hexadoku.exe -gen penta            generate an EUC penta-hexadoku
+    hexadoku.exe -gen hexadocube       generate a hexadocube
 
 Puzzle file format (auto-detected):
 
@@ -167,6 +327,14 @@ Puzzle file format (auto-detected):
 - 16x16 letter format `a-p` (some puzzle collections) is auto-detected
 - samurai: 1216 cells (hexamurai) or 369 cells (9x9 samurai) on a
   character raster, blanks between the grids
+- hexadocube: 1536 characters on a 64x48 raster — six 16x16 faces, the
+  shared cells drawn once per face
+- a `# variant: <name>` header line overrides the cell count, which is
+  what tells an `euc-penta-hexadoku` from the `hexamurai` it shares its
+  geometry with (`hexamurai`, `hexamurai-plus`, `samurai`,
+  `hexa-samurai`, `penta-hexadoku`, `hexadocube`, `digest`)
+- `digest` additionally reads `# codes:` and `# block: r<row>c<a>-c<b>`
+  lines from the same header
 
 The generator (`-gen`) produces *minimal* puzzles: clues are removed in
 random order while the solution stays unique, so in the result removing
@@ -186,7 +354,8 @@ Puzzles
 - `top95.txt`, `hardest.txt` — 9x9 benchmark collections from [norvig.com](https://norvig.com/sudoku.html)
 - `inkala2012.txt` — Arto Inkala's "world's hardest sudoku" (2012)
 - `generated_sudoku.txt`, `generated_hexadoku.txt`,
-  `samurai_generated.txt`, `hexasamurai_generated.txt` — hard puzzles
+  `samurai_generated.txt`, `hexasamurai_generated.txt`,
+  `penta_generated.txt`, `hexadocube_generated.txt` — hard puzzles
   produced by `-gen` (this solver)
 - `elektor/2009-07_08.txt`, `elektor/2011-07_08.txt` — the two genuine
   Elektor Hexamurai, read exactly from the PDF text layer

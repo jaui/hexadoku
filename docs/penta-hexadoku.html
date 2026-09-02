@@ -1,0 +1,291 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>EUC Penta-Hexadoku — das Schachbrett</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@500;600;700&family=Source+Serif+4:opsz,wght@8..60,400;8..60,600&family=JetBrains+Mono:wght@400;500;700&display=swap">
+<link rel="stylesheet" href="spezial.css">
+<style>
+.candbox { display: flex; flex-wrap: wrap; gap: 1.5rem; align-items: flex-start; }
+.cand {
+  display: grid;
+  grid-template-columns: repeat(8, 1.6rem);
+  gap: 2px;
+  font-family: var(--f-mono);
+  font-size: 0.75rem;
+}
+.cand b {
+  display: grid;
+  place-items: center;
+  height: 1.6rem;
+  font-weight: 500;
+  border: 1px solid var(--rule);
+  border-radius: 2px;
+}
+.cand b.on  { background: color-mix(in srgb, var(--g4) 32%, var(--cell-bg)); color: var(--ink); }
+.cand b.off { color: var(--ink-soft); opacity: 0.35; text-decoration: line-through; }
+.cand b.white { background: var(--cell-bg); }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<header class="masthead">
+  <p class="eyebrow">Spezialrätsel · Elektor 7-8/2012</p>
+  <h1>EUC Penta-Hexadoku</h1>
+  <p class="standfirst">
+    Fünf verschränkte Gitter auf einem Schachbrett: gerade Werte nur auf
+    farbigen Feldern, ungerade nur auf weißen. Die Geometrie ist bekannt —
+    es ist Zeichen für Zeichen das Windrad von 2009. Neu ist eine Regel,
+    die in keine Unit passt.
+  </p>
+  <nav class="pagenav">
+    <a href="hexamurai.html">Hexamurai</a>
+    <a href="hexadocube.html">Hexadocube</a>
+    <a href="penta-hexadoku.html" aria-current="page">EUC Penta-Hexadoku</a>
+    <a href="digest.html">Hexadoku Digest</a>
+    <a href="fremdformate.html">Alphanumski &amp; AlphaSudoku</a>
+    <a href="werkstattbericht.html">Werkstattbericht</a>
+  </nav>
+</header>
+
+<section class="figures">
+  <div class="fig"><b>5</b><span>Gitter</span></div>
+  <div class="fig"><b>1088</b><span>Zellen</span></div>
+  <div class="fig"><b>228</b><span>Units</span></div>
+  <div class="fig"><b>16 → 8</b><span>Kandidaten je Zelle</span></div>
+  <div class="fig"><b>465</b><span>gemessene Farbfelder</span></div>
+  <div class="fig"><b>0</b><span>Ausnahmen</span></div>
+</section>
+
+<!-- ============ I ============ -->
+<section class="chapter">
+  <div class="chapter-head">
+    <span class="num">I</span>
+    <h2>Die Geometrie ist nicht neu</h2>
+    <p>Von der Seite abgemessen: die fünf Gitterecken sind (0,8), (8,24),
+       (16,0), (12,12), (24,16) auf einem 40×40-Raster — exakt das Windrad
+       des Hexamurai von 2009.</p>
+  </div>
+
+  <div class="body">
+    <div class="rail"><span class="chip chip-ok">gelöst</span></div>
+    <p>
+      Dieselben 1088 Zellen, dieselben 228 Units, dieselben geteilten
+      4×12-Streifen. Der Solver baut beide Layouts aus derselben Liste von
+      Ursprüngen; sie unterscheiden sich in genau einer Zeile Code — dem
+      Schachbrett.
+    </p>
+
+    <figure>
+      <div class="controls">
+        <span>Anzeigen:</span>
+        <button id="btnBoth" aria-pressed="true">Schachbrett + Gitter</button>
+        <button id="btnGrids" aria-pressed="false">nur Gitter</button>
+        <button id="btnChk" aria-pressed="false">nur Schachbrett</button>
+      </div>
+      <div class="frame" id="pentaFig"></div>
+      <div class="legend" id="pentaLegend"></div>
+      <figcaption>
+        Ein erzeugtes EUC-Penta-Hexadoku (<b>hexadoku.exe -gen penta</b>,
+        193 Vorgaben, in <b>puzzles/penta_generated.txt</b>). Die Färbung
+        ist die Regel, nicht Dekoration: auf einem farbigen Feld darf nur
+        <b>0 2 4 6 8 A C E</b> stehen, auf einem weißen nur
+        <b>1 3 5 7 9 B D F</b>. Alle fünf Ursprünge sind gerade, also passt
+        das Muster über die Überlappungen hinweg zusammen — sonst wäre die
+        Regel gar nicht erfüllbar.
+      </figcaption>
+    </figure>
+  </div>
+</section>
+
+<!-- ============ II ============ -->
+<section class="chapter">
+  <div class="chapter-head">
+    <span class="num">II</span>
+    <h2>Woher die Phase kommt</h2>
+    <p>Ob „farbig“ Zeile+Spalte gerade oder ungerade heißt, entscheidet
+       nicht der Geschmack, sondern die Seite.</p>
+  </div>
+
+  <div class="body">
+    <div class="rail"><span class="chip chip-neutral">gemessen</span></div>
+    <p>
+      Die gedruckte Seite wurde als Bild ausgewertet: Umriss der Figur
+      bestimmen, durch 40 teilen, in jeder Rasterzelle die Hintergrundfarbe
+      messen. Ergebnis — <b>465 farbige Felder, davon 465 mit geradem
+      Zeile+Spalte und null mit ungeradem</b>. Gegenprobe an dem 4×4-Block,
+      den der Artikel ausgefüllt abdruckt, „to illustrate the arrangement of
+      the even/uneven chequerboard“: alle sechzehn Zellen stimmen.
+    </p>
+    <blockquote>
+      … the even numbers (0,2,4,6,8,A,C,E) only appear on a coloured
+      background, while the uneven numbers (1,3,5,7,9,B,D,F) only appear in
+      white squares.
+    </blockquote>
+    <p>
+      Andersherum formuliert steht dieselbe Regel weiter oben im Artikel:
+      <em>„an even hexadecimal number must never appear alongside another
+      even number, and an uneven number must never be next to another uneven
+      number“</em> — daher EUC, für even/uneven chequerboard.
+    </p>
+  </div>
+</section>
+
+<!-- ============ III ============ -->
+<section class="chapter">
+  <div class="chapter-head">
+    <span class="num">III</span>
+    <h2>Eine Regel, die in keine Unit passt</h2>
+    <p>Eine Unit sagt: „diese 16 Zellen enthalten jeden Wert genau einmal“.
+       Das Schachbrett sagt etwas über eine <em>einzelne</em> Zelle.</p>
+  </div>
+
+  <div class="body">
+    <div class="rail"><span class="chip chip-neutral">Bauart</span></div>
+    <p>
+      Daraus wurde ein Array, <code>variant.allow</code>, mit dem
+      <code>cand</code> maskiert — anstelle der Konstanten <code>all</code>.
+      Für jedes andere Layout steht dort <code>all</code>, die Regel kostet
+      also ein Load statt eines Immediate und sonst nichts.
+    </p>
+
+    <figure>
+      <div class="frame">
+        <div class="candbox">
+          <div>
+            <div class="legend" style="margin:0 0 .6rem"><span>farbiges Feld — <code>allow = 0x5555</code></span></div>
+            <div class="cand" id="candEven"></div>
+          </div>
+          <div>
+            <div class="legend" style="margin:0 0 .6rem"><span>weißes Feld — <code>allow = 0xAAAA</code></span></div>
+            <div class="cand" id="candOdd"></div>
+          </div>
+        </div>
+      </div>
+      <figcaption>
+        Die Kandidatenmenge jeder Zelle ist halbiert, bevor eine einzige
+        Propagation gelaufen ist. Jede Unit hat genau acht farbige und acht
+        weiße Zellen — sonst könnten die acht geraden Werte gar nicht
+        untergebracht werden.
+      </figcaption>
+    </figure>
+
+    <div class="note">
+      <span class="lbl">Was die Regel wert ist</span>
+      <p>
+        Dasselbe erzeugte Rätsel, zweimal gelesen. Als Penta-Hexadoku:
+        <b>193 Vorgaben, eindeutig, 39 ms, 1550 Verzweigungen</b>. Ohne die
+        Kopfzeile <code>#&nbsp;variant:&nbsp;penta-hexadoku</code> hält der
+        Solver es an der Zellzahl für ein gewöhnliches Hexamurai — und
+        dieselben 193 Vorgaben sind dann <b>mehrdeutig</b>.
+      </p>
+      <p>
+        Weil beide Layouts auf demselben Raster mit derselben Zellzahl
+        sitzen, kann die Zellzahl sie nicht auseinanderhalten. Deshalb nennt
+        die Datei ihr Layout im Kopf beim Namen.
+      </p>
+    </div>
+  </div>
+</section>
+
+<!-- ============ IV ============ -->
+<section class="chapter">
+  <div class="chapter-head">
+    <span class="num">IV</span>
+    <h2>Was noch fehlt</h2>
+    <p>Wie beim Hexadocube: die Geometrie ist da, die Lesung nicht.</p>
+  </div>
+
+  <div class="body">
+    <div class="rail"><span class="chip chip-open">offen</span></div>
+    <p>
+      Die Vorgaben des echten Rätsels sind auf der Seite eine Grafik — die
+      Textebene der PDF-Seite trägt 108 Wörter, keines davon eine Ziffer aus
+      dem Gitter. Sie müssen also visuell gelesen werden. Der Artikel verrät
+      immerhin, was dabei herauskommen muss: die Vorgaben „form the words
+      Elektor 2012 and the logo on the blank grid“, und ein 4×4-Block ist
+      bereits ausgefüllt abgedruckt.
+    </p>
+    <p>
+      Die 256 Hex-Zeichen, die die Seite als Text trägt, sind die gedruckte
+      Lösung des Mai-Hexadokus 2012 — die liegt längst als
+      <code>2012-07_08_prevsolution.txt</code> im Archiv.
+    </p>
+  </div>
+</section>
+
+<footer class="colophon">
+  Gezeichnet aus <code>puzzles/penta_generated.txt</code>; Phase und
+  Farbfelder aus dem Seitenrender von Elektor 7-8/2012 S. 138 gemessen.
+  Rätselautor Claude Ghyselen; Regeltext S. 139.
+</footer>
+
+</div>
+
+<script src="spezial.js"></script>
+<script src="data.js"></script>
+<script>
+(function () {
+  const PIN = [[0,8],[8,24],[16,0],[12,12],[24,16]];
+  const COLORS = ["var(--g1)","var(--g2)","var(--g3)","var(--g4)","var(--g5)"];
+  const EVEN = "02468ACE", ODD = "13579BDF";
+
+  function show(mode) {
+    const chk = mode !== "grids";
+    const svg = drawRaster({
+      rows: PENTA,
+      cell: 15,
+      box: 4,
+      title: "EUC Penta-Hexadoku",
+      tint: (r, c) =>
+        chk && (r + c) % 2 === 0
+          ? "color-mix(in srgb, var(--g4) 30%, var(--cell-bg))"
+          : "var(--cell-bg)",
+      grids:
+        mode === "chk"
+          ? []
+          : PIN.map(([r, c], i) => ({
+              r: r, c: c, n: 16, color: COLORS[i],
+              label: String.fromCharCode(65 + i),
+            })),
+    });
+    mount("pentaFig", svg);
+    for (const [id, k] of [["btnBoth","both"],["btnGrids","grids"],["btnChk","chk"]])
+      document.getElementById(id).setAttribute("aria-pressed", String(k === mode));
+  }
+  document.getElementById("btnBoth").onclick = () => show("both");
+  document.getElementById("btnGrids").onclick = () => show("grids");
+  document.getElementById("btnChk").onclick = () => show("chk");
+
+  document.getElementById("pentaLegend").innerHTML =
+    '<span><i class="swatch" style="background:color-mix(in srgb, var(--g4) 30%, var(--cell-bg))"></i>farbig, Zeile+Spalte gerade — nur 0 2 4 6 8 A C E</span>' +
+    '<span><i class="swatch" style="background:var(--cell-bg)"></i>weiß — nur 1 3 5 7 9 B D F</span>' +
+    PIN.map(
+      ([r, c], i) =>
+        `<span><i class="swatch" style="background:${COLORS[i]}"></i>Gitter ${String.fromCharCode(65 + i)} bei ${r},${c}</span>`
+    ).join("");
+
+  show("both");
+
+  // candidate masks
+  const all = "0123456789ABCDEF";
+  const fill = (id, allowed, cls) => {
+    document.getElementById(id).innerHTML = [...all]
+      .map((ch) =>
+        allowed.includes(ch)
+          ? `<b class="${cls}">${ch}</b>`
+          : `<b class="off">${ch}</b>`
+      )
+      .join("");
+  };
+  fill("candEven", EVEN, "on");
+  fill("candOdd", ODD, "white");
+})();
+</script>
+
+</body>
+</html>

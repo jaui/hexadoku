@@ -1,0 +1,425 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Hexadocube — sechs Gitter auf einem Würfel</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@500;600;700&family=Source+Serif+4:opsz,wght@8..60,400;8..60,600&family=JetBrains+Mono:wght@400;500;700&display=swap">
+<link rel="stylesheet" href="spezial.css">
+<style>
+/* ---------- der faltbare Würfel ---------- */
+.scene {
+  position: relative;
+  perspective: 1800px;
+  height: 38rem;
+  overflow: hidden;
+}
+.cube {
+  position: absolute;
+  width: var(--fs);
+  height: var(--fs);
+  transform-style: preserve-3d;
+  transform-origin: center center;
+}
+.face {
+  position: absolute;
+  width: var(--fs);
+  height: var(--fs);
+  transform-style: preserve-3d;
+  background: var(--cell-bg);
+  outline: 1px solid var(--grid-heavy);
+  display: grid;
+  grid-template-columns: repeat(16, 1fr);
+  grid-template-rows: repeat(16, 1fr);
+}
+.face > i {
+  display: block;
+  font-style: normal;
+  font-family: var(--f-mono);
+  font-size: calc(var(--fs) / 26);
+  line-height: 1;
+  text-align: center;
+  align-self: center;
+  color: var(--ink);
+}
+.face > i.edge   { background: color-mix(in srgb, var(--g4) 30%, var(--cell-bg)); }
+.face > i.corner { background: color-mix(in srgb, var(--accent) 55%, var(--cell-bg)); }
+.face > i.box    { box-shadow: inset 0 0 0 0.5px var(--grid-line); }
+.face .tag {
+  position: absolute;
+  inset: auto auto 4% 6%;
+  font-family: var(--f-display);
+  font-weight: 700;
+  font-size: calc(var(--fs) / 7);
+  color: color-mix(in srgb, var(--ink) 18%, transparent);
+  pointer-events: none;
+}
+/* hinges: each face is nested in the neighbour it is folded away from */
+.hinge-right { transform-origin: left center; left: 100%; }
+.hinge-up    { transform-origin: center bottom; top: -100%; }
+.hinge-down  { transform-origin: center top; top: 100%; }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<header class="masthead">
+  <p class="eyebrow">Spezialrätsel · Elektor 7-8/2010</p>
+  <h1>Hexadocube</h1>
+  <p class="standfirst">
+    Sechs Hexadokus auf den Flächen eines Würfels, abgewickelt über eine
+    Doppelseite gedruckt. Statt zwölf Kantenzuordnungen von Hand zu
+    tabellieren, faltet der Solver das Netz in 3D — und die Identifikation
+    fällt aus ganzzahligen Koordinaten.
+  </p>
+  <nav class="pagenav">
+    <a href="hexamurai.html">Hexamurai</a>
+    <a href="hexadocube.html" aria-current="page">Hexadocube</a>
+    <a href="penta-hexadoku.html">EUC Penta-Hexadoku</a>
+    <a href="digest.html">Hexadoku Digest</a>
+    <a href="fremdformate.html">Alphanumski &amp; AlphaSudoku</a>
+    <a href="werkstattbericht.html">Werkstattbericht</a>
+  </nav>
+</header>
+
+<section class="figures">
+  <div class="fig"><b>6</b><span>Gitter</span></div>
+  <div class="fig"><b>1352</b><span>Zellen</span></div>
+  <div class="fig"><b>1536</b><span>gezeichnete Zellen</span></div>
+  <div class="fig"><b>276</b><span>Units</span></div>
+  <div class="fig"><b>12 · 8</b><span>Kanten · Ecken</span></div>
+  <div class="fig"><b>176</b><span>Zellen im Rand</span></div>
+</section>
+
+<!-- ============ I ============ -->
+<section class="chapter">
+  <div class="chapter-head">
+    <span class="num">I</span>
+    <h2>Falten</h2>
+    <p>Die Abwicklung und der Würfel sind dieselbe Sache. Der Regler dazwischen
+       zeigt, welche Ränder aufeinandertreffen.</p>
+  </div>
+
+  <div class="body">
+    <div class="rail"><span class="chip chip-ok">gelöst</span></div>
+    <figure>
+      <div class="controls">
+        <label for="fold">Faltung</label>
+        <input type="range" id="fold" min="0" max="100" value="0">
+        <button id="btnFlat" aria-pressed="true">flach</button>
+        <button id="btnCube" aria-pressed="false">Würfel</button>
+        <button id="btnSpin" aria-pressed="false">drehen</button>
+      </div>
+      <div class="scene"><div class="cube" id="cube"></div></div>
+      <div class="legend">
+        <span><i class="swatch" style="background:color-mix(in srgb, var(--g4) 30%, var(--cell-bg))"></i>Zelle auf einer Würfelkante — auf zwei Flächen gezeichnet</span>
+        <span><i class="swatch" style="background:color-mix(in srgb, var(--accent) 55%, var(--cell-bg))"></i>Würfelecke — auf drei Flächen gezeichnet</span>
+        <span><i class="swatch" style="background:var(--cell-bg)"></i>Flächeninneres</span>
+      </div>
+      <figcaption>
+        Die sechs Flächen tragen ein erzeugtes Hexadocube-Rätsel
+        (<b>hexadoku.exe -gen hexadocube</b>, 431 Vorgaben). Beim Falten
+        legen sich die farbigen Randringe paarweise aufeinander: was dort
+        steht, ist <em>dieselbe Zelle</em>, von zwei Seiten gesehen. Im
+        gedruckten Rätsel bleibt dieser Ring komplett leer — deshalb ist eine
+        einzelne Fläche mit ihren 84 Vorgaben kein Rätsel, sondern ein
+        Bruchstück.
+      </figcaption>
+    </figure>
+  </div>
+</section>
+
+<!-- ============ II ============ -->
+<section class="chapter">
+  <div class="chapter-head">
+    <span class="num">II</span>
+    <h2>Das Netz, wie es gedruckt wurde</h2>
+    <p>Vier Flächen in einer Reihe, die um den Würfel laufen, je eine darüber
+       und darunter — Seite 60 und 61 der Doppelausgabe, quer über den Bund.</p>
+  </div>
+
+  <div class="body">
+    <div class="rail"><span class="chip chip-neutral">abgemessen</span></div>
+    <figure>
+      <div class="frame" id="netFig"></div>
+      <figcaption>
+        Die Abwicklung als Textraster: 64 Zeichen breit, 48 hoch, Leerzeichen
+        wo das Netz keine Fläche hat. Genau so liegt das Rätsel in
+        <b>puzzles/hexadocube_generated.txt</b> — die Datei behält das
+        gedruckte Bild, der Solver sieht den gefalteten Würfel.
+        Flächen <b>0</b> und <b>1</b> standen auf S. 60, <b>2</b> bis
+        <b>5</b> auf S. 61.
+      </figcaption>
+    </figure>
+  </div>
+</section>
+
+<!-- ============ III ============ -->
+<section class="chapter">
+  <div class="chapter-head">
+    <span class="num">III</span>
+    <h2>Warum nicht zwölf Tabellen</h2>
+    <p>Jede Fläche bekommt Ursprung und zwei Achsen als 3D-Ganzzahlvektoren,
+       vom Nachbarn im Netz weiterpropagiert. Gleiche Gitterpunkte sind
+       dieselbe Zelle.</p>
+  </div>
+
+  <div class="body">
+    <div class="rail"><span class="chip chip-neutral">Bauart</span></div>
+    <p>
+      Fläche 0 wird als <code>z = 15</code>-Fläche hingelegt, <code>u</code>
+      entlang <code>+x</code>, <code>v</code> entlang <code>+y</code>. Jeder
+      Nachbar im Netz entsteht durch eine Vierteldrehung um die gemeinsame
+      Kante: nach rechts wird <code>u</code> zu <code>−n</code> und
+      <code>v</code> bleibt, nach unten wird <code>v</code> zu <code>−n</code>
+      und <code>u</code> bleibt; der Ursprung wandert jeweils so mit, dass die
+      geteilte Linie aus 16 Gitterpunkten erhalten bleibt. Zelle
+      <code>(r, c)</code> liegt dann auf <code>O + r·V + c·U</code>.
+    </p>
+    <p>
+      Damit ist an keiner Stelle eine Kantenzuordnung notiert. Sie entsteht
+      dadurch, dass zwei Flächen denselben Gitterpunkt treffen — in der
+      richtigen Orientierung, und ohne dass man sich pro Kante vertun kann.
+      Die Prüfung dafür ist eine Zählung: kommen 1352 Zellen und 276 Units
+      heraus, mit 1176 Zellen in 3 Units, 168 in 5 und 8 in 6, dann stimmt
+      die Faltung.
+    </p>
+
+    <figure>
+      <div class="tablewrap"><table>
+        <thead>
+          <tr><th>Zelle</th><th class="num">Anzahl</th><th class="num">gezeichnet</th>
+              <th class="num">Units</th><th>warum</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>Flächeninneres</td><td class="num">6 · 14 · 14 = 1176</td><td class="num">1×</td><td class="num">3</td>
+              <td>Zeile, Spalte, Box einer Fläche</td></tr>
+          <tr><td>auf einer Würfelkante</td><td class="num">12 · 14 = 168</td><td class="num">2×</td><td class="num">5</td>
+              <td>die Linie längs der Kante ist <em>eine</em> Unit beider Flächen, dazu zwei Querlinien und zwei Boxen</td></tr>
+          <tr><td>Würfelecke</td><td class="num">8</td><td class="num">3×</td><td class="num">6</td>
+              <td>drei Kantenlinien, jede von zwei der drei Flächen geteilt, plus drei Boxen</td></tr>
+          <tr><td><b>gesamt</b></td><td class="num"><b>1352</b></td><td class="num"><b>1536 Zeichen</b></td><td class="num"><b>276</b></td>
+              <td>6·48 = 288 Units minus 12 doppelt deklarierte Randlinien</td></tr>
+        </tbody>
+      </table></div>
+      <figcaption>
+        Dass eine Ecke in 6 und nicht in 9 Units liegt, ist der Grund, warum
+        <b>maxCellUnits</b> bei 6 bleiben konnte und der Solverkern unverändert
+        weiterläuft.
+      </figcaption>
+    </figure>
+
+    <h3>Die zwölf Kanten, wie die Faltung sie ausrechnet</h3>
+    <figure>
+      <div class="tablewrap"><table>
+        <thead><tr><th>Fläche</th><th>Rand</th><th>trifft</th><th>Rand</th><th>Richtung</th><th>im Netz benachbart</th></tr></thead>
+        <tbody id="edgeRows"></tbody>
+      </table></div>
+      <figcaption>
+        Nur drei dieser zwölf Kanten sind im Netz auch Nachbarn — die übrigen
+        neun kommen erst beim Falten zusammen. „umgekehrt“ heißt, dass die
+        16 Zellen der Kante auf den beiden Flächen in entgegengesetzter
+        Reihenfolge stehen. Aus <code>hexadocubeNet()</code> in
+        <b>cube.go</b> ausgelesen, nicht abgetippt.
+      </figcaption>
+    </figure>
+  </div>
+</section>
+
+<!-- ============ IV ============ -->
+<section class="chapter">
+  <div class="chapter-head">
+    <span class="num">IV</span>
+    <h2>Was noch fehlt</h2>
+    <p>Die Geometrie ist da, das Rätsel nicht.</p>
+  </div>
+
+  <div class="body">
+    <div class="rail"><span class="chip chip-open">offen</span></div>
+    <p>
+      Der Solver beherrscht das Layout; ein erzeugter Hexadocube mit 431
+      Vorgaben löst eindeutig in 197 ms über 10 844 Verzweigungen. Was fehlt,
+      ist allein die Lesung: die Vorgaben sind auf einem Scan eine Grafik, es
+      müssen also alle sechs Flächen visuell transkribiert werden — und es gibt
+      kein gedrucktes Lösungsgitter zum Abgleich, die Eindeutigkeit des ganzen
+      Würfels müsste die Prüfung übernehmen.
+    </p>
+    <div class="note">
+      <span class="lbl">Nebenbei</span>
+      <p>
+        Die hell hervorgehobenen Zellen <em>innerhalb</em> einer Fläche im
+        Original sind keine Regel, sondern Dekoration: sie zeichnen die
+        Flächennummer in den Hintergrund, „so angeordnet, dass die Zahlen
+        gegenüberliegender Flächen immer 7 ergeben, wie bei einem Würfel“.
+      </p>
+    </div>
+  </div>
+</section>
+
+<footer class="colophon">
+  Würfel und Netz gezeichnet aus <code>puzzles/hexadocube_generated.txt</code>,
+  Kantentabelle aus <code>hexadocubeNet()</code> in <code>cube.go</code>.
+  Quelle: Elektor 7-8/2010, S. 60–61, Rätselautor Claude Ghyselen
+  (Elektor-Nummer 090724-I).
+</footer>
+
+</div>
+
+<script src="spezial.js"></script>
+<script src="data.js"></script>
+<script>
+(function () {
+  // ---- net: which face sits where, and the fold that gets it there ----
+  const FACES = [
+    { id: 0, row: 1, col: 0, hinge: null },
+    { id: 1, row: 1, col: 1, hinge: "right", parent: 0 },
+    { id: 2, row: 1, col: 2, hinge: "right", parent: 1 },
+    { id: 3, row: 1, col: 3, hinge: "right", parent: 2 },
+    { id: 4, row: 0, col: 3, hinge: "up", parent: 3 },
+    { id: 5, row: 2, col: 3, hinge: "down", parent: 3 },
+  ];
+
+  // ---- the twelve cube edges, read out of the folding in cube.go ----
+  const EDGES = [
+    [0, "oben", 4, "rechts", true], [0, "rechts", 1, "links", false],
+    [0, "unten", 5, "rechts", false], [0, "links", 3, "rechts", false],
+    [1, "oben", 4, "oben", true], [1, "rechts", 2, "links", false],
+    [1, "unten", 5, "unten", true], [2, "oben", 4, "links", false],
+    [2, "rechts", 3, "links", false], [2, "unten", 5, "links", true],
+    [3, "oben", 4, "unten", false], [3, "unten", 5, "oben", false],
+  ];
+  const netNeighbours = new Set(["0-1", "1-2", "2-3", "3-4", "3-5"]);
+  document.getElementById("edgeRows").innerHTML = EDGES.map(
+    ([a, sa, b, sb, rev]) =>
+      `<tr><td class="num">${a}</td><td>${sa}</td><td class="num">${b}</td><td>${sb}</td>` +
+      `<td>${rev ? "umgekehrt" : "gleichsinnig"}</td>` +
+      `<td>${netNeighbours.has(a + "-" + b) || netNeighbours.has(b + "-" + a) ? "ja" : "nein — erst durch Falten"}</td></tr>`
+  ).join("");
+
+  // ---- build the six faces as nested DOM, so folding is one transform ----
+  const N = 16;
+  function faceCells(f) {
+    const frag = document.createDocumentFragment();
+    for (let r = 0; r < N; r++) {
+      for (let c = 0; c < N; c++) {
+        const ch = CUBE[f.row * N + r][f.col * N + c];
+        const i = document.createElement("i");
+        const onEdge = r === 0 || c === 0 || r === N - 1 || c === N - 1;
+        const onCorner = (r === 0 || r === N - 1) && (c === 0 || c === N - 1);
+        i.className = onCorner ? "corner" : onEdge ? "edge" : "box";
+        i.textContent = ch === "." || ch === " " ? "" : ch;
+        frag.appendChild(i);
+      }
+    }
+    const tag = document.createElement("span");
+    tag.className = "tag";
+    tag.textContent = f.id;
+    frag.appendChild(tag);
+    return frag;
+  }
+
+  const cube = document.getElementById("cube");
+  const nodes = {};
+  for (const f of FACES) {
+    const d = document.createElement("div");
+    d.className = "face" + (f.hinge ? " hinge-" + f.hinge : "");
+    d.appendChild(faceCells(f));
+    nodes[f.id] = d;
+    (f.hinge ? nodes[f.parent] : cube).appendChild(d);
+  }
+
+  let spin = false, spinT = 0, raf = 0, fs = 160;
+  const lerp = (a, b, t) => a + (b - a) * t;
+
+  function apply(t) {
+    // t = 0 flat net, 1 folded cube
+    for (const f of FACES) {
+      if (!f.hinge) continue;
+      const a = 90 * t;
+      nodes[f.id].style.transform =
+        f.hinge === "right" ? `rotateY(${a}deg)`
+        : f.hinge === "up" ? `rotateX(${a}deg)`
+        : `rotateX(${-a}deg)`;
+    }
+    // frame it: the flat net is 4 faces wide and 3 tall with face 0 in the
+    // middle row, the folded cube is one face wide. Interpolate the place
+    // where face 0 sits so both states stay centred in the scene.
+    const scene = document.querySelector(".scene");
+    const W = scene.clientWidth, H = scene.clientHeight;
+    cube.style.left = lerp(W / 2 - 2 * fs, W / 2 - fs / 2, t) + "px";
+    cube.style.top = lerp(H / 2 - 0.5 * fs, H / 2 - fs / 2, t) + "px";
+    const scale = lerp(1, 1.45, t);
+    cube.style.transform =
+      `scale(${scale}) rotateX(${-20 * t}deg) rotateY(${(-32 + spinT) * t}deg)`;
+  }
+
+  const slider = document.getElementById("fold");
+  const setPressed = (flat, folded) => {
+    document.getElementById("btnFlat").setAttribute("aria-pressed", String(flat));
+    document.getElementById("btnCube").setAttribute("aria-pressed", String(folded));
+  };
+  function setFold(v) {
+    slider.value = v;
+    apply(v / 100);
+    setPressed(v == 0, v == 100);
+  }
+  slider.oninput = () => setFold(+slider.value);
+  document.getElementById("btnFlat").onclick = () => setFold(0);
+  document.getElementById("btnCube").onclick = () => setFold(100);
+  document.getElementById("btnSpin").onclick = (e) => {
+    spin = !spin;
+    e.currentTarget.setAttribute("aria-pressed", String(spin));
+    if (spin) {
+      if (+slider.value < 100) setFold(100);
+      const step = () => {
+        spinT = (spinT + 0.4) % 360;
+        apply(+slider.value / 100);
+        raf = requestAnimationFrame(step);
+      };
+      raf = requestAnimationFrame(step);
+    } else {
+      cancelAnimationFrame(raf);
+    }
+  };
+
+  // size the faces so that the *flat* net fits the scene in both directions
+  const fit = () => {
+    const scene = document.querySelector(".scene");
+    fs = Math.max(90, Math.min(240, scene.clientWidth / 4.3, scene.clientHeight / 3.3));
+    cube.style.setProperty("--fs", fs + "px");
+    apply(+slider.value / 100);
+  };
+  window.addEventListener("resize", fit);
+  setFold(0);
+  fit();
+
+  // ---- the net as a raster, exactly as the file stores it ----
+  mount(
+    "netFig",
+    drawRaster({
+      rows: CUBE,
+      cell: 9,
+      box: 4,
+      glyphs: false,
+      title: "Abwicklung des Hexadocube",
+      tint: (r, c, ch) => {
+        if (ch === " ") return null;
+        const rr = r % N, cc = c % N;
+        const onEdge = rr === 0 || cc === 0 || rr === N - 1 || cc === N - 1;
+        const onCorner = (rr === 0 || rr === N - 1) && (cc === 0 || cc === N - 1);
+        if (onCorner) return "color-mix(in srgb, var(--accent) 55%, var(--cell-bg))";
+        if (onEdge) return "color-mix(in srgb, var(--g4) 30%, var(--cell-bg))";
+        return ch === "." ? "var(--cell-bg)" : "color-mix(in srgb, var(--ink) 12%, var(--cell-bg))";
+      },
+      grids: FACES.map((f) => ({
+        r: f.row * N, c: f.col * N, n: N, color: "var(--grid-heavy)", label: String(f.id),
+      })),
+    })
+  );
+})();
+</script>
+
+</body>
+</html>

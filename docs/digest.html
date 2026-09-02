@@ -1,0 +1,261 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Hexadoku Digest — sechzehn Preiscodes</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@500;600;700&family=Source+Serif+4:opsz,wght@8..60,400;8..60,600&family=JetBrains+Mono:wght@400;500;700&display=swap">
+<link rel="stylesheet" href="spezial.css">
+<style>
+.codegrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(11rem, 1fr));
+  gap: 0.5rem 1.2rem;
+  font-family: var(--f-mono);
+  font-size: 0.74rem;
+  margin: 1rem 0 0;
+}
+.codegrid div { display: flex; justify-content: space-between; gap: 0.6rem;
+  border-bottom: 1px solid var(--rule-soft); padding: 0.25rem 0; }
+.codegrid b { font-weight: 500; letter-spacing: 0.08em; color: var(--accent); }
+.chain { font-family: var(--f-mono); font-size: 0.72rem; color: var(--ink-soft); }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<header class="masthead">
+  <p class="eyebrow">Spezialrätsel · Elektor 3/2011</p>
+  <h1>Hexadoku &lsquo;Digest&rsquo;</h1>
+  <p class="standfirst">
+    Ein ganz gewöhnliches 16×16-Gitter mit 73 Vorgaben — und einer Regel,
+    die außerhalb des Rätsels steht: sechzehn markierte Fünferblöcke nehmen
+    die Preiscodes von sechzehn älteren Hexadokus auf, jeden genau einmal.
+    Ohne dieses Wissen ist das Gitter absichtlich mehrdeutig.
+  </p>
+  <nav class="pagenav">
+    <a href="hexamurai.html">Hexamurai</a>
+    <a href="hexadocube.html">Hexadocube</a>
+    <a href="penta-hexadoku.html">EUC Penta-Hexadoku</a>
+    <a href="digest.html" aria-current="page">Hexadoku Digest</a>
+    <a href="fremdformate.html">Alphanumski &amp; AlphaSudoku</a>
+    <a href="werkstattbericht.html">Werkstattbericht</a>
+  </nav>
+</header>
+
+<section class="figures">
+  <div class="fig"><b>73</b><span>Vorgaben</span></div>
+  <div class="fig"><b>16 × 5</b><span>Blockzellen</span></div>
+  <div class="fig"><b>16</b><span>Preiscodes</span></div>
+  <div class="fig"><b>16</b><span>Verzweigungen</span></div>
+  <div class="fig"><b>237/256</b><span>gegen den Druck</span></div>
+  <div class="fig"><b>9302F</b><span>graue Zellen</span></div>
+</section>
+
+<!-- ============ I ============ -->
+<section class="chapter">
+  <div class="chapter-head">
+    <span class="num">I</span>
+    <h2>Welches Zusatzwissen</h2>
+    <p>Der Artikel nennt die Menge — und mehr nicht.</p>
+  </div>
+
+  <div class="body">
+    <div class="rail"><span class="chip chip-ok">gelöst</span></div>
+    <blockquote>
+      Each block takes the solution of a Hexadoku puzzle that appeared in one
+      of 16 editions of Elektor magazine in the period January 2009 to June
+      2010. The July &amp; August 2009 double edition is excluded.
+    </blockquote>
+    <p>
+      Die ausgeschlossene Doppelausgabe trug den <a href="hexamurai.html">Hexamurai</a>,
+      der keinen Fünf-Zeichen-Code hat; es bleiben genau sechzehn
+      Monatsrätsel für sechzehn Blöcke. Was der Artikel <em>nicht</em> sagt:
+      welcher Block zu welchem Monat gehört. Die Zuordnung ist Teil des
+      Rätsels — das Zusatzwissen ist eine <b>ungeordnete Menge</b> aus
+      sechzehn Zeichenketten.
+    </p>
+
+    <figure>
+      <div class="controls">
+        <span>Anzeigen:</span>
+        <button id="btnClues" aria-pressed="true">Vorgaben</button>
+        <button id="btnCodes" aria-pressed="false">Codes eingesetzt</button>
+        <button id="btnSol" aria-pressed="false">Lösung</button>
+      </div>
+      <div class="frame" id="digestFig"></div>
+      <div class="legend">
+        <span><i class="swatch" style="background:color-mix(in srgb, var(--g1) 22%, var(--cell-bg))"></i>einer der sechzehn Blöcke</span>
+        <span><i class="swatch" style="background:color-mix(in srgb, var(--ink) 22%, var(--cell-bg))"></i>graue Antwortzellen r3c5–c9</span>
+        <span><i class="swatch" style="background:var(--cell-bg)"></i>freie Zelle</span>
+      </div>
+      <figcaption>
+        Vorgaben und Blockpositionen wurden exakt aus der Textebene der Seite
+        gelesen — die Hefte ab 2011 sind born-digital, die 73 Ziffern stehen
+        als Text im PDF —, die Schattierung der Blöcke und der grauen Zellen
+        aus dem Seitenrender. Block <b>r3c1–c5</b> und der graue Lauf
+        überlappen sich in <b>r3c5</b>; die Seite zeichnet diese Zelle
+        diagonal zweifarbig geteilt.
+      </figcaption>
+    </figure>
+  </div>
+</section>
+
+<!-- ============ II ============ -->
+<section class="chapter">
+  <div class="chapter-head">
+    <span class="num">II</span>
+    <h2>Die sechzehn Codes, aus dem Archiv zurückgeholt</h2>
+    <p>Elektor kündigt jeden Code zwei Ausgaben später an — und jeder taucht
+       außerdem als fünf aufeinanderfolgende Zellen in der Lösung auf, die
+       dieses Repository für die betreffende Ausgabe rekonstruiert hat.</p>
+  </div>
+
+  <div class="body">
+    <div class="rail"><span class="chip chip-ok">geprüft</span></div>
+    <p>
+      Damit prüfen sich zwei unabhängige Lesungen gegenseitig: die
+      Ankündigung im Scan und die eigene Rekonstruktion. Bei zwei Ausgaben
+      war das nötig — die Ankündigungen kommen als <code>DFBl 2</code> und
+      <code>68310'</code> aus dem Scan, und die Lösungen jener Hefte tragen
+      <code>DFB12</code> in Zeile 16 und <code>6B310</code> in Zeile 9.
+    </p>
+    <figure>
+      <div class="tablewrap"><table>
+        <thead>
+          <tr><th>Rätsel in</th><th>Code angekündigt in</th><th>Code</th>
+              <th>landet in Block</th></tr>
+        </thead>
+        <tbody id="codeRows"></tbody>
+      </table></div>
+      <figcaption>
+        Die rechte Spalte ist nicht überliefert, sondern das Ergebnis der
+        Suche: die Zuordnung, die als einzige ein gültiges Hexadoku ergibt.
+      </figcaption>
+    </figure>
+  </div>
+</section>
+
+<!-- ============ III ============ -->
+<section class="chapter">
+  <div class="chapter-head">
+    <span class="num">III</span>
+    <h2>Eine Suchebene mehr</h2>
+    <p>Fünf Zellen, die zusammen zu einer vorgegebenen Zeichenkette passen
+       müssen, sind keine Unit. Also kommt eine Schicht um die gewöhnliche
+       Suche herum.</p>
+  </div>
+
+  <div class="body">
+    <div class="rail"><span class="chip chip-neutral">Bauart</span></div>
+    <p>
+      Dieselbe MRV-Idee wie bei den Zellen, nur eine Ebene höher: immer den
+      Block mit den wenigsten noch passenden Codes nehmen, jeden davon
+      probieren und zwischen zwei Zuweisungen die Propagation arbeiten
+      lassen. Ein Code passt zu einem Block, wenn jedes seiner fünf Zeichen
+      in der jeweiligen Zelle noch Kandidat ist — nach ein, zwei gesetzten
+      Blöcken ein sehr scharfer Filter, weil jeder gesetzte Block die
+      Möglichkeiten aller Blöcke in seinem Zeilenband und in seinen Spalten
+      beschneidet.
+    </p>
+    <p>Das Rätsel fällt in <b>16 Verzweigungen</b>.</p>
+
+    <div class="note">
+      <span class="lbl">Drei unabhängige Gegenproben</span>
+      <p>
+        <b>1.</b> Dieselben 73 Vorgaben ohne die Blockregel haben mehr als
+        eine Lösung — genau das, was der Artikel behauptet.
+      </p>
+      <p>
+        <b>2.</b> Das gelöste Gitter stimmt mit der Lösung überein, die
+        Elektor zwei Ausgaben später in 5/2011 abgedruckt hat: 237 von 256
+        Zellen. Der Rest sind zwei Zeilen, in denen die OCR jenes Scans
+        Zeichen verschluckt hat.
+      </p>
+      <p>
+        <b>3.</b> Die grauen Antwortzellen ergeben <code>9302F</code> — und
+        das gedruckte Gitter zeigt an derselben Stelle <code>9302F</code>.
+      </p>
+    </div>
+
+    <p class="chain">
+      # variant: digest<br>
+      # codes: 4395C 3097D 813D2 &hellip; C81BA 6B310<br>
+      # block: r1c2-c6<br>
+      # block: r2c8-c12 &hellip;
+    </p>
+  </div>
+</section>
+
+<footer class="colophon">
+  Gitter, Blöcke und Codes aus <code>puzzles/elektor/2011-03.txt</code>;
+  Lösung und Zuordnung aus <code>hexadoku.exe</code>, Suchebene in
+  <code>digest.go</code>. Quelle: Elektor 3/2011, S. 75.
+</footer>
+
+</div>
+
+<script src="spezial.js"></script>
+<script src="data.js"></script>
+<script>
+(function () {
+  const [gr, gc, glen] = DIGEST_GREY;
+
+  // block index per cell, -1 if none
+  const blockOf = Array.from({ length: 16 }, () => new Array(16).fill(-1));
+  DIGEST_BLOCKS.forEach(([r, c], i) => {
+    for (let k = 0; k < 5; k++) blockOf[r][c + k] = i;
+  });
+  const isGrey = (r, c) => r === gr && c >= gc && c < gc + glen;
+
+  function rowsFor(mode) {
+    if (mode === "sol") return DIGEST_SOLUTION;
+    if (mode === "clues") return DIGEST;
+    // clues plus the sixteen codes in their blocks
+    const rows = DIGEST.map((r) => r.split(""));
+    DIGEST_BLOCKS.forEach(([r, c, code]) => {
+      for (let k = 0; k < 5; k++) rows[r][c + k] = code[k];
+    });
+    return rows.map((r) => r.join(""));
+  }
+
+  function show(mode) {
+    mount(
+      "digestFig",
+      drawRaster({
+        rows: rowsFor(mode),
+        cell: 30,
+        box: 4,
+        title: "Hexadoku Digest",
+        tint: (r, c) => {
+          if (isGrey(r, c)) return "color-mix(in srgb, var(--ink) 22%, var(--cell-bg))";
+          if (blockOf[r][c] >= 0) return "color-mix(in srgb, var(--g1) 22%, var(--cell-bg))";
+          return "var(--cell-bg)";
+        },
+      })
+    );
+    for (const [id, k] of [["btnClues","clues"],["btnCodes","codes"],["btnSol","sol"]])
+      document.getElementById(id).setAttribute("aria-pressed", String(k === mode));
+  }
+  document.getElementById("btnClues").onclick = () => show("clues");
+  document.getElementById("btnCodes").onclick = () => show("codes");
+  document.getElementById("btnSol").onclick = () => show("sol");
+  show("clues");
+
+  // which block took which code
+  const where = {};
+  DIGEST_BLOCKS.forEach(([r, c, code]) => {
+    where[code] = `r${r + 1}c${c + 1}–c${c + 5}`;
+  });
+  document.getElementById("codeRows").innerHTML = DIGEST_CODES.map(
+    ([issue, announced, code]) =>
+      `<tr><td class="num">${issue}</td><td class="num">${announced}</td>` +
+      `<td class="code">${code}</td><td class="num">${where[code] || "—"}</td></tr>`
+  ).join("");
+})();
+</script>
+
+</body>
+</html>
