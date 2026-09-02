@@ -263,3 +263,24 @@ const DIGEST_CODES = [
 
 // the grey answer cells: row, first column, length (zero-based)
 const DIGEST_GREY = [2, 4, 5];
+
+// Elektor 06-2007, the grid the Werkstattbericht uses as its opening
+// art: 120 clues, '#' marks the grey prize cells
+const WERKSTATT = [
+  "A..52..B9D..C.16",
+  "6..3...9.0418E2.",
+  "09......6.E...7.",
+  "..2.8.E3.CA....5",
+  "F640AC...51928..",
+  "...EB8.1...6..A.",
+  ".B.85......D.4..",
+  "5....9.68.0A.D..",
+  "E51...8.A.2..B..",
+  "8..7..3.C####.0.",
+  ".2.F0.B....7..4E",
+  ".40C..6D3E..A...",
+  "..7....4.2.5E93B",
+  ".1.4.BC.7.6..250",
+  ".03B..95..D.7..A",
+  "D..A6..2.B934..8"
+];

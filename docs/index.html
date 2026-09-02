@@ -9,40 +9,87 @@
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@500;600;700&family=Source+Serif+4:opsz,wght@8..60,400;8..60,600&family=JetBrains+Mono:wght@400;500;700&display=swap">
 <link rel="stylesheet" href="spezial.css">
 <style>
+.leadin {
+  font-family: var(--f-mono);
+  font-size: 0.66rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--ink-soft);
+  margin: 0 0 0.9rem;
+}
+
+/* Hairline grid of tiles. The rules sit on the tiles, not on the
+   container, so a row that does not fill up leaves no empty tile behind. */
 .cards {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(19rem, 1fr));
-  gap: 0;
   border-top: 1px solid var(--rule);
 }
+
 .card {
-  display: block;
+  display: flex;
+  flex-direction: column;
   text-decoration: none;
   color: inherit;
-  padding: 1.6rem 1.6rem 1.6rem 0;
-  border-bottom: 1px solid var(--rule-soft);
+  background: var(--paper);
+  border-bottom: 1px solid var(--rule);
   border-right: 1px solid var(--rule-soft);
+  padding: 1.3rem 1.3rem 1.5rem;
+  transition: background 0.12s ease-out;
 }
-.card:hover h2 { color: var(--accent); }
+.card:hover, .card:focus-visible { background: var(--paper-sunk); }
+.card:focus-visible { outline: 2px solid var(--accent); outline-offset: -2px; }
+
+/* the teaser: the actual diagram of the page it links to, in miniature */
+.thumb {
+  height: 8.5rem;
+  margin: -0.2rem 0 1rem;
+  display: grid;
+  place-items: center;
+  overflow: hidden;
+  background: var(--cell-bg);
+  border: 1px solid var(--rule-soft);
+}
+.thumb svg { height: 100%; width: auto; max-width: 100%; margin: 0; }
+.card:hover .thumb { border-color: var(--rule); }
+
 .card .kicker {
   font-family: var(--f-mono);
-  font-size: 0.62rem;
+  font-size: 0.6rem;
   letter-spacing: 0.12em;
   text-transform: uppercase;
   color: var(--ink-soft);
 }
+
+/* the heading has to read as a link standing still, not only on hover */
 .card h2 {
   font-family: var(--f-display);
   font-weight: 600;
-  font-size: 1.25rem;
+  font-size: 1.22rem;
   letter-spacing: -0.015em;
-  margin: 0.4rem 0 0.5rem;
+  margin: 0.35rem 0 0.5rem;
+  color: var(--accent);
+  text-decoration: underline;
+  text-decoration-color: color-mix(in srgb, var(--accent) 35%, transparent);
+  text-decoration-thickness: 1px;
+  text-underline-offset: 4px;
 }
-.card p { margin: 0; color: var(--ink-soft); font-size: 0.95rem; max-width: 26rem; }
+.card:hover h2, .card:focus-visible h2 { text-decoration-color: var(--accent); }
+
+.card h2 .arrow {
+  display: inline-block;
+  margin-left: 0.3em;
+  text-decoration: none;
+  transition: transform 0.14s ease-out;
+}
+.card:hover h2 .arrow, .card:focus-visible h2 .arrow { transform: translateX(0.2em); }
+
+.card p { margin: 0; color: var(--ink-soft); font-size: 0.95rem; }
 .card .meta {
-  margin-top: 0.9rem;
+  margin-top: auto;
+  padding-top: 0.9rem;
   font-family: var(--f-mono);
-  font-size: 0.64rem;
+  font-size: 0.63rem;
   letter-spacing: 0.06em;
   color: var(--ink-soft);
 }
@@ -69,52 +116,61 @@
   <div class="fig"><b>4</b><span>Sonderformate offen</span></div>
 </section>
 
+<p class="leadin">Sieben Seiten — jede Kachel führt zu einer</p>
+
 <div class="cards">
   <a class="card" href="werkstattbericht.html">
+    <span class="thumb" id="tWerk"></span>
     <span class="kicker">Werkstattbericht</span>
-    <h2>Was schiefging, und wie</h2>
+    <h2>Was schiefging, und wie<span class="arrow">→</span></h2>
     <p>Vom C++-Brute-Force zum Go-Solver mit Bitmasken, die PDF-Toolchain,
        Gittererkennung in Scans, die Paarung von Rätsel und Lösung.</p>
     <span class="meta">Protokoll · deutsch</span>
   </a>
   <a class="card" href="suchbaum.html">
+    <span class="thumb" id="tTree"></span>
     <span class="kicker">Suchbaum</span>
-    <h2>Die Suche Schritt für Schritt</h2>
+    <h2>Die Suche Schritt für Schritt<span class="arrow">→</span></h2>
     <p>Kandidaten je Zelle, naked und hidden singles, die MRV-Zelle als
        Verzweigungspunkt mit dem Histogramm, das die Wahl erklärt.</p>
     <span class="meta">Interaktiv · deutsch</span>
   </a>
   <a class="card" href="hexamurai.html">
+    <span class="thumb" id="tMurai"></span>
     <span class="kicker">Elektor 7-8/2009 · 7-8/2011</span>
-    <h2>Hexamurai</h2>
+    <h2>Hexamurai<span class="arrow">→</span></h2>
     <p>Fünf verschränkte Gitter, zwei Anordnungen — und warum die zweite
        fünf Größenordnungen mehr Suche kostet als die erste.</p>
     <span class="meta">1088 · 768 Zellen</span>
   </a>
   <a class="card" href="hexadocube.html">
+    <span class="thumb" id="tCube"></span>
     <span class="kicker">Elektor 7-8/2010</span>
-    <h2>Hexadocube</h2>
+    <h2>Hexadocube<span class="arrow">→</span></h2>
     <p>Sechs Hexadokus auf den Flächen eines Würfels. Statt zwölf
        Kantentabellen wird das Netz in 3D gefaltet — mit Regler.</p>
     <span class="meta">1352 Zellen · 276 Units</span>
   </a>
   <a class="card" href="penta-hexadoku.html">
+    <span class="thumb" id="tPenta"></span>
     <span class="kicker">Elektor 7-8/2012</span>
-    <h2>EUC Penta-Hexadoku</h2>
+    <h2>EUC Penta-Hexadoku<span class="arrow">→</span></h2>
     <p>Das Windrad von 2009 auf einem Schachbrett: gerade Werte nur auf
        farbigen Feldern. Eine Regel, die in keine Unit passt.</p>
     <span class="meta">16 → 8 Kandidaten</span>
   </a>
   <a class="card" href="digest.html">
+    <span class="thumb" id="tDigest"></span>
     <span class="kicker">Elektor 3/2011</span>
-    <h2>Hexadoku &lsquo;Digest&rsquo;</h2>
+    <h2>Hexadoku &lsquo;Digest&rsquo;<span class="arrow">→</span></h2>
     <p>Sechzehn Blöcke nehmen die Preiscodes von sechzehn älteren Rätseln
        auf. Das Zusatzwissen kam aus dem eigenen Archiv zurück.</p>
     <span class="meta">16 Verzweigungen</span>
   </a>
   <a class="card" href="fremdformate.html">
+    <span class="thumb" id="tFremd"></span>
     <span class="kicker">Elektor 7-8/2007 · 7-8/2008</span>
-    <h2>Alphanumski &amp; AlphaSudoku</h2>
+    <h2>Alphanumski &amp; AlphaSudoku<span class="arrow">→</span></h2>
     <p>36×36 und 25×25. Geometrisch harmlos — was sie außer Reichweite
        bringt, ist das Alphabet, nicht das Layout.</p>
     <span class="meta">36 · 25 Symbole</span>
@@ -125,8 +181,148 @@
   Quellcode und Rätseldaten: <a href="https://github.com/jaui/hexadoku">github.com/jaui/hexadoku</a>.
   Elektor-Ausgaben aus der
   <a href="https://archive.org/details/ElektorMagazine">ElektorMagazine-Sammlung</a> auf archive.org.
+  Die Vorschaubilder sind die Abbildungen der jeweiligen Seite, verkleinert
+  aus denselben Rätseldateien gezeichnet.
 </footer>
 
 </div>
+
+<script src="spezial.js"></script>
+<script src="data.js"></script>
+<script>
+(function () {
+  const PIN = [[0,8],[8,24],[16,0],[12,12],[24,16]];
+  const COLORS = ["var(--g1)","var(--g2)","var(--g3)","var(--g4)","var(--g5)"];
+  const N = 16;
+
+  const clued = (v) => `color-mix(in srgb, ${v} 55%, var(--cell-bg))`;
+
+  // --- Werkstattbericht: the grid the page opens with ---
+  mount("tWerk", drawRaster({
+    rows: WERKSTATT.map((r) => r.replace(/#/g, ".")),
+    cell: 8, box: 4, glyphs: false, pad: 4,
+    title: "Hexadoku aus Elektor 06-2007",
+    tint: (r, c) => {
+      if (WERKSTATT[r][c] === "#") return clued("var(--accent)");
+      return WERKSTATT[r][c] === "." ? "var(--cell-bg)"
+        : "color-mix(in srgb, var(--ink) 22%, var(--cell-bg))";
+    },
+  }));
+
+  // --- Suchbaum: a schematic branch, not data ---
+  (function () {
+    const svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+    svg.setAttribute("viewBox", "0 0 140 120");
+    svg.setAttribute("width", "140");
+    const ns = "http://www.w3.org/2000/svg";
+    const line = (x1, y1, x2, y2, cut) => {
+      const l = document.createElementNS(ns, "line");
+      l.setAttribute("x1", x1); l.setAttribute("y1", y1);
+      l.setAttribute("x2", x2); l.setAttribute("y2", y2);
+      l.setAttribute("stroke", cut ? "var(--accent)" : "var(--grid-heavy)");
+      l.setAttribute("stroke-width", cut ? 1 : 1.4);
+      if (cut) l.setAttribute("stroke-dasharray", "3 3");
+      svg.appendChild(l);
+    };
+    const dot = (x, y, r, fill) => {
+      const c = document.createElementNS(ns, "circle");
+      c.setAttribute("cx", x); c.setAttribute("cy", y); c.setAttribute("r", r);
+      c.setAttribute("fill", fill);
+      svg.appendChild(c);
+    };
+    const nodes = [
+      [70, 16, [[36, 52], [104, 52]]],
+      [36, 52, [[18, 90], [54, 90]]],
+      [104, 52, [[86, 90], [122, 90]]],
+    ];
+    for (const [x, y, kids] of nodes)
+      for (const [kx, ky] of kids) line(x, y, kx, ky, kx === 54 || kx === 122);
+    dot(70, 16, 5.5, "var(--accent)");
+    dot(36, 52, 4.5, "var(--ink)");
+    dot(104, 52, 4.5, "var(--ink)");
+    dot(18, 90, 4, "var(--ink)");
+    dot(86, 90, 4, "var(--ink)");
+    dot(54, 90, 3.5, "var(--accent)");
+    dot(122, 90, 3.5, "var(--accent)");
+    mount("tTree", svg);
+  })();
+
+  // --- Hexamurai: the pinwheel ---
+  (function () {
+    const cov = Array.from({ length: 40 }, () => new Array(40).fill(0));
+    for (const [r0, c0] of PIN)
+      for (let r = 0; r < N; r++) for (let c = 0; c < N; c++) cov[r0 + r][c0 + c]++;
+    mount("tMurai", drawRaster({
+      rows: cov.map((row) => row.map((v) => (v ? "." : " ")).join("")),
+      cell: 4, box: 4, glyphs: false, pad: 3,
+      title: "Windrad aus fünf Gittern",
+      tint: (r, c) => (cov[r][c] > 1 ? "var(--accent-bg)" : "var(--cell-bg)"),
+      grids: PIN.map(([r, c], i) => ({ r: r, c: c, n: N, color: COLORS[i] })),
+    }));
+  })();
+
+  // --- Hexadocube: the printed net ---
+  mount("tCube", drawRaster({
+    rows: CUBE,
+    cell: 2.6, box: 0, glyphs: false, pad: 3,
+    title: "Abwicklung des Würfels",
+    tint: (r, c, ch) => {
+      if (ch === " ") return null;
+      const rr = r % N, cc = c % N;
+      const corner = (rr === 0 || rr === N - 1) && (cc === 0 || cc === N - 1);
+      const edge = rr === 0 || cc === 0 || rr === N - 1 || cc === N - 1;
+      if (corner) return clued("var(--accent)");
+      if (edge) return "color-mix(in srgb, var(--g4) 34%, var(--cell-bg))";
+      return ch === "." ? "var(--cell-bg)"
+        : "color-mix(in srgb, var(--ink) 18%, var(--cell-bg))";
+    },
+    grids: [[1,0],[1,1],[1,2],[1,3],[0,3],[2,3]].map(([fr, fc]) => ({
+      r: fr * N, c: fc * N, n: N, color: "var(--grid-heavy)",
+    })),
+  }));
+
+  // --- Penta: chequerboard on the same pinwheel ---
+  mount("tPenta", drawRaster({
+    rows: PENTA,
+    cell: 4, box: 0, glyphs: false, pad: 3,
+    title: "Schachbrett über fünf Gittern",
+    tint: (r, c) =>
+      (r + c) % 2 === 0
+        ? "color-mix(in srgb, var(--g4) 40%, var(--cell-bg))"
+        : "var(--cell-bg)",
+    grids: PIN.map(([r, c], i) => ({ r: r, c: c, n: N, color: COLORS[i] })),
+  }));
+
+  // --- Digest: the sixteen blocks ---
+  (function () {
+    const block = Array.from({ length: N }, () => new Array(N).fill(false));
+    DIGEST_BLOCKS.forEach(([r, c]) => { for (let k = 0; k < 5; k++) block[r][c + k] = true; });
+    const [gr, gc, glen] = DIGEST_GREY;
+    mount("tDigest", drawRaster({
+      rows: DIGEST,
+      cell: 8, box: 4, glyphs: false, pad: 4,
+      title: "Sechzehn Blöcke im Digest",
+      tint: (r, c, ch) => {
+        if (r === gr && c >= gc && c < gc + glen)
+          return "color-mix(in srgb, var(--ink) 40%, var(--cell-bg))";
+        if (block[r][c]) return clued("var(--g1)");
+        return ch === "." ? "var(--cell-bg)"
+          : "color-mix(in srgb, var(--ink) 22%, var(--cell-bg))";
+      },
+    }));
+  })();
+
+  // --- Fremdformate: the 36x36 chequerboard of 6x6 boxes ---
+  mount("tFremd", drawRaster({
+    rows: Array.from({ length: 36 }, () => ".".repeat(36)),
+    cell: 4, box: 6, glyphs: false, pad: 3,
+    title: "Alphanumski, 36×36 in 6×6-Boxen",
+    tint: (r, c) =>
+      (Math.floor(r / 6) + Math.floor(c / 6)) % 2 === 1
+        ? "color-mix(in srgb, var(--g5) 30%, var(--cell-bg))"
+        : "var(--cell-bg)",
+  }));
+})();
+</script>
 </body>
 </html>
