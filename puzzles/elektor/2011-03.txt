@@ -1,4 +1,78 @@
-# Elektor 2011-03 - not a standalone puzzle
-# Hexadoku Digest (Elektor 3/2011, p. 75): sixteen marked blocks of five cells must be filled with the prize codes of earlier Hexadokus from January 2009 to June 2010. Without that outside knowledge the grid is deliberately not unique.
-# transcribed visually: nothing to transcribe, kept as a marker so the
-# pipeline does not keep reporting it as a failed reconstruction.
+# Elektor Hexadoku 'Digest' 2011-03 (p. 75), 73 clues
+# variant: digest
+#
+# A 16x16 grid with one rule on top of the hexadoku ones: the sixteen
+# marked horizontal blocks of five cells each take the prize codes of
+# sixteen earlier Hexadokus, one code per block. The article names the
+# set and no more - "Each block takes the solution of a Hexadoku puzzle
+# that appeared in one of 16 editions of Elektor magazine in the period
+# January 2009 to June 2010. The July & August 2009 double edition is
+# excluded." - so which block gets which month is part of the puzzle.
+# Without the codes the 73 clues are deliberately not unique.
+#
+# The clues and the block positions were read exactly out of the text
+# layer of the page (the 2011 issues are born-digital), the shading of
+# the blocks and of the grey answer cells out of the page render.
+#
+# The sixteen codes, in the order of their issues - Elektor announces
+# each one two issues later in the "Prize winners" box, and every one of
+# them also turns up as five consecutive cells in the solution this repo
+# reconstructed for that issue, which cross-checks both readings:
+#
+#   2009-01 4395C   2009-09 10965   2010-01 26FB4   2010-05 C81BA
+#   2009-02 3097D   2009-10 DA2BF   2010-02 95CD4   2010-06 6B310
+#   2009-03 813D2   2009-11 A5F32   2010-03 51E7A
+#   2009-04 A2543   2009-12 F1482   2010-04 DFB12
+#   2009-05 857C9
+#   2009-06 579BD
+#
+# (The announcements for 2010-04 and 2010-06 come out of the scan as
+# "DFBl 2" and "68310'"; the solutions of those two issues carry DFB12 in
+# row 16 and 6B310 in row 9, which settles both.)
+#
+# codes: 4395C 3097D 813D2 A2543 857C9 579BD 10965 DA2BF A5F32 F1482 26FB4 95CD4 51E7A DFB12 C81BA 6B310
+#
+# block: r1c2-c6
+# block: r2c8-c12
+# block: r3c1-c5
+# block: r4c12-c16
+# block: r5c11-c15
+# block: r6c1-c5
+# block: r7c5-c9
+# block: r8c11-c15
+# block: r9c9-c13
+# block: r10c5-c9
+# block: r11c1-c5
+# block: r12c10-c14
+# block: r13c3-c7
+# block: r14c1-c5
+# block: r15c7-c11
+# block: r16c5-c9
+#
+# The grey answer cells are r3c5-c9, the five characters the reader had
+# to send in. The block r3c1-c5 and the grey run overlap in r3c5, which
+# the page draws as a cell split diagonally between the two colours.
+#
+# Solved with the block search in digest.go: unique, 16 branch nodes, and
+# every one of the sixteen codes used exactly once. Two independent
+# checks on the result - the 73 clues on their own are *not* unique, as
+# the article says, and the grid agrees with the solution Elektor printed
+# in 5/2011 (2011-05_prevsolution.txt) in 237 of 256 cells, the rest
+# being two rows where the OCR of that scan dropped characters. The grey
+# cells give 9302F, and the printed grid shows 9302F in the same place.
+........5.E.74.3
+.0138.........A2
+.........4...B..
+E..4....83......
+.7..18B.3.......
+......69B0..5..A
+..........48....
+.936.C.4........
+.CD...8.......19
+12.........E4.B6
+......2D6..B..F.
+0...5.E.........
+.........D3..6..
+......50....A3D.
+34.9D.......EF.7
+D.........F.2.C.
