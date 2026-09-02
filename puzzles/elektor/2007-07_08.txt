@@ -1,5 +1,25 @@
 # Elektor 2007-07_08 - not a standalone puzzle
-# "Alphanumski" (p. 141): overlapping grids over a much larger symbol set
-# than 0-F - the page shows V, S, T, Q, O, W, U, J, G, N and more. Not a
-# hexadoku. The 160-clue mask for this issue is a 16x16 window cut out of
-# that larger lattice and is meaningless on its own.
+# "Alphanumski" (p. 140-141), creator Gery Szcepanski - the one special
+# puzzle of the series that is not by Claude Ghyselen.
+#
+# It is not a hexadoku and not a verbund of overlapping grids either: it
+# is one single 36x36 grid, printed across the double page, 18 columns on
+# each side. The article states the rules outright - "all letters of the
+# alphabet (A through Z) and all numerals 0 through 9 should occur only
+# once in every line (1x36), every column (1x36) and every box (6x6;
+# identified by red outlines and a background colour)". The boxes are
+# shaded in a chequerboard of 6x6 blocks, which is decoration and not a
+# rule, unlike the chequerboard of the 2012 penta-hexadoku.
+#
+# So the geometry is the plainest of the whole series - rows, columns,
+# boxes of one grid - and what puts it out of reach here is the alphabet:
+# this solver carries candidates as uint16 bitmasks and is built for 9 or
+# 16 values, while Alphanumski needs 36. Supporting it means widening the
+# value representation everywhere, not adding a layout.
+#
+# The 160-clue mask in 2007-07_08_mask.txt is a 16x16 window the grid
+# detector cut out of that much larger lattice and is meaningless on its
+# own.
+#
+# The article also names the predecessor: an "Alphadoku" of 25x25 cells
+# in the double issue 7-8/2006, which this archive does not reach back to.

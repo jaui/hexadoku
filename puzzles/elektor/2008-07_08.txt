@@ -1,3 +1,24 @@
 # Elektor 2008-07_08 - not a standalone puzzle
-# The double issue prints an AlphaSudoku (25x25, p. 118) instead of a
-# hexadoku; p. 119 only announces the winners of the previous one.
+# "AlphaSudoku" (p. 118): the double issue prints this instead of a
+# hexadoku; p. 119 only announces the winners of the previous one (the
+# May 2008 code is 36815).
+#
+# 25x25 cells over 25 symbols: the numbers 1 through 9 and the letters A
+# through P - "including the letter 'O', hence the absence of the '0' in
+# the numbers", which is how a 25-symbol alphabet stays readable. Boxes
+# are 5x5, marked by a coloured outline.
+#
+# It carries an extra rule of its own, and it is the ancestor of the
+# later ones: "The puzzle is essentially a (16x16) Alphadoku comprising
+# nine classic (9x9) Sudokus using numbers 1 through 9." Nine 9x9 blocks
+# inside the 25x25 grid are shaded and must additionally be valid
+# sudokus over the digits alone - so those 81 cells carry two alphabets
+# at once, 25 values by the outer rules and 9 by the inner ones.
+#
+# Claude Ghyselen names it as his own first puzzle for Elektor in the
+# 2012 article ("one of my suggestions used in the 2008 annual double
+# edition: the Alphasudoku"), ahead of the Hexamurai 7-8/2009, the
+# Hexadocube 7-8/2010 and the EUC Penta-Hexadoku 7-8/2012.
+#
+# Out of reach here for the same reason as the Alphanumski of 7-8/2007:
+# 25 values do not fit a solver built around 9 or 16.
