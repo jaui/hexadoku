@@ -105,7 +105,7 @@ body {
 
 .masthead {
   border-bottom: 2px solid var(--ink);
-  padding: 3rem 0 1.25rem;
+  padding: 2.4rem 0 1.25rem;
 }
 
 .eyebrow {
@@ -379,10 +379,8 @@ blockquote {
 
 /* ---------- zurück zur Übersicht ---------- */
 
-/* Deliberately not part of .pagenav: coming back has to be findable at a
-   glance, the way the cards on the index page are, not one entry among
-   seven siblings. Sits above the eyebrow and again below the colophon,
-   because these pages are long. */
+/* Repeated below the colophon, because these pages are long and the bar
+   at the top is then a whole screen away. */
 .backlink {
   display: inline-flex;
   align-items: center;
@@ -407,21 +405,6 @@ blockquote {
 .backlink:hover, .backlink:focus-visible { text-decoration-color: var(--accent); }
 .backlink:hover .arrow, .backlink:focus-visible .arrow { transform: translateX(-0.25em); }
 
-/* In the masthead the link would otherwise read as a second eyebrow -
-   same colour, same mono caps. A bordered chip is the vocabulary the
-   controls on these pages already use, so it reads as something to press. */
-.masthead .backlink {
-  text-decoration: none;
-  border: 1px solid color-mix(in srgb, var(--accent) 40%, transparent);
-  border-radius: 2px;
-  padding: 0.4rem 0.75rem;
-  margin-bottom: 1.6rem;
-}
-.masthead .backlink:hover, .masthead .backlink:focus-visible {
-  background: var(--accent-bg);
-  border-color: var(--accent);
-}
-
 .backhome {
   display: block;
   border-top: 1px solid var(--rule);
@@ -432,13 +415,15 @@ blockquote {
 
 /* ---------- Navigation zwischen den Seiten ---------- */
 
+/* The bar sits at the very top of the page, above the masthead, and its
+   first entry is the way back - which is why there is no separate chip
+   any more. */
 .pagenav {
-  border-top: 2px solid var(--ink);
-  margin-top: 1rem;
-  padding-top: 1rem;
   display: flex;
   flex-wrap: wrap;
   gap: 0.4rem 1.6rem;
+  padding: 1.1rem 0;
+  border-bottom: 1px solid var(--rule);
   font-family: var(--f-mono);
   font-size: 0.68rem;
   letter-spacing: 0.06em;
@@ -446,7 +431,11 @@ blockquote {
 }
 .pagenav a { color: var(--ink-soft); text-decoration: none; border-bottom: 1px solid transparent; }
 .pagenav a:hover { color: var(--ink); border-bottom-color: var(--accent); }
-.pagenav a[aria-current="page"] { color: var(--accent); }
+/* accent is reserved for the way back, so the current page is marked
+   by weight and a rule instead - otherwise two entries look alike */
+.pagenav a[aria-current="page"] { color: var(--ink); border-bottom-color: var(--ink); }
+.pagenav a.home { color: var(--accent); font-weight: 500; margin-right: 0.4rem; }
+.pagenav a.home:hover { border-bottom-color: var(--accent); }
 
 footer.colophon {
   border-top: 1px solid var(--rule);

@@ -378,21 +378,15 @@ code {
 .backlink:hover .arrow, .backlink:focus-visible .arrow { transform: translateX(-0.25em); }
 .backhome { display: block; border-top: 1px solid var(--rule); margin-top: 2.5rem; padding-top: 1.4rem; }
 .backhome .backlink { font-size: 0.8rem; }
-.masthead .backlink {
-  align-self: flex-start;
-  text-decoration: none;
-  border: 1px solid color-mix(in srgb, var(--accent) 40%, transparent);
-  border-radius: 2px;
-  padding: 0.4rem 0.75rem;
-  margin-bottom: 1.6rem;
-}
+/* the bar now opens the page, so the masthead starts higher; without
+   the chip the left column would otherwise hang far below the art */
+.masthead { padding-top: 1.6rem; align-items: start; }
 .pagenav {
-  border-top: 2px solid var(--ink);
-  margin-top: 1.6rem;
-  padding-top: 1rem;
   display: flex;
   flex-wrap: wrap;
   gap: 0.4rem 1.6rem;
+  padding: 1.1rem 0;
+  border-bottom: 1px solid var(--rule);
   font-family: var(--f-mono);
   font-size: 0.68rem;
   letter-spacing: 0.06em;
@@ -404,20 +398,29 @@ code {
   border-bottom: 1px solid transparent;
 }
 .pagenav a:hover { color: var(--ink); border-bottom-color: var(--accent); }
-.pagenav a[aria-current="page"] { color: var(--accent); }
-.masthead .pagenav { grid-column: 1 / -1; }
+/* accent is reserved for the way back, so the current page is marked
+   by weight and a rule instead - otherwise two entries look alike */
+.pagenav a[aria-current="page"] { color: var(--ink); border-bottom-color: var(--ink); }
+.pagenav a.home { color: var(--accent); font-weight: 500; margin-right: 0.4rem; }
+.pagenav a.home:hover { border-bottom-color: var(--accent); }
 
-.masthead .backlink:hover, .masthead .backlink:focus-visible {
-  background: color-mix(in srgb, var(--accent) 12%, transparent);
-  border-color: var(--accent);
-}
 </style>
 
 <div class="wrap">
 
+<nav class="pagenav">
+  <a href="index.html" class="home">&#8592; Übersicht</a>
+  <a href="werkstattbericht.html" aria-current="page">Werkstattbericht</a>
+  <a href="suchbaum.html">Suchbaum</a>
+  <a href="hexamurai.html">Hexamurai</a>
+  <a href="hexadocube.html">Hexadocube</a>
+  <a href="penta-hexadoku.html">EUC Penta-Hexadoku</a>
+  <a href="digest.html">Hexadoku Digest</a>
+  <a href="fremdformate.html">Alphanumski &amp; AlphaSudoku</a>
+</nav>
+
 <header class="masthead">
   <div>
-  <a class="backlink" href="index.html"><span class="arrow">&#8592;</span> Alle Seiten</a>
     <p class="eyebrow">Werkstattbericht · Solver &amp; Archivpipeline</p>
     <h1>Hexadoku</h1>
     <p class="standfirst">
@@ -431,16 +434,6 @@ code {
     <div class="grid-art" id="gridArt" aria-label="Hexadoku aus Elektor 06-2007"></div>
     <p class="grid-cap">Elektor 06-2007 · per Sichtprüfung gerettet<br>120 Vorgaben · löst mit 0 Verzweigungen</p>
   </div>
-  <nav class="pagenav">
-    <a href="index.html">Übersicht</a>
-    <a href="werkstattbericht.html" aria-current="page">Werkstattbericht</a>
-    <a href="suchbaum.html">Suchbaum</a>
-    <a href="hexamurai.html">Hexamurai</a>
-    <a href="hexadocube.html">Hexadocube</a>
-    <a href="penta-hexadoku.html">EUC Penta-Hexadoku</a>
-    <a href="digest.html">Hexadoku Digest</a>
-    <a href="fremdformate.html">Alphanumski &amp; AlphaSudoku</a>
-  </nav>
 </header>
 
 <section class="figures">
