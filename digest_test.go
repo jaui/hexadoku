@@ -37,7 +37,7 @@ func TestDigest(t *testing.T) {
 	}
 	checkFull(t, v, &work)
 	check := *g
-	if n := v.countWith(&check, 2); n != 1 {
+	if n := v.countWith(&check, 2, nil); n != 1 {
 		t.Fatalf("%d solutions, want exactly 1", n)
 	}
 
@@ -62,7 +62,7 @@ func TestDigest(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	if n := plain.count(bare, 2); n < 2 {
+	if n := plain.count(bare, 2, nil); n < 2 {
 		t.Fatalf("the clues alone have %d solution(s); the digest is only "+
 			"pinned down by the codes", n)
 	}

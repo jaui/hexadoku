@@ -1,25 +1,76 @@
-# Elektor 2007-07_08 - not a standalone puzzle
-# "Alphanumski" (p. 140-141), creator Gery Szcepanski - the one special
-# puzzle of the series that is not by Claude Ghyselen.
+# Elektor Alphanumski 2007-07_08 (Elektor 7-8/2007, p. 140-141), 820 clues
+# read from the PDF text layer by cmd/alphaextract (exact, not OCR):
+#   alphaextract -variant alphanumski -page 140 -page2 141 Elektornonlinear.ir2007-07_08.pdf
 #
-# It is not a hexadoku and not a verbund of overlapping grids either: it
-# is one single 36x36 grid, printed across the double page, 18 columns on
-# each side. The article states the rules outright - "all letters of the
-# alphabet (A through Z) and all numerals 0 through 9 should occur only
-# once in every line (1x36), every column (1x36) and every box (6x6;
-# identified by red outlines and a background colour)". The boxes are
-# shaded in a chequerboard of 6x6 blocks, which is decoration and not a
-# rule, unlike the chequerboard of the 2012 penta-hexadoku.
+# "Alphanumski", by Gery Szcepanski - the one special puzzle of the
+# series that is not by Claude Ghyselen. One single 36x36 grid printed
+# across the double page, 18 columns on each side, so the two halves are
+# fitted separately and joined left to right.
 #
-# So the geometry is the plainest of the whole series - rows, columns,
-# boxes of one grid - and what puts it out of reach here is the alphabet:
-# this solver carries candidates as uint16 bitmasks and is built for 9 or
-# 16 values, while Alphanumski needs 36. Supporting it means widening the
-# value representation everywhere, not adding a layout.
+# The article states the rules outright - "all letters of the alphabet (A
+# through Z) and all numerals 0 through 9 should occur only once in every
+# line (1x36), every column (1x36) and every box (6x6; identified by red
+# outlines and a background colour)". The boxes are shaded in a
+# chequerboard of 6x6 blocks, which is decoration and not a rule, unlike
+# the chequerboard of the 2012 penta-hexadoku. So the geometry is the
+# plainest of the whole series, and only the 36-value alphabet puts it
+# outside the ordinary solver.
 #
-# The 160-clue mask in 2007-07_08_mask.txt is a 16x16 window the grid
-# detector cut out of that much larger lattice and is meaningless on its
-# own.
+# As printed the puzzle has TWO solutions. They differ in exactly four
+# cells - r26c4, r26c33, r29c4 and r29c33 - which form a rectangle whose
+# two values 9 and X can be swapped around it. All four are blank on the
+# page (checked against the render at 300 dpi), so this is a flaw of the
+# puzzle and not of the reading: 820 of the 824 glyphs on the two pages
+# are clues, and the remaining four sit in the running text.
+#
+# It never mattered to a reader. None of the four cells is one of the
+# seven grey answer cells, so both solutions give the same code, and
+# Elektor announced it in 10/2007: "The solution of the july/august 2007
+# puzzle is: LVC4ZM1." The reconstruction reproduces it.
+#
+# Two side files survive from before the puzzle was read: the 160-clue
+# 2007-07_08_mask.txt and 2007-07_08_ocr.txt are a 16x16 window the grid
+# detector cut out of this much larger lattice, and are meaningless.
 #
 # The article also names the predecessor: an "Alphadoku" of 25x25 cells
-# in the double issue 7-8/2006, which this archive does not reach back to.
+# in the double issue 7-8/2006. That one is in the archive after all, from
+# the Dutch edition - see 2006-07_08.txt, where it is called Alfadoku.
+# variant: alphanumski
+# grey: r28c22-c28
+# code: LVC4ZM1
+..A..R.3D......1ZW.YM.7.I.JG6X.FQ.L8
+D6L.3T1Q.5...GJA.2C..B8....SO.IE0.N.
+O.H..EG..7.0..KUY.D1.JIFPL...R.X..9S
+7.0..SLP6HY2.N.9IQ..AOUTB3WZE.GJ1R..
+GQNBJ.IE.8.V45D.3L0S.9XW7T2AH.Y...C.
+.C..YIZSKN..E..X7RL...249.D05.UPH..B
+.1....BJXT..S.O..VGE.8..Q5LI0..976.R
+5I.LMQ..ADO8.U2Y.9WFTRN.....P7X.E0..
+.V8C2.45.MGR...0B6.IL.3YNAF..OKD.1..
+0.ETWBQ9..N.XF3..1..JZCVHY.4DK.U2IGO
+J.3.OGW....EI.L.T..DS..28..M..B.A...
+KA6..UVI..P.DJN.G8OB..9.21XEZ.M..L.C
+.W15.FJG0..P94.I2...N...MHEXADOKU.VL
+.3V.78.O.WHN..PLUSTG2YDK0B5916..JCZ.
+9..N..6DUB..5..MEY.X..HO.7..2PAR.SF.
+..K.UMCX.R4.AD.GN39.V.S.TQOW..016.27
+P2.OD.EY..S.QK.T..A0.54U.JG....BN.X.
+6Y.QRX9.2K7A..FO.HZL.M1E.C4.SN.GIP85
+.0SK5D.2.YR.GH.V.IE.P...XW.L.8NC4.T6
+TM.AINU1C.WZB..8.....HJL5..Y9G..D.E2
+Y.9FL20...Q.ZTE..D..O.A3..P.74W.8U.J
+1U.E.P.N.OL.F.425XMW.CYDZV.TJ.H..G..
+.GB6..HT..X3L0..PAR8F7KZO..2U.QM591.
+.Z4.8.DA76V.N..JQUS25TG.EK0.MC..LXP.
+8.2.4VY0N.KJ.ZAQWPB3.S.X..U6..CI.F.G
+.B..S.TLVU..Y2.4H.1...W6..73F0E8.A..
+Q.F36....2MD.B.E1T.9Y40IRXHNKAZS.J5.
+.7IWPARF.X.S69U..0.OH.......Q.2.Y.3K
+.D..0C36P.I.KV.FLJUA.25QWS..Y.1..B.N
+UJYH.K5Z.A...I..DO..7N.R.P9.G..4WM60
+MF.8HY.R1J3..7WD.G2.XV.5S.BP.L.A.Q0.
+..RJ.3.MB.DYPL.6.EH.8IZ0FN1..T..C5UX
+BSQ.XWP.O..T1.03..NR9..MA2Y7.H.L.8.D
+I.5.T6S7...W2Q8.......LG...KXJ.N..O3
+C..2A..KL.6QU..NR43JW.B..0.DV.SH.TM.
+L...172.HV89OAIBX..KUDTSCM65..JWGERY

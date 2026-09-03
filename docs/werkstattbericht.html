@@ -416,7 +416,7 @@ code {
   <a href="hexadocube.html">Hexadocube</a>
   <a href="penta-hexadoku.html">EUC Penta-Hexadoku</a>
   <a href="digest.html">Hexadoku Digest</a>
-  <a href="fremdformate.html">Alphanumski &amp; AlphaSudoku</a>
+  <a href="fremdformate.html">Fremdformate</a>
 </nav>
 
 <header class="masthead">
@@ -981,7 +981,7 @@ code {
         <div><dt>Symptom</dt><dd>Drei Ausgaben lieferten hartnäckig zu wenige Vorgaben und mehrdeutige Lösungen — nach Werkzeugfehler aussehend.</dd></div>
         <div><dt>Befund</dt><dd>Alle drei sind keine gewöhnlichen Hexadokus. Die beiden Doppelhefte 7-8/2009 und 7-8/2011 zeigen ein <em>Hexamurai</em>: fünf überlappende 16×16-Gitter im Kreuz, nach dem Samurai-Vorbild, und das Heft sagt ausdrücklich, dass sie sich nicht einzeln lösen lassen. Ausgabe 3/2011 ist ein <em>Hexadoku Digest</em>, dessen sechzehn markierte Fünferblöcke mit den Preiscodes früherer Hexadokus von Januar 2009 bis Juni 2010 gefüllt werden müssen.</dd></div>
         <div><dt>Einordnung</dt><dd>Die Pipeline verhält sich richtig, indem sie diese Gitter als nicht eindeutig meldet. Sie sind jetzt als Sonderform gekennzeichnet und werden nicht mehr als fehlgeschlagene Rekonstruktion gezählt — ein Werkzeug, das eine Grenze des Materials als eigenen Fehler ausweist, verschleiert beides.</dd></div>
-        <div><dt>Nachtrag</dt><dd>Die beiden Hexamurai sind inzwischen keine Sonderfälle mehr, sondern eigene Geometrien im Solver, exakt aus der PDF-Textebene eingelesen und beide als eindeutig lösbar bestätigt — siehe Kapitel XI. Sonderform bleibt allein der Digest: er verlangt Preiscodes aus achtzehn Heften, keine Gitterregel.</dd></div>
+        <div><dt>Nachtrag</dt><dd>Die beiden Hexamurai sind inzwischen keine Sonderfälle mehr, sondern eigene Geometrien im Solver, exakt aus der PDF-Textebene eingelesen und beide als eindeutig lösbar bestätigt — siehe Kapitel XI. Dasselbe gilt inzwischen für den Digest und, siehe Kapitel XIII, für das Alphanumski und das AlphaSudoku. Als Sonderform bleiben nur Hexadocube und Penta-Hexadoku — bei ihnen fehlt die Transkription, nicht die Regel: ihre Vorgaben stehen als Grafik auf der Seite.</dd></div>
       </dl>
     </div>
   </article>
@@ -1008,12 +1008,12 @@ code {
   </article>
 
   <article class="entry">
-    <div class="rail"><span class="tag">OPEN-03</span><span class="chip chip-open">offen</span></div>
+    <div class="rail"><span class="tag">OPEN-03</span><span class="chip chip-ok">gelöst</span></div>
     <div>
       <h3>Hefte ohne auffindbares Gitter</h3>
       <dl>
-        <div><dt>Stand</dt><dd>98 der 110 Hefte liefern Masken oder Lösungsgitter, und daraus sind <span class="win">86 Rätsel</span> gewonnen: 67 gegen eine gedruckte Lösung geprüft, 15 eindeutig lösbar ohne Vergleichsmöglichkeit, dazu vier dokumentierte Sonderformen: Alphanumski, AlphaSudoku, Hexadocube und der Digest. Die beiden Hexamurai zählen nicht mehr dazu, sie sind gelöst.</dd></div>
-        <div><dt>Offen</dt><dd>Vier Hefte liefern weiterhin kein Rätselgitter, nur das daneben gedruckte Lösungsgitter: 4/2006, 5/2006, 1/2007 und 11/2013. Alles blasse Scans der frühen Jahrgänge. Die Seite ist jeweils bekannt, für sie steht der Betrachtungsmodus bereit — das ist Ablesearbeit, kein offenes Verfahren mehr.</dd></div>
+        <div><dt>Stand</dt><dd>Aus 110 Heften stehen <span class="win">109 Rätsel</span> in <code>puzzles/elektor/</code>: 85 gegengeprüft, 22 eindeutig lösbar ohne Vergleichsmöglichkeit, dazu zwei dokumentierte Sonderformen — Hexadocube und Penta-Hexadoku. Die beiden Hexamurai zählen nicht mehr dazu, ebenso wenig der Digest, das Alphanumski und das AlphaSudoku: sie sind gelöst.</dd></div>
+        <div><dt>Erledigt</dt><dd>Die vier Hefte, aus denen die Erkennung kein Rätselgitter holte — 4/2006, 5/2006, 1/2007 und 11/2013, alles blasse Scans der frühen Jahrgänge —, sind von Hand abgelesen. 4/2006 aus der niederländischen Ausgabe, weil dem englischen Scan die Seite fehlt. Drei davon sind über Preiscode oder gedruckte Lösung bestätigt, 5/2006 ist eindeutig lösbar ohne Vergleichsmöglichkeit. Kein Heft ist mehr ohne Rätsel.</dd></div>
         <div><dt>Korrektur</dt><dd>Die frühere Vermutung, es liege an der Rechenzeit des seitenweisen Bildsweeps, war falsch. Es waren vier voneinander unabhängige Fehler in der Erkennung, alle in Kapitel XII.</dd></div>
       </dl>
     </div>
@@ -1246,7 +1246,104 @@ code {
       <dl>
         <div><dt>Befund</dt><dd>Was von den hartnäckigen Fällen übrig blieb, waren zum guten Teil gar keine Hexadokus. Die Sommer-Doppelhefte drucken jedes Jahr etwas anderes: 7-8/2007 ein <em>Alphanumski</em> über einen weit größeren Zeichenvorrat, 7-8/2008 ein <em>AlphaSudoku</em> in 25×25, 7-8/2010 einen <em>Hexadocube</em> — sechs Gitter auf den Flächen eines abgewickelten Würfels, über die Faltkanten verbunden —, dazu die beiden bekannten Hexamurai.</dd></div>
         <div><dt>Erkennungsmerkmal</dt><dd>Im ersten Band des Ausschnitts standen <code>V</code>, <code>S</code>, <code>T</code>, <code>Q</code>, <code>W</code>. Zeichen, die es in einem Hexadoku nicht gibt, sind der schnellste Beweis, dass man das falsche Rätsel vor sich hat.</dd></div>
-        <div><dt>Konsequenz</dt><dd>Alle als Sonderform dokumentiert und gegen Überschreiben geschützt. Der Hexadocube wäre mit der neuen Geometrie-Beschreibung lösbar — seine Vorgaben stehen aber als Grafik auf der Seite, das bliebe Handarbeit über sechs Gitter.</dd></div>
+        <div><dt>Konsequenz</dt><dd>Alle als Sonderform dokumentiert und gegen Überschreiben geschützt. Das Alphanumski und das AlphaSudoku sind inzwischen gelöst, siehe WIDE-01. Der Hexadocube wäre mit der Geometrie-Beschreibung ebenfalls lösbar — seine Vorgaben stehen aber als Grafik auf der Seite, das bliebe Handarbeit über sechs Gitter.</dd></div>
+      </dl>
+    </div>
+  </article>
+</section>
+
+<!-- ============ 14 ============ -->
+<section class="chapter">
+  <div class="chapter-head">
+    <span class="num">XIII</span>
+    <h2>Zwei Rätsel, die nicht am Layout scheiterten</h2>
+    <p>Die Sommerhefte 7-8/2006, 7-8/2007 und 7-8/2008 galten lange als außer Reichweite.
+       Ihre Geometrie ist die schlichteste der ganzen Reihe — im Weg stand das
+       Alphabet: 25 und 36 Werte gegen einen Kern, der auf 16 gebaut ist.
+       Ausführlich auf der Seite
+       <a href="fremdformate.html">Fremdformate</a>.</p>
+  </div>
+
+  <article class="entry">
+    <div class="rail"><span class="tag">WIDE-01</span><span class="chip chip-ok">gelöst</span></div>
+    <div>
+      <h3>Ein zweiter Kern statt eines Umbaus</h3>
+      <dl>
+        <div><dt>Problem</dt><dd>Der Kandidatensatz einer Zelle ist eine <code>uint16</code>-Bitmaske, ein Bit je Wert, und der ganze heiße Pfad hängt daran. 36 Werte hieße, diese Darstellung überall zu verbreitern — und der Kern ist genau dort schnell, wo er auf 16 Werte festgelegt ist.</dd></div>
+        <div><dt>Lösung</dt><dd>Kein Umbau, sondern eine zweite Datei: <code>alpha.go</code> trägt denselben Algorithmus über <code>uint64</code>-Masken. Eine einzige echte Verallgemeinerung — eine Unit kennt ihre eigene Größe und ihre eigene Wertemenge — trägt die neun eingebetteten Sudoku-Blöcke des AlphaSudoku, neun Zellen über neun Werten in einem Rätsel aus fünfundzwanzig. Der 16er-Kern bleibt unberührt, dieselbe Binary erkennt beide an <code>&#35; variant:</code>.</dd></div>
+        <div><dt>Gegenprobe</dt><dd>Der neue Kern muss derselbe Algorithmus sein: dieselben 102 rekonstruierten Hexadokus, einmal vom spezialisierten 16×16-Kern gelöst und einmal vom breiten — Zelle für Zelle gleich, und auf denselben Zufallsinstanzen verzweigen beide identisch.</dd></div>
+      </dl>
+    </div>
+  </article>
+
+  <article class="entry">
+    <div class="rail"><span class="tag">WIDE-02</span><span class="chip chip-ok">gelöst</span></div>
+    <div>
+      <h3>Die Vorgaben standen die ganze Zeit im Textlayer</h3>
+      <dl>
+        <div><dt>Befund</dt><dd>Beide Seiten tragen jede Vorgabe als echtes Textglyph, wie schon die Hexamurai-Seiten — die jahrelange Annahme, hier bliebe nur Ablesearbeit, war falsch. Von den 824 Einzelzeichen der 36×36-Doppelseite sind 820 Vorgaben; die übrigen vier stehen im Fließtext.</dd></div>
+        <div><dt>Lösung</dt><dd><code>cmd/alphaextract</code> auf dem Rasterfit von <code>muraiextract</code>, der dafür nach <code>internal/pdftext</code> herausgezogen wurde. Das Alphanumski steht quer über der Doppelseite, 18 Spalten je Seite: zwei getrennte Fits, danach nebeneinandergelegt. Gegenprobe der Verschiebung: <code>muraiextract</code> liefert für 7-8/2009 byteweise dieselbe Datei wie zuvor.</dd></div>
+        <div><dt>Falle</dt><dd>Der erste Lauf holte nur 93 statt 345 Vorgaben. <code>FitAxis</code> verankert das Raster in der Seitenmitte, die halben Indizes sind also negativ, und die Fenstersuche zählt von null aufwärts — die Indizes müssen vorher verschoben werden. <code>muraiextract</code> tut genau das, nur stand es nicht im gemeinsamen Teil.</dd></div>
+      </dl>
+    </div>
+  </article>
+
+  <article class="entry">
+    <div class="rail"><span class="tag">WIDE-03</span><span class="chip chip-neutral">Befund</span></div>
+    <div>
+      <h3>Das Alphanumski hat zwei Lösungen</h3>
+      <dl>
+        <div><dt>Symptom</dt><dd>Gelöst in einer einzigen Verzweigung, und trotzdem <em>nicht eindeutig</em>. Bei 820 Vorgaben auf 1296 Zellen sah das zunächst nach einem verlorenen Zeichen aus.</dd></div>
+        <div><dt>Befund</dt><dd>Es sind genau zwei Lösungen, und sie unterscheiden sich in vier Zellen, die ein Rechteck bilden: r26c4, r26c33, r29c4, r29c33, in dem <code>9</code> und <code>X</code> gegeneinander tauschbar sind. Alle vier sind auf der gedruckten Seite leer — gegen den 300-dpi-Render geprüft —, und die Glyphenbilanz geht auf. Ein Mangel des Rätsels, nicht der Lesung.</dd></div>
+        <div><dt>Konsequenz</dt><dd>Für die Leser folgenlos: keine der vier Zellen ist eine der sieben grauen Antwortzellen, beide Lösungen geben denselben Code. Der Solver beantwortet deshalb zusätzlich die Frage, die hier zählt — ob <em>jede</em> Lösung dieselben grauen Zellen trägt. Das ist exakt und billig zu entscheiden: eine abweichende Lösung existiert genau dann, wenn sich eine graue Zelle auf einen anderen Wert zwingen lässt und das Rätsel noch löst.</dd></div>
+      </dl>
+    </div>
+  </article>
+
+  <article class="entry">
+    <div class="rail"><span class="tag">WIDE-04</span><span class="chip chip-ok">gelöst</span></div>
+    <div>
+      <h3>Der Preiscode als Beweis, und ein Testfall am falschen Punkt</h3>
+      <dl>
+        <div><dt>Abnahme</dt><dd>Für beide Rätsel gibt es kein gedrucktes Lösungsgitter, nur den zwei Hefte später angekündigten Code: <code>LVC4ZM1</code> (10/2007) und <code>HKCEAO</code> (10/2008). Sieben bzw. sechs bestimmte Zellen aus 1296 bzw. 625 zufällig zu treffen ist ausgeschlossen — der Code bestätigt Transkription, Regelmodell und Solver in einem. Dieselbe Logik nimmt die Hexadokus vor 11/2007 ab.</dd></div>
+        <div><dt>Falle</dt><dd>Ein Test punchte die Hälfte eines Zufallsgitters heraus und ließ lösen — und lief nicht zurück. Nicht der Kern: das Vervollständigen eines <em>zufällig</em> gelöcherten Gitters ist bei halber Füllung am schwersten, und in dieser Größe ist das eine Wand. Mit 550 von 1296 leeren Zellen sind es 6 Verzweigungen, mit 600 schon 206 696, bei 648 kommt die Suche nicht zurück. Ein gedrucktes Rätsel sieht so nicht aus — beide echten fallen fast ohne Verzweigung.</dd></div>
+        <div><dt>Nebenbefund</dt><dd>Beim AlphaSudoku dreht die Zusatzregel das Vorzeichen um: Sie macht das Lösen leicht (81 Zellen verlieren zwei Drittel ihrer Kandidaten, das Rätsel fällt ohne jede Verzweigung), aber ein zufälliges Vollgitter zu <em>erfinden</em> gelingt nicht mehr — die neun Blöcke brauchen jeweils alle Ziffern, und ein gieriges Zufallsfüllen läuft sich fest. Beim 36×36 dauert dasselbe 15 ms.</dd></div>
+      </dl>
+    </div>
+  </article>
+
+  <article class="entry">
+    <div class="rail"><span class="tag">WIDE-05</span><span class="chip chip-ok">gelöst</span></div>
+    <div>
+      <h3>Ein Heft, das gar nicht fehlte</h3>
+      <dl>
+        <div><dt>Ausgangslage</dt><dd>Der Alphanumski-Artikel von 2007 nennt beiläufig einen Vorgänger: ein „Alphadoku“ von 25×25 Zellen in der Doppelausgabe 7-8/2006. Die Sammlung <code>ElektorMagazine</code> hat für 2006 aber nur 01–06 und 09–12, und eine englische 7-8/2006 existiert dort nicht. Der Eintrag stand deshalb lange als „reicht das Archiv nicht zurück“.</dd></div>
+        <div><dt>Fund</dt><dd>Die <em>niederländische</em> Ausgabe liegt als eigenes archive.org-Item, <code>elektuur-513-2006-7-8</code> — derselbe Weg, den schon 4/2006, 6/2011 und 12/2014 gegangen sind. Anders als die gescannten Jahrgänge von 2006 ist sie born-digital: Distiller aus QuarkXPress, jede Vorgabe ein Textglyph. Das Rätsel heißt dort <em>Alfadoku</em>, stammt von einem Leser (S. Jobse) und läuft über die 25 Buchstaben A bis Y, ohne jede Ziffer und ohne Zusatzregel.</dd></div>
+        <div><dt>Anpassung</dt><dd>Im Solver eine Zeile — der breite Kern konnte das längst. Im Extraktor eine echte: Er nahm an, die Spalten verteilten sich gleichmäßig auf die Seiten (36 = 18 + 18). Das Alfadoku ist 16 + 9, also trägt eine Variante jetzt die Spaltenzahl <em>je Seite</em>. Gegenprobe: Alphanumski und AlphaSudoku kommen danach byteweise unverändert heraus.</dd></div>
+      </dl>
+    </div>
+  </article>
+
+  <article class="entry">
+    <div class="rail"><span class="tag">WIDE-06</span><span class="chip chip-neutral">Befund</span></div>
+    <div>
+      <h3>Die Leser hatten unrecht, und die Redaktion auch</h3>
+      <dl>
+        <div><dt>Vorgeschichte</dt><dd>Elektuur druckte im Oktober 2006 Leserbriefe zum Alfadoku: Einer kam nach Wochen nicht weiter und hielt es für unlösbar oder mehrdeutig, sein Programm meldete gar keine Lösung. Ein anderer schrieb in Excel einen Löser, der Sudokus und Hexadokus schafft, aber „bij de Alfadoku blijft het programma hangen omdat het geen eenduidige oplossing kan vinden“. Die Redaktion schloss mehrere Lösungen ausdrücklich nicht aus und erklärte nur eine für gültig: <code>IDRFBV</code>.</dd></div>
+        <div><dt>Befund</dt><dd>Die Lösung ist <b>eindeutig</b>, und die sechs roten Zellen ergeben genau diesen Code. Was die Programme von 2006 aufhielt, war nicht Mehrdeutigkeit, sondern Schwierigkeit: <b>454 055 Verzweigungen</b>, rund fünf Sekunden. Das ist mit weitem Abstand das schwerste Rätsel dieses Archivs — die 108 Hexadokus liegen bei null bis wenigen hundert, das AlphaSudoku fällt ohne eine einzige Verzweigung, der Alphanumski braucht eine.</dd></div>
+        <div><dt>Nebenwirkung</dt><dd>Der Eindeutigkeitsbeweis kostet gut eine Minute und ist damit der langsamste Test im Projekt. Er bleibt trotzdem drin, denn er ist die Aussage — <code>go test -short</code> überspringt ihn.</dd></div>
+      </dl>
+    </div>
+  </article>
+  <article class="entry">
+    <div class="rail"><span class="tag">WIDE-07</span><span class="chip chip-ok">gelöst</span></div>
+    <div>
+      <h3>Nicht zweimal suchen, nicht alles ansehen</h3>
+      <dl>
+        <div><dt>Profil</dt><dd>Zwei Rätsel trugen fast die ganze Laufzeit des Archivs: der Eindeutigkeitsbeweis des Hexamurai 2011 (46–59 s) und das Alfadoku (10–25 s). Das CPU-Profil war eindeutig — 97 % in <code>propagate</code>, davon die Hälfte in <code>cand</code>; Kopieren des Boards, MRV, Zuweisung zusammen unter 3 %. Und <code>-unique</code> lief denselben Baum zweimal ab: einmal <code>solve</code>, einmal <code>count</code>, je 22 s.</dd></div>
+        <div><dt>Zwei Eingriffe</dt><dd><code>count</code> gibt die erste gefundene Lösung zurück, damit der Beweis die Lösung nebenbei liefert und niemand vorher suchen muss. Und <code>propagate</code> sieht nur noch Units an, in denen sich etwas geändert haben kann: eine Zuweisung berührt genau die Units der Zellen, die eine Unit mit ihr teilen — je Zelle vorberechnet als Bitmenge, die <code>assign</code> mit fünf ORs in die Dirty-Menge des Boards mischt. Beim Hexamurai sind das 48 von 176 Units statt aller 176 plus 768 Zellen, mehrfach je Knoten.</dd></div>
+        <div><dt>Beweis</dt><dd>Naked und Hidden Singles sind monoton, ihr kleinster Fixpunkt ist eindeutig — also müssen exakt dieselben Suchbäume herauskommen. Der Test hält die alte Propagation als Orakel daneben und vergleicht auf allen 112 Rätseln des Archivs die Zahl der Verzweigungen: identisch, bis hin zu den 3 364 151 des Hexamurai und den 454 055 des Alfadoku.</dd></div>
+        <div><dt>Ergebnis</dt><dd>Best-of-3: <code>-unique</code> Hexamurai 2011 <b>46–59 s → 10,4 s</b>, Alfadoku <b>10–25 s → 4,1 s</b>, die ganze Validierung <b>55 s → 17 s</b>. Nicht geholfen haben <code>GOAMD64=v3</code> (+13 %) und PGO (+38 %, beides langsamer) — und, wie in WIDE-04 gemessen, Multithreading.</dd></div>
       </dl>
     </div>
   </article>

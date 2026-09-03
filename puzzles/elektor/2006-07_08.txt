@@ -1,0 +1,66 @@
+# Elektor Alfadoku 2006-07_08 (Elektuur 513, 7-8/2006, p. 140-141), 267 clues
+# read from the PDF text layer by cmd/alphaextract (exact, not OCR):
+#   alphaextract -variant alfadoku -page 131 -page2 132 Elektuur2006-07_08.pdf
+#
+# The predecessor the 2007 Alphanumski article names. Only the Dutch
+# edition of this double issue is on archive.org (item elektuur-513-2006-7-8);
+# the English one is missing there, as it is for 4/2006.
+#
+# Puzzle designed by a reader, S. Jobse - not by Claude Ghyselen and not
+# by Gery Szcepanski, which makes it the odd one out of the whole series.
+# The rules are stated in full on the page: "De Alfadoku werkt met alle
+# letters van het alfabet, met uitzondering van de Z, dus A t/m Y." A
+# 25x25 grid in which every letter A-Y appears once in each row, each
+# column and each 5x5 box. No digits, no extra rule - the plainest of the
+# three wide layouts, and unusual only in its alphabet.
+#
+# The grid is printed across the double page, but not halved evenly: 16
+# columns on the left page and 9 on the right.
+#
+# It is the hardest puzzle in this archive by a wide margin. Where the
+# AlphaSudoku falls to propagation alone and the Alphanumski takes one
+# branch, this one needs about 450000 branch nodes - and that is what the
+# readers ran into. Elektuur printed their letters in 10/2006: one had
+# given up after weeks and suspected several solutions, another had
+# written a program that solves sudokus and hexadokus but "blijft hangen
+# omdat het geen eenduidige oplossing kan vinden". The editors hedged:
+#
+#   We sluiten dat niet helemaal uit; bij zo'n grote puzzel bestaat
+#   inderdaad de kans dat er meer dan een oplossingsmogelijkheid is en
+#   een computerprogramma kan daar behoorlijk op vastlopen. ... Daarom
+#   rekenen we maar een oplossing goed en dat is: IDRFBV.
+#
+# The hedge was unnecessary. The solution is unique, and the six red
+# answer cells give exactly the code they announced. The programs of 2006
+# did not hang on ambiguity but on difficulty.
+#
+# The answer cells are printed red here rather than grey; the header
+# keyword stays "grey", as everywhere else in this archive.
+# variant: alfadoku
+# grey: r15c7-c12
+# code: IDRFBV
+TEH.R....X...I..VGJ...LY.
+.DPA....WS......UO.H.I.F.
+......VYT.O..BQMC.S..U...
+..XK.B....SHF.E.I...O.MR.
+...OMGA.F..R.VT.L.....BH.
+D.EHP....K.B..NLA...I....
+..L.....XT.S...YFNGE.QU.A
+.V.B.....A.JKL.U....DTY.P
+.S.F.IO..G.MA..R.C.......
+.K..XC.R.UDO..G....TLBE..
+......TSY...XFC.NL....J.R
+...S..W.OPM...JK.UF.Q..V.
+F.T.GJCA....SU....VY..P..
+B.....Q....LND..R.A..C.XM
+EHKLAX......P..S.M..N.W..
+.PS..EL....Y.G.C...BW...K
+..M..VUB..I..C.D.ENKG....
+.C.IT.R.QOW......J..SV.P.
+HX..L..N..FKRT..S......EI
+....J..CI....NDA..WG.OR.T
+VJY...SF...NG.H..RT.....E
+XQ.N.Y..C.K...VEB.IS.....
+...CF....IR.D.L.X..N.W.UJ
+L....W.MP.Y.E..H...A...ON
+R......OBH.....J...CKDT.S

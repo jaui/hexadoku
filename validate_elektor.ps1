@@ -4,6 +4,16 @@
 #     Where that grid was too OCR-damaged to use for reconstruction, the
 #     comparison still works as evidence: agreement far above chance
 #     confirms both sides, and the few differing cells are the OCR slips.
+#
+# Deliberately sequential. Checking the puzzles side by side was tried and
+# taken out again: most of a run sits in the uniqueness proof of the 2011
+# hexamurai alone and most of the rest in the alfadoku, while the other
+# 106 puzzles together need about four seconds. Best of three runs on
+# twelve cores was 57.0 s sequential against 48.7 s parallel - a factor
+# of 1.17, with a run-to-run spread nearly as large as the gain, and not
+# worth the runspace machinery. What did help was the solver: -unique now
+# searches the tree once instead of twice, and propagation looks only at
+# units an assignment touched - a full run went from 55 s to 17 s.
 param([string]$Dir = "puzzles\elektor")
 
 function Get-GridLines([string]$path) {
@@ -48,10 +58,41 @@ foreach ($p in $puzzles) {
         $special++
         continue
     }
+    # The wide layouts of the summer double issues 7-8/2006, 7-8/2007 and
+    # 7-8/2008: 25 and 36 values, so a solver core of their own, and no
+    # printed solution grid anywhere to compare against. What settles them
+    # is the code the magazine announced for the grey answer cells, and
+    # the solver checks that itself - it knows the alphabet, and the codes
+    # are six and seven characters over it rather than five hex digits, so
+    # the claim regex further down cannot read them.
+    if ($raw -match '(?m)^\s*#\s*variant:\s*(alphanumski|alphasudoku|alfadoku|alphadoku)') {
+        $layout = $Matches[1]
+        $u = .\hexadoku.exe -unique $p.FullName 2>$null
+        $hit = $u | Select-String 'grey cells .* give (\S+), the code the magazine announced'
+        if (-not $hit) {
+            Write-Host "FAIL $key : $layout does not reproduce the announced code"
+            $fail++; continue
+        }
+        $code = $hit.Matches[0].Groups[1].Value
+        if ($u | Select-String 'solution is unique') {
+            Write-Host "PASS $key ($layout, uniquely solvable; the grey cells give $code, the code the magazine announced)"
+            $pass++; continue
+        }
+        # The Alphanumski has two solutions as printed. They differ in
+        # four cells, none of them grey, so the answer is still the one
+        # Elektor announced - which is what the solver reports here.
+        if ($u | Select-String 'grey cells are the same in every solution') {
+            Write-Host "PASS $key ($layout, more than one solution as printed, but every one gives $code in the grey cells - the code the magazine announced)"
+            $pass++; continue
+        }
+        Write-Host "FAIL $key : $layout leaves the grey cells ambiguous"
+        $fail++; continue
+    }
+
     # More than one grid on a wide raster - hexamurai, hexadocube, penta.
     # There is no printed solution grid to compare against, so uniqueness
     # is the whole check: a wrong arrangement would not be uniquely
-    # solvable. (The 2011 hexamurai needs a couple of minutes for the
+    # solvable. (The 2011 hexamurai needs some ten seconds for the
     # proof.) The test is the cell count the solver itself goes by, not
     # the word "hexamurai" appearing somewhere in the header - 2009-10 is
     # a plain hexadoku whose comment only mentions the hexamurai printed

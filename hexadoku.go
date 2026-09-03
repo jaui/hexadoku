@@ -105,7 +105,7 @@ func generate(n int, rng *rand.Rand) (*board, uint64) {
 	for _, k := range order {
 		keep[k] = false
 		check := boardFromClues(full, &keep)
-		if countSolutions(check, 2) != 1 {
+		if countSolutions(check, 2, nil) != 1 {
 			keep[k] = true
 		}
 	}
@@ -359,6 +359,13 @@ const defaultPuzzle = "E......A...6.F8..65...E.18.F.0.A3.7B..65.D...2..8....." +
 var compact bool // -compact: print only the solution in compact form
 
 func run(name, text string, bench int, checkUnique bool) bool {
+	// alphanumski or alphasudoku? Their alphabets do not fit a uint16, so
+	// they have a core of their own; the cell count cannot detect them
+	// (countTokens knows only 0-9A-F), the header names them.
+	if wv := wideVariantForText(text); wv != nil {
+		return runWide(name, wv, text, bench, checkUnique)
+	}
+
 	// samurai, cube or penta layout? (named in a "# variant:" header or
 	// detected by its total cell count; the cells sit on a character
 	// raster, so it needs the geometry-driven core)
@@ -395,10 +402,23 @@ func run(name, text string, bench int, checkUnique bool) bool {
 		fmt.Printf("=== %s (%dx%d, %d clues)\n%s\n", name, size, size, ncells-int(b.free), b)
 	}
 
+	// With -unique the tree is searched once: the proof that no second
+	// solution exists finds the first one on its way, so there is no
+	// separate solve before it. The branch-node count reported is then
+	// the proof's, which covers the whole tree rather than the part up to
+	// the first solution.
 	nodes = 0
 	work := *b
 	start := time.Now()
-	ok := solve(&work)
+	var ok bool
+	nsol := 0
+	if checkUnique {
+		check := *b
+		nsol = countSolutions(&check, 2, &work)
+		ok = nsol > 0
+	} else {
+		ok = solve(&work)
+	}
 	elapsed := time.Since(start)
 
 	if !ok {
@@ -412,8 +432,7 @@ func run(name, text string, bench int, checkUnique bool) bool {
 	fmt.Printf("%s\nsolved in %v, %d branch nodes\n", &work, elapsed, nodes)
 
 	if checkUnique {
-		check := *b
-		if n := countSolutions(&check, 2); n > 1 {
+		if nsol > 1 {
 			fmt.Println("warning: solution is not unique")
 		} else {
 			fmt.Println("solution is unique")

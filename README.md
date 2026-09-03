@@ -3,8 +3,10 @@ hexadoku
 
 Hexadoku (16x16 Sudoku) solver in Go — solves classic 9x9 Sudoku, the
 five-grid samurai layouts of both sizes (Elektor's *Hexamurai*), the six
-grids on the faces of Elektor's *Hexadocube*, and the chequerboard rule of
-its *EUC Penta-Hexadoku* as well.
+grids on the faces of Elektor's *Hexadocube*, the chequerboard rule of its
+*EUC Penta-Hexadoku*, and the three summer puzzles whose alphabet is
+wider than a hexadoku's — the 36x36 *Alphanumski* and the two 25x25 grids,
+*AlphaSudoku* and *Alfadoku*.
 Hexadokus were published as reader puzzles in the Elektor magazine:
 each row, column and 4x4 box must contain the hex digits 0-F exactly once.
 
@@ -25,9 +27,9 @@ one drawn from the very files in `puzzles/` that the solver reads:
 from the printed net to the cube), [`penta-hexadoku.html`](docs/penta-hexadoku.html)
 (the chequerboard rule), [`digest.html`](docs/digest.html) (the sixteen
 prize codes and where they land) and
-[`fremdformate.html`](docs/fremdformate.html) (the 36x36 Alphanumski and
-the 25x25 AlphaSudoku, both out of reach). [`docs/index.html`](docs/index.html)
-links them all.
+[`fremdformate.html`](docs/fremdformate.html) (the Alfadoku, Alphanumski
+and AlphaSudoku, and the second solver core their alphabets needed).
+[`docs/index.html`](docs/index.html) links them all.
 
 [`docs/suchbaum.html`](docs/suchbaum.html) (German) steps through the
 search interactively: candidates per cell, which cell falls as a naked
@@ -120,10 +122,22 @@ which is what makes the redundancy of the 2011 middle grid visible.
 Propagation crosses the seams by itself — there is no special case for
 the overlaps anywhere in the solver.
 
-The general core costs about 17% over the specialized 16x16 core on a
-plain hexadoku (`go test -bench Cores`), which is why the single-grid
-sizes keep theirs. `go test` cross-checks the two cores against each
-other on all 54 reconstructed Elektor puzzles.
+The general core used to cost about 17% over the specialized 16x16 core
+on a plain hexadoku. It no longer does: propagation looks only at units
+an assignment can have changed - every cell carries the set of units
+whose picture it touches, precomputed as a bitmask, and `assign` ORs it
+into the board's dirty set - so a node no longer sweeps every cell and
+every unit several times over. On the built-in puzzle the general core
+now runs at 26 µs against the specialized core's 28 µs. Naked and hidden
+singles are monotone, so the fixpoint is the same one the full sweep
+reached; `propagate_test.go` keeps that sweep as an oracle and checks
+every puzzle in the archive for identical branch-node counts. On the
+2011 hexamurai, whose uniqueness proof is the longest search here, it
+halved the time; the other half went to `-unique` searching the tree
+once instead of twice, because `count` now hands back the first solution
+it finds (46-59 s down to 10 s). The specialized cores in `solver.go`
+stay as they are: they are the reference, and `go test` cross-checks the
+general core against them on all 102 reconstructed Elektor hexadokus.
 
 Samurai puzzles are recognized by their cell count and are written on a
 character raster — one line per row, blanks where no grid covers the
@@ -150,6 +164,10 @@ breaking a rule.
     muraiextract.exe -pdftotext <poppler>\pdftotext.exe -page 124 ^
                      -solver hexadoku.exe -o puzzles\elektor\2009-07_08.txt ^
                      elektor_pdfs\Elektornonlinear.ir2009-07_08.pdf
+
+Reading the glyphs and fitting the lattice are shared with
+`cmd/alphaextract`, which does the same for the two wide puzzles below;
+both live in `internal/pdftext`.
 
 Hexadocube
 ----------
@@ -293,6 +311,114 @@ Three things confirm the result:
     # block: r2c8-c12
     ...
 
+Alfadoku, Alphanumski and AlphaSudoku
+------------------------------------
+
+Three summer double issues printed puzzles whose geometry is the plainest
+of the whole series — rows, columns and boxes of a single grid — and
+which were still out of reach for a long time. What stood in the way was
+the alphabet, not the layout.
+
+**Alfadoku** (Elektuur 513, 7-8/2006) is the earliest and the only one
+designed by a *reader*, S. Jobse: one 25x25 grid in 5x5 boxes over the 25
+letters `A` to `Y` — "alle letters van het alfabet, met uitzondering van
+de Z" — with no digits and no extra rule at all. Only the Dutch edition
+of that issue is on archive.org (item `elektuur-513-2006-7-8`); unlike
+the scanned 2006 volumes it is born-digital, so its clues are text
+glyphs. The grid spans the double page unevenly: 16 columns left, 9
+right.
+
+**Alphanumski** (7-8/2007, by Gery Szcepanski, the one puzzle of the
+series not by Claude Ghyselen) is one 36x36 grid in 6x6 boxes over the 36
+characters `0-9` and `A-Z`, printed across a double page, 18 columns on
+each side. The chequerboard of its boxes is decoration, not a rule.
+
+**AlphaSudoku** (7-8/2008, Ghyselen's first for Elektor) is one 25x25
+grid in 5x5 boxes over 25 symbols — the digits `1-9` and the letters
+`A-P`, "including the letter 'O', hence the absence of the '0' in the
+numbers" — plus one extra rule:
+
+> The puzzle is essentially a (16x16) Alphadoku comprising nine classic
+> (9x9) Sudokus using numbers 1 through 9. … The nine embedded Sudokus
+> have a background colour.
+
+Measured off the page, the shading covers nine 3x3 blocks, one in the
+middle of each of the nine middle 5x5 boxes (rows and columns 7-9, 12-14,
+17-19). Every clue standing in one is a digit. That makes two additions:
+a shaded cell takes a digit and no letter, which is the same per-cell
+`allow` mask the penta-hexadoku uses for its chequerboard; and each block
+holds 1-9 once, which is nine more units — of *nine cells over nine
+values*, where every other unit of this puzzle has twenty-five of each.
+The rows and columns of the embedded sudoku need no units of their own: a
+shaded row crosses three blocks, so nine of its cells take digits only,
+and the 25-cell row already holds each digit exactly once.
+
+A candidate set is a bitmask, one bit per value, and the whole hot path
+depends on that, so 36 values are a different data type rather than a new
+layout. `alpha.go` therefore carries the same search over `uint64` masks
+with one real generalization — a unit knows its own size and its own
+value set, which is what the nine blocks need. The 9/16 cores in
+`solver.go` and the `uint16` core in `general.go` are untouched. The cell
+count cannot recognize either puzzle (`countTokens` knows only `0-9A-F`),
+so a file names its layout, and the same binary solves it:
+
+    # variant: alphasudoku
+    # grey: r20c6-c11
+    # code: HKCEAO
+
+None of the three issues ever printed a solution grid, only the code for
+the answer cells two issues later — `IDRFBV` in 10/2006, `LVC4ZM1` in
+10/2007 and `HKCEAO` in 10/2008. Six or seven named cells out of 625 or
+1296 cannot agree by accident, so reproducing the code confirms the
+transcription, the rule model and the solver at once; the solver checks
+the claim itself, because it is the part that knows the alphabet. The
+AlphaSudoku falls to propagation **without a single branch**.
+
+The Alfadoku is the opposite, and the hardest puzzle in this archive by a
+wide margin: **454055 branch nodes**, about five seconds. That is what
+readers ran into in 2006. Elektuur printed their letters in 10/2006 — one
+had given up after weeks and suspected several solutions, another had
+written a program that solves sudokus and hexadokus but "blijft hangen
+omdat het geen eenduidige oplossing kan vinden" — and the editors hedged
+that with such a large puzzle they could not rule out more than one
+solution. They needn't have: it is uniquely solvable, and the six red
+cells give exactly the `IDRFBV` they announced. The programs of 2006 hung
+on difficulty, not on ambiguity.
+
+The Alphanumski, as printed, has **two solutions**. They differ in four
+cells forming a rectangle — r26c4, r26c33, r29c4, r29c33 — around which
+`9` and `X` can be swapped. All four are blank on the page (checked
+against the render at 300 dpi) and 820 of the 824 glyphs on the two pages
+are clues, so this is a flaw of the puzzle, not of the reading. It never
+mattered: none of the four is a grey cell, so both solutions give the
+same code, and `-unique` reports exactly that.
+
+    hexadoku.exe -unique puzzles\elektor\2006-07_08.txt
+    hexadoku.exe -unique puzzles\elektor\2008-07_08.txt
+    hexadoku.exe -unique puzzles\elektor\2007-07_08.txt
+
+**`cmd/alphaextract`** reads all three out of the PDF text layer, exactly
+as `muraiextract` does for the Hexamurai, on the shared lattice fit in
+`internal/pdftext`. A puzzle printed across a double page needs one fit
+per page, joined left to right, and the halves need not be equal:
+
+    go build -o alphaextract.exe ./cmd/alphaextract
+    alphaextract.exe -pdftotext <poppler>\pdftotext.exe -variant alphasudoku ^
+                     -page 118 -o puzzles\elektor\2008-07_08.txt ^
+                     elektor_pdfs\Elektornonlinear.ir2008-07_08.pdf
+    alphaextract.exe -pdftotext <poppler>\pdftotext.exe -variant alphanumski ^
+                     -page 140 -page2 141 -o puzzles\elektor\2007-07_08.txt ^
+                     elektor_pdfs\Elektornonlinear.ir2007-07_08.pdf
+    alphaextract.exe -pdftotext <poppler>\pdftotext.exe -variant alfadoku ^
+                     -page 131 -page2 132 -o puzzles\elektor\2006-07_08.txt ^
+                     elektor_pdfs\Elektuur2006-07_08.pdf
+
+Note that `-gen` does not produce these. For the AlphaSudoku a random
+full grid cannot even be built: the 81 shaded cells are locked to nine of
+the twenty-five values and the nine blocks each need all nine digits, so
+a greedy random fill keeps painting itself into a corner. The rule that
+makes the puzzle easy to solve makes a grid hard to invent.
+
 Build
 -----
 
@@ -335,6 +461,12 @@ Puzzle file format (auto-detected):
   `hexa-samurai`, `penta-hexadoku`, `hexadocube`, `digest`)
 - `digest` additionally reads `# codes:` and `# block: r<row>c<a>-c<b>`
   lines from the same header
+- `alphanumski` (36 lines of 36 characters over `0-9A-Z`),
+  `alphasudoku` (25 over `1-9A-P`) and `alfadoku` (25 over `A-Y`) *must*
+  be named in the header — their alphabets are wider than the cell
+  counter understands. They also read
+  `# grey: r<row>c<a>-c<b>` for the answer cells (repeatable) and an
+  optional `# code:` claim, which the solver verifies against them
 
 The generator (`-gen`) produces *minimal* puzzles: clues are removed in
 random order while the solution stays unique, so in the result removing
@@ -432,9 +564,11 @@ provably correct whenever the remainder is uniquely solvable.
 
 Validation is end-to-end (`validate_elektor.ps1`): every reconstructed
 puzzle must be uniquely solvable *and* its solution must equal a
-solution actually printed in some issue. Current state over 110 PDFs:
-**67 verified against a printed solution, 15 uniquely solvable but
-without one to compare to, 4 documented special formats.**
+solution actually printed in some issue — or, where none was ever
+printed, the prize code the magazine announced for the grey answer cells.
+Current state over 110 PDFs: **85 verified, 22 uniquely solvable but
+without anything to compare to, 0 failures, 2 documented special
+formats.**
 
 Uniqueness alone is not enough to trust a reconstruction. A faint
 printed *solution* grid can lose enough cells to the ink probe to pose as
@@ -448,8 +582,9 @@ is documented as such in `puzzles/elektor/<issue>.txt`:
 
 | issue | what it prints |
 | --- | --- |
-| 7-8/2007 | *Alphanumski*, overlapping grids over a much larger symbol set |
-| 7-8/2008 | *AlphaSudoku*, 25x25 |
+| 7-8/2006 | *Alfadoku*, one 25x25 grid over the letters A-Y (solved, see above) |
+| 7-8/2007 | *Alphanumski*, one 36x36 grid over 36 symbols (solved, see above) |
+| 7-8/2008 | *AlphaSudoku*, 25x25 over 25 symbols (solved, see above) |
 | 7-8/2009 | *Hexamurai*, five grids in a pinwheel (solved, see above) |
 | 7-8/2010 | *Hexadocube*, six grids on the faces of an unfolded cube |
 | 7-8/2011 | *Hexamurai*, five grids in a plus (solved, see above) |

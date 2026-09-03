@@ -189,21 +189,22 @@ func (v *variant) solveAssign(g *gboard, done, used uint16) bool {
 }
 
 // countAssign is the same search, counting solutions up to limit.
-func (v *variant) countAssign(g *gboard, limit int, done, used uint16) int {
+func (v *variant) countAssign(g *gboard, limit int, done, used uint16, first *gboard) int {
 	if !v.propagate(g) {
 		return 0
 	}
 	b, fits, ok := v.nextBlock(g, done, used)
 	if !ok {
-		return v.count(g, limit)
+		return v.count(g, limit, first)
 	}
 	save := *g
 	n := 0
 	for fits != 0 && n < limit {
 		c := bits.TrailingZeros16(fits)
 		fits &= fits - 1
+		nodes++
 		if v.placeCode(g, b, c) {
-			n += v.countAssign(g, limit-n, done|1<<b, used|1<<c)
+			n += v.countAssign(g, limit-n, done|1<<b, used|1<<c, first)
 		}
 		*g = save
 	}
@@ -250,9 +251,9 @@ func (v *variant) solveWith(g *gboard) bool {
 	return v.solveAssign(g, 0, 0)
 }
 
-func (v *variant) countWith(g *gboard, limit int) int {
+func (v *variant) countWith(g *gboard, limit int, first *gboard) int {
 	if len(v.blocks) == 0 {
-		return v.count(g, limit)
+		return v.count(g, limit, first)
 	}
-	return v.countAssign(g, limit, 0, 0)
+	return v.countAssign(g, limit, 0, 0, first)
 }

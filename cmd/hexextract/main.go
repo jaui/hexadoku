@@ -1350,6 +1350,7 @@ func chain(outDir, solver string) error {
 			for _, marker := range []string{
 				"transcribed visually",    // read by eye and checked
 				"muraiextract",            // one of the hexamurai
+				"alphaextract",            // the alphanumski or the alphasudoku
 				"not a standalone puzzle", // a documented special format
 			} {
 				if strings.Contains(string(b), marker) {

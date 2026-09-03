@@ -21,12 +21,43 @@ type gboard struct {
 	placed [maxUnits]uint16 // values already used per unit
 	grid   [maxGCells]uint8
 	free   int16 // number of empty cells
+
+	// units that may hold a single propagate has not seen yet. A fresh
+	// board has every unit dirty; assign adds the units an assignment
+	// can affect; propagate clears what it examines and stops when
+	// nothing is left.
+	dirty dirtySet
+}
+
+// dirtySet is a bitset over units, sized for the largest layout.
+type dirtySet [(maxUnits + 63) / 64]uint64
+
+func (d *dirtySet) set(u int) { d[u>>6] |= 1 << (u & 63) }
+
+func (d *dirtySet) or(o *dirtySet) {
+	for i := range d {
+		d[i] |= o[i]
+	}
+}
+
+// pop removes and returns the lowest dirty unit, or -1.
+func (d *dirtySet) pop() int {
+	for i := range d {
+		if w := d[i]; w != 0 {
+			d[i] = w & (w - 1)
+			return i<<6 + bits.TrailingZeros64(w)
+		}
+	}
+	return -1
 }
 
 func (v *variant) newBoard() *gboard {
 	g := &gboard{free: int16(v.ncells)}
 	for i := range g.grid {
 		g.grid[i] = empty
+	}
+	for u := 0; u < v.nunits; u++ {
+		g.dirty.set(u)
 	}
 	return g
 }
@@ -51,59 +82,77 @@ func (v *variant) assign(g *gboard, k int, val uint8) {
 	g.placed[u[4]] |= m
 	g.placed[u[5]] |= m
 	g.free--
+	g.dirty.or(&v.touch[k])
 }
 
+// propagate runs naked and hidden singles to a fixpoint, looking only at
+// units something has happened to.
+//
+// Both rules are monotone - a candidate, once gone, never returns - so
+// their least fixpoint is unique and the order of applying them cannot
+// matter. What matters is not to miss one, and that is what the dirty set
+// guarantees: a unit's picture can only change through an assignment to
+// a cell that shares a unit with one of its cells, and assign marks
+// exactly those units. A unit that is not dirty has not changed since it
+// was last examined and cannot hold a single. So every board that leaves
+// here is the same board the full sweep would have produced - the test
+// in propagate_test.go holds the two against each other, branch node for
+// branch node, over every puzzle in the archive.
+//
+// Naked singles are found on the way: every cell lies in a unit, and the
+// unit pass computes each empty cell's candidates anyway, so the separate
+// sweep over all cells the old version began with is gone as well.
+//
+// For the 2011 hexamurai an assignment touches some 48 of the 176 units -
+// the ones of its own grid and the shared strip - where the sweep would
+// have visited all 176 plus 768 cells, several times per node. Measured,
+// best of three: its uniqueness proof fell from 22.3 s to 10.4 s, and with
+// the proof no longer preceded by a separate solve (see count) a
+// hexadoku.exe -unique on it went from 46-59 s to 10 s. The alfadoku, one
+// grid where nearly every unit meets every other, gains a third.
 func (v *variant) propagate(g *gboard) bool {
 	for {
-		changed := false
-		for k := 0; k < v.ncells; k++ {
+		u := g.dirty.pop()
+		if u < 0 {
+			return true
+		}
+		cells := v.unitCells[u][:v.nvals]
+		var once, twice uint16
+		for _, k := range cells {
 			if g.grid[k] != empty {
 				continue
 			}
-			m := v.cand(g, k)
+			m := v.cand(g, int(k))
 			if m == 0 {
 				return false
 			}
 			if m&(m-1) == 0 { // naked single
-				v.assign(g, k, uint8(bits.TrailingZeros16(m)))
-				changed = true
-			}
-		}
-		for u := 0; u < v.nunits; u++ {
-			cells := v.unitCells[u][:v.nvals]
-			var once, twice uint16
-			for _, k := range cells {
-				if g.grid[k] == empty {
-					m := v.cand(g, int(k))
-					twice |= once & m
-					once |= m
-				}
-			}
-			if once|g.placed[u] != v.all {
-				return false // a value has nowhere left to go in this unit
-			}
-			unique := once &^ twice // hidden singles
-			if unique == 0 {
+				v.assign(g, int(k), uint8(bits.TrailingZeros16(m)))
 				continue
 			}
-			for _, k := range cells {
-				if g.grid[k] != empty {
-					continue
-				}
-				m := v.cand(g, int(k)) & unique
-				if m == 0 {
-					continue
-				}
-				if m&(m-1) != 0 {
-					return false // one cell is the only place for two values
-				}
-				v.assign(g, int(k), uint8(bits.TrailingZeros16(m)))
-				changed = true
-				unique &^= m
-			}
+			twice |= once & m
+			once |= m
 		}
-		if !changed {
-			return true
+		if once|g.placed[u] != v.all {
+			return false // a value has nowhere left to go in this unit
+		}
+		unique := once &^ twice // hidden singles
+		if unique == 0 {
+			continue
+		}
+		for _, k := range cells {
+			if g.grid[k] != empty {
+				continue
+			}
+			m := v.cand(g, int(k)) & unique
+			if m == 0 {
+				continue
+			}
+			if m&(m-1) != 0 {
+				return false // one cell is the only place for two values
+			}
+			v.assign(g, int(k), uint8(bits.TrailingZeros16(m)))
+			unique &^= m
 		}
 	}
 }
@@ -157,19 +206,27 @@ var (
 
 // countBudget counts solutions but gives up after budget branch nodes.
 // The second result says whether the count is complete.
-func (v *variant) countBudget(g *gboard, limit int, budget int64) (int, bool) {
+func (v *variant) countBudget(g *gboard, limit int, budget int64, first *gboard) (int, bool) {
 	budgetLeft, budgetHit = budget, false
-	n := v.count(g, limit)
+	n := v.count(g, limit, first)
 	hit := budgetHit
 	budgetLeft, budgetHit = -1, false
 	return n, !hit
 }
 
-func (v *variant) count(g *gboard, limit int) int {
+// count counts solutions up to limit. The first one found is left in
+// first, if that is not nil: a uniqueness proof then yields the solution
+// as a by-product, and the runner need not search the tree twice - for
+// the 2011 hexamurai, whose first solution comes only after most of the
+// tree, that is the difference between 22 and 44 seconds.
+func (v *variant) count(g *gboard, limit int, first *gboard) int {
 	if !v.propagate(g) {
 		return 0
 	}
 	if g.free == 0 {
+		if first != nil && first.free != 0 {
+			*first = *g
+		}
 		return 1
 	}
 	k := v.mrv(g)
@@ -186,8 +243,9 @@ func (v *variant) count(g *gboard, limit int) int {
 		}
 		val := uint8(bits.TrailingZeros16(m))
 		m &= m - 1
+		nodes++
 		v.assign(g, k, val)
-		n += v.count(g, limit-n)
+		n += v.count(g, limit-n, first)
 		*g = save
 		if budgetHit {
 			break

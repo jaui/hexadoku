@@ -75,11 +75,14 @@ func solve(b *board) bool {
 	return solve9(b)
 }
 
-func countSolutions(b *board, limit int) int {
+// countSolutions counts solutions up to limit. The first one found is
+// left in first, if that is not nil - a uniqueness proof yields the
+// solution on its way, so nobody has to search the tree twice.
+func countSolutions(b *board, limit int, first *board) int {
 	if size == size16 {
-		return count16(b, limit)
+		return count16(b, limit, first)
 	}
-	return count9(b, limit)
+	return count9(b, limit, first)
 }
 
 func fillRand(b *board, rng *rand.Rand) bool {
@@ -208,11 +211,14 @@ func solve16(b *board) bool {
 	return false
 }
 
-func count16(b *board, limit int) int {
+func count16(b *board, limit int, first *board) int {
 	if !b.propagate16() {
 		return 0
 	}
 	if b.free == 0 {
+		if first != nil && first.free != 0 {
+			*first = *b
+		}
 		return 1
 	}
 	k := b.mrv16()
@@ -222,8 +228,9 @@ func count16(b *board, limit int) int {
 	for m != 0 && n < limit {
 		v := uint8(bits.TrailingZeros16(m))
 		m &= m - 1
+		nodes++
 		b.assign16(k, v)
-		n += count16(b, limit-n)
+		n += count16(b, limit-n, first)
 		*b = save
 	}
 	return n
@@ -376,11 +383,14 @@ func solve9(b *board) bool {
 	return false
 }
 
-func count9(b *board, limit int) int {
+func count9(b *board, limit int, first *board) int {
 	if !b.propagate9() {
 		return 0
 	}
 	if b.free == 0 {
+		if first != nil && first.free != 0 {
+			*first = *b
+		}
 		return 1
 	}
 	k := b.mrv9()
@@ -390,8 +400,9 @@ func count9(b *board, limit int) int {
 	for m != 0 && n < limit {
 		v := uint8(bits.TrailingZeros16(m))
 		m &= m - 1
+		nodes++
 		b.assign9(k, v)
-		n += count9(b, limit-n)
+		n += count9(b, limit-n, first)
 		*b = save
 	}
 	return n

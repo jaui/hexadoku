@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Alphanumski &amp; AlphaSudoku — die Fremdformate</title>
+<title>Die Fremdformate — Alfadoku, Alphanumski, AlphaSudoku</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@500;600;700&family=Source+Serif+4:opsz,wght@8..60,400;8..60,600&family=JetBrains+Mono:wght@400;500;700&display=swap">
@@ -21,7 +21,33 @@
 }
 .alphabet b.wide  { background: color-mix(in srgb, var(--g5) 26%, var(--cell-bg)); }
 .alphabet b.digit { background: color-mix(in srgb, var(--g6) 26%, var(--cell-bg)); }
-.alphabet b.out   { opacity: 0.3; text-decoration: line-through; }
+
+/* the two solutions of the alphanumski, side by side */
+.swap {
+  display: flex; gap: 1.6rem; flex-wrap: wrap;
+  margin: 1rem 0 0; font-family: var(--f-mono); font-size: 0.8rem;
+}
+.swap table { border-collapse: collapse; }
+.swap caption {
+  font-family: var(--f-sans); font-size: 0.68rem; letter-spacing: 0.08em;
+  text-transform: uppercase; color: var(--ink-soft);
+  padding-bottom: 0.35rem; white-space: nowrap;
+}
+.swap th, .swap td {
+  border: 1px solid var(--rule); width: 2.6rem; height: 1.9rem;
+  text-align: center; font-weight: 500;
+}
+.swap th {
+  border: 0; font-family: var(--f-sans); font-size: 0.62rem;
+  color: var(--ink-soft); font-weight: 500; height: 1.2rem;
+}
+.swap td { background: color-mix(in srgb, var(--accent) 22%, var(--cell-bg)); }
+
+.code {
+  font-family: var(--f-mono); font-weight: 700; letter-spacing: 0.14em;
+  background: color-mix(in srgb, var(--ink) 12%, var(--cell-bg));
+  padding: 0.1em 0.4em; border-radius: 2px;
+}
 </style>
 </head>
 <body>
@@ -35,32 +61,162 @@
   <a href="hexadocube.html">Hexadocube</a>
   <a href="penta-hexadoku.html">EUC Penta-Hexadoku</a>
   <a href="digest.html">Hexadoku Digest</a>
-  <a href="fremdformate.html" aria-current="page">Alphanumski &amp; AlphaSudoku</a>
+  <a href="fremdformate.html" aria-current="page">Fremdformate</a>
 </nav>
 
 <header class="masthead">
-  <p class="eyebrow">Spezialrätsel · Elektor 7-8/2007 und 7-8/2008</p>
-  <h1>Alphanumski &amp; AlphaSudoku</h1>
+  <p class="eyebrow">Spezialrätsel · Elektuur 7-8/2006, Elektor 7-8/2007 und 7-8/2008</p>
+  <h1>Die Fremdformate</h1>
   <p class="standfirst">
-    Zwei Doppelausgaben ohne Hexadoku. Beide sind geometrisch harmlos —
-    was sie außer Reichweite bringt, ist nicht das Layout, sondern das
-    Alphabet: 36 und 25 Werte, wo dieser Solver auf 9 oder 16 gebaut ist.
+    Drei Sommerausgaben ohne Hexadoku. Alle drei galten hier lange als
+    außer Reichweite — nicht wegen des Layouts, sondern wegen des
+    Alphabets: 25 und 36 Werte, wo der Kern auf 9 oder 16 gebaut ist.
+    Alle drei sind inzwischen gelesen und gelöst, und jedes gibt den
+    Preiscode zurück, den die Redaktion zwei Hefte später abdruckte.
   </p>
 </header>
 
 <section class="figures">
-  <div class="fig"><b>36×36</b><span>Alphanumski 2007</span></div>
-  <div class="fig"><b>36</b><span>Symbole</span></div>
-  <div class="fig"><b>25×25</b><span>AlphaSudoku 2008</span></div>
-  <div class="fig"><b>25</b><span>Symbole</span></div>
-  <div class="fig"><b>16</b><span>Werte im Solver</span></div>
-  <div class="fig"><b>uint16</b><span>Kandidatenmaske</span></div>
+  <div class="fig"><b>3</b><span>Rätsel</span></div>
+  <div class="fig"><b>1432</b><span>Vorgaben gelesen</span></div>
+  <div class="fig"><b>uint64</b><span>Kandidatenmaske</span></div>
+  <div class="fig"><b>3</b><span>Codes bestätigt</span></div>
+  <div class="fig"><b>454055</b><span>Verzweigungen, Alfadoku</span></div>
+  <div class="fig"><b>0</b><span>Verzweigungen, AlphaSudoku</span></div>
 </section>
 
 <!-- ============ I ============ -->
 <section class="chapter">
   <div class="chapter-head">
     <span class="num">I</span>
+    <h2>Das Alphabet, nicht das Layout</h2>
+    <p>Warum diese beiden einen zweiten Solverkern brauchten, und warum es
+       trotzdem nur eine Datei ist.</p>
+  </div>
+
+  <div class="body">
+    <div class="rail"><span class="chip chip-neutral">Grenze</span></div>
+    <p>
+      Alle übrigen Spezialrätsel dieser Reihe brauchten <em>Geometrie</em>:
+      eine andere Anordnung (<a href="hexamurai.html">Hexamurai</a>), eine
+      Faltung (<a href="hexadocube.html">Hexadocube</a>), eine
+      Zellrestriktion (<a href="penta-hexadoku.html">Penta-Hexadoku</a>),
+      eine Suchebene (<a href="digest.html">Digest</a>). Diese drei
+      brauchen etwas anderes — mehr Werte, als in ein <code>uint16</code>
+      passen: fünfundzwanzig Buchstaben, sechsunddreißig alphanumerische
+      Zeichen, fünfundzwanzig gemischte.
+    </p>
+    <div class="alphabet" id="alnumAlpha"></div>
+    <p style="margin-top:1rem">
+      Der Kandidatensatz einer Zelle ist eine Bitmaske, ein Bit je Wert,
+      und der ganze heiße Pfad hängt daran: <code>OnesCount16</code>,
+      <code>TrailingZeros16</code>, die <code>placed</code>-Maske je Unit.
+      36 Werte hieße, diese Darstellung überall zu verbreitern — und genau
+      dort ist der Kern schnell, wo er auf 16 Werte festgelegt ist.
+    </p>
+    <p>
+      Die Lösung ist deshalb kein Umbau, sondern eine zweite Datei:
+      <code>alpha.go</code> trägt denselben Suchalgorithmus über
+      <code>uint64</code>-Masken, mit einer einzigen echten
+      Verallgemeinerung — eine Unit kennt ihre eigene Größe und ihre eigene
+      Wertemenge. Das braucht das AlphaSudoku (Kapitel III), und es kostet
+      den 16er-Kern nichts, weil er unberührt bleibt. Dieselbe Binary
+      erkennt beide an einer Kopfzeile:
+    </p>
+    <pre><code># variant: alphasudoku
+# grey: r20c6-c11
+# code: HKCEAO</code></pre>
+    <div class="note">
+      <span class="lbl">Gegenprobe</span>
+      <p>
+        Dass der neue Kern derselbe Algorithmus ist, prüft der Test an
+        Material mit bekannter Antwort: dieselben 102 rekonstruierten
+        Elektor-Hexadokus, einmal vom spezialisierten 16×16-Kern gelöst und
+        einmal vom breiten — Zelle für Zelle gleich, und auf denselben
+        Zufallsinstanzen verzweigen beide identisch.
+      </p>
+    </div>
+  </div>
+</section>
+
+<!-- ============ II ============ -->
+<section class="chapter">
+  <div class="chapter-head">
+    <span class="num">II</span>
+    <h2>Alfadoku, 7-8/2006</h2>
+    <p>Das früheste der drei und das einzige von einem <em>Leser</em>:
+       Rätselentwurf S. Jobse. Gedruckt nur in der niederländischen
+       Ausgabe, die dieses Archiv erreicht — Elektuur 513.</p>
+  </div>
+
+  <div class="body">
+    <div class="rail"><span class="chip chip-ok">gelöst</span></div>
+    <blockquote>
+      De Alfadoku werkt met alle letters van het alfabet, met uitzondering
+      van de Z, dus A t/m Y.
+    </blockquote>
+    <p>
+      25×25 Zellen, 5×5-Boxen, fünfundzwanzig <em>Buchstaben</em> und keine
+      einzige Ziffer. Keine Zusatzregel, kein Verbund — von den dreien das
+      schlichteste Rätsel und im Solver eine einzige Zeile:
+      <code>newWide("alfadoku", 25, 5, "A…Y")</code>. Es ist der Vorgänger,
+      den der Alphanumski-Artikel ein Jahr später beiläufig nennt.
+    </p>
+
+    <figure>
+      <div class="frame" id="alfaFig"></div>
+      <div class="legend">
+        <span><i class="swatch" style="background:color-mix(in srgb, var(--ink) 22%, var(--cell-bg))"></i>die sechs Antwortzellen — auf der Seite rot, hier mit der Lösung gefüllt</span>
+        <span><i class="swatch" style="background:var(--cell-bg)"></i>5×5-Boxen</span>
+      </div>
+      <figcaption>
+        267 Vorgaben, aus dem Textlayer gelesen. Das Gitter läuft über die
+        Doppelseite, aber nicht mittig geteilt: 16 Spalten links, 9 rechts.
+      </figcaption>
+    </figure>
+
+    <h3>Die Leser hielten es für unlösbar</h3>
+    <p>
+      Im Oktoberheft druckte Elektuur ihre Briefe ab. Einer hatte nach
+      Wochen aufgegeben und vermutete mehrere Lösungen; sogar sein Programm
+      meldete gar keine. Ein anderer hatte in Excel einen Löser
+      geschrieben, der Sudokus und Hexadokus schafft, aber
+      <em>„bij de Alfadoku blijft het programma hangen omdat het geen
+      eenduidige oplossing kan vinden“</em>. Die Redaktion wich aus:
+    </p>
+    <blockquote>
+      We sluiten dat niet helemaal uit; bij zo&rsquo;n grote puzzel bestaat
+      inderdaad de kans dat er meer dan een oplossingsmogelijkheid is en een
+      computerprogramma kan daar behoorlijk op vastlopen. … Daarom rekenen
+      we maar één oplossing goed en dat is: <b>IDRFBV</b>.
+    </blockquote>
+    <div class="note">
+      <span class="lbl">Das Ausweichen war unnötig</span>
+      <p>
+        Die Lösung ist <b>eindeutig</b>, und die sechs roten Zellen ergeben
+        genau <span class="code">IDRFBV</span>. Woran die Programme von 2006
+        hängenblieben, war nicht Mehrdeutigkeit, sondern Schwierigkeit:
+        <b>454 055 Verzweigungen</b> und fünf Sekunden — mit weitem Abstand
+        das schwerste Rätsel dieses Archivs. Zum Vergleich fällt das
+        AlphaSudoku mit seiner Zusatzregel ohne eine einzige Verzweigung,
+        und der Alphanumski braucht eine.
+      </p>
+    </div>
+    <p>
+      Das ist auch der Grund, warum es hier so lange fehlte: Von der
+      Doppelausgabe 7-8/2006 gibt es auf archive.org keine englische
+      Fassung. Die niederländische liegt als eigenes Item
+      (<code>elektuur-513-2006-7-8</code>) und ist, anders als die
+      gescannten Jahrgänge von 2006, <em>born-digital</em> — deshalb steht
+      jede Vorgabe als Textglyph auf der Seite.
+    </p>
+  </div>
+</section>
+
+<!-- ============ III ============ -->
+<section class="chapter">
+  <div class="chapter-head">
+    <span class="num">III</span>
     <h2>Alphanumski, 7-8/2007</h2>
     <p>Ein einziges 36×36-Gitter, quer über die Doppelseite gedruckt, 18
        Spalten je Seite. Rätselautor: Géry Szcepanski — der einzige der
@@ -68,7 +224,7 @@
   </div>
 
   <div class="body">
-    <div class="rail"><span class="chip chip-open">außer Reichweite</span></div>
+    <div class="rail"><span class="chip chip-ok">gelöst</span></div>
     <blockquote>
       … all letters of the alphabet (A through Z) and all numerals 0 through
       9 should occur only once in every line (1×36), every column (1×36) and
@@ -86,43 +242,80 @@
       <div class="frame" id="alnumFig"></div>
       <div class="legend">
         <span><i class="swatch" style="background:color-mix(in srgb, var(--g5) 22%, var(--cell-bg))"></i>6×6-Box, farbig hinterlegt</span>
-        <span><i class="swatch" style="background:var(--cell-bg)"></i>6×6-Box, weiß</span>
-        <span><i class="swatch" style="background:color-mix(in srgb, var(--accent) 40%, var(--cell-bg))"></i>Größe des 16×16-Ausschnitts, den die Erkennung herausschnitt (Lage willkürlich)</span>
+        <span><i class="swatch" style="background:color-mix(in srgb, var(--ink) 22%, var(--cell-bg))"></i>die sieben Antwortzellen, hier mit der Lösung gefüllt</span>
+        <span><i class="swatch" style="background:color-mix(in srgb, var(--accent) 22%, var(--cell-bg))"></i>die vier Zellen, in denen sich die beiden Lösungen unterscheiden</span>
       </div>
       <figcaption>
-        Schematisch, nicht transkribiert: 36×36 Zellen in 6×6-Boxen, deren
-        Hintergründe ein Schachbrett bilden. Rot umrandet ist die
-        <em>Größe</em> dessen, was in <b>2007-07_08_mask.txt</b> gelandet ist
-        — ein 16×16-Fenster, das die automatische Gittererkennung aus dem
-        viel größeren Raster herausgeschnitten hat. Wo genau es saß, ist
-        nicht überliefert; die Lage hier ist willkürlich gewählt. Mit 160
-        Vorgaben sieht es wie ein außergewöhnlich gut bestücktes Hexadoku aus
-        und ist doch bedeutungslos.
+        Das gedruckte Rätsel, 820 Vorgaben, aus dem PDF-Textlayer gelesen —
+        nicht abgetippt und nicht per OCR geraten. Zeile 13 verrät den
+        Rätselautor: quer durch das Gitter steht <b>HEXADOKU</b>.
       </figcaption>
     </figure>
 
-    <h3>Das Alphabet ist das Problem</h3>
-    <div class="alphabet" id="alnumAlpha"></div>
-    <p style="margin-top:1rem">
-      Der Solver trägt die Kandidaten einer Zelle als <code>uint16</code>-Bitmaske
-      — ein Bit je Wert — und der ganze heiße Pfad
-      (<code>OnesCount16</code>, <code>TrailingZeros16</code>, die
-      <code>placed</code>-Masken je Unit) hängt daran. 36 Werte hieße, diese
-      Darstellung überall zu verbreitern. Das ist keine neue Geometrie,
-      sondern ein anderer Datentyp.
-    </p>
+    <h3>Aus dem Textlayer, nicht aus dem Scan</h3>
     <p>
-      Der Artikel nennt nebenbei den Vorgänger: ein „Alphadoku“ mit 25×25
-      Zellen in der Doppelausgabe 7-8/2006, bis dorthin reicht dieses Archiv
-      nicht zurück.
+      Wie die Hexamurai-Seiten trägt diese Doppelseite jede Vorgabe als
+      echtes Textglyph. Damit ist eine <em>exakte</em> Transkription möglich:
+      <code>cmd/alphaextract</code> liest die Glyphenpositionen mit
+      <code>pdftotext -bbox</code>, legt ein Gitterraster hinein und ordnet
+      jedes Zeichen seiner Zelle zu — je Seite ein eigener Fit, danach die
+      beiden Hälften nebeneinandergelegt. Von den 824 Einzelzeichen beider
+      Seiten sind 820 Vorgaben; die restlichen vier stehen im Fließtext.
+      Das Verfahren teilt sich den Rasterfit mit
+      <a href="hexamurai.html">muraiextract</a>, herausgezogen nach
+      <code>internal/pdftext</code>.
     </p>
+
+    <h3>Das Rätsel hat zwei Lösungen</h3>
+    <p>
+      Und zwar nicht wegen eines Lesefehlers. Die beiden unterscheiden sich
+      in genau vier Zellen, die ein Rechteck bilden — r26c4, r26c33, r29c4
+      und r29c33 —, und in diesem Rechteck lassen sich <code>9</code> und
+      <code>X</code> gegeneinander tauschen, ohne eine Zeile, eine Spalte
+      oder eine Box zu verletzen. Alle vier sind auf der gedruckten Seite
+      leer, gegen den 300-dpi-Render geprüft.
+    </p>
+    <div class="swap">
+      <table>
+        <caption>Lösung 1</caption>
+        <tr><th></th><th>c4</th><th>c33</th></tr>
+        <tr><th>r26</th><td>9</td><td>X</td></tr>
+        <tr><th>r29</th><td>X</td><td>9</td></tr>
+      </table>
+      <table>
+        <caption>Lösung 2</caption>
+        <tr><th></th><th>c4</th><th>c33</th></tr>
+        <tr><th>r26</th><td>X</td><td>9</td></tr>
+        <tr><th>r29</th><td>9</td><td>X</td></tr>
+      </table>
+    </div>
+    <p>
+      Für die Leser hat das nie eine Rolle gespielt. Keine der vier Zellen
+      ist eine der sieben grauen Antwortzellen, also geben beide Lösungen
+      denselben Code — und den druckte Elektor in 10/2007: <em>„The solution
+      of the july/august 2007 puzzle is: <span class="code">LVC4ZM1</span>.“</em>
+      Genau das steht in der Rekonstruktion in r28c22–c28.
+    </p>
+    <div class="note">
+      <span class="lbl">Warum das der Beweis ist</span>
+      <p>
+        Sieben bestimmte Zellen aus 1296 zufällig zu treffen ist
+        ausgeschlossen. Der Code bestätigt damit in einem Zug die
+        Transkription, das Regelmodell und den Solver — dieselbe Logik, mit
+        der die Hexadokus vor 11/2007 abgenommen werden, für die Elektor
+        ebenfalls nur den Code und kein Lösungsgitter druckte. Der Solver
+        prüft die Behauptung deshalb selbst und beantwortet zusätzlich die
+        Frage, die hier zählt: ob <em>jede</em> Lösung dieselben grauen
+        Zellen hat.
+      </p>
+    </div>
   </div>
 </section>
 
-<!-- ============ II ============ -->
+<!-- ============ IV ============ -->
 <section class="chapter">
   <div class="chapter-head">
-    <span class="num">II</span>
+    <span class="num">IV</span>
     <h2>AlphaSudoku, 7-8/2008</h2>
     <p>25×25 Zellen, 5×5-Boxen — und neun eingebettete 3×3-Blöcke, die
        zusammen ein klassisches Sudoku bilden. Rätselautor: Claude Ghyselen,
@@ -130,7 +323,7 @@
   </div>
 
   <div class="body">
-    <div class="rail"><span class="chip chip-open">außer Reichweite</span></div>
+    <div class="rail"><span class="chip chip-ok">gelöst</span></div>
     <p>
       Das Alphabet umgeht hier geschickt eine Verwechslung: 25 Symbole, die
       Ziffern <b>1–9</b> und die Buchstaben <b>A–P</b> — „including the letter
@@ -143,27 +336,61 @@
     </blockquote>
     <p>
       Auf der Seite gemessen sind das neun 3×3-Blöcke, je einer in der Mitte
-      der neun mittleren 5×5-Boxen — Zeilen 6–8, 11–13, 16–18, dieselben
-      Spalten. Ihre 81 Zellen bilden zusammen ein 9×9-Gitter, dessen Boxen
-      genau diese Blöcke sind, und die Vorgaben darin sind Ziffern. 25 = 16 + 9:
-      die sechzehn Buchstaben tragen das Alphadoku, die neun Ziffern das
-      eingebettete Sudoku.
+      der neun mittleren 5×5-Boxen — Zeilen 7–9, 12–14, 17–19, dieselben
+      Spalten. Und jede einzelne Vorgabe, die dort steht, ist eine Ziffer.
     </p>
 
     <figure>
       <div class="frame" id="alsuFig"></div>
       <div class="legend">
         <span><i class="swatch" style="background:color-mix(in srgb, var(--g6) 34%, var(--cell-bg))"></i>die neun eingebetteten 3×3-Blöcke</span>
-        <span><i class="swatch" style="background:color-mix(in srgb, var(--ink) 22%, var(--cell-bg))"></i>graue Antwortzellen, sechs Ziffern</span>
+        <span><i class="swatch" style="background:color-mix(in srgb, var(--ink) 22%, var(--cell-bg))"></i>die sechs Antwortzellen, hier mit der Lösung gefüllt</span>
         <span><i class="swatch" style="background:var(--cell-bg)"></i>5×5-Boxen des Grundgitters</span>
       </div>
       <figcaption>
-        Schematisch, aus dem Seitenrender ausgemessen: die schattierten
-        Blöcke liegen mittig in den neun mittleren 5×5-Boxen, der äußere
-        Ring aus sechzehn Boxen bleibt frei. Die Antwort waren hier
-        <b>sechs</b> Ziffern statt der üblichen fünf.
+        Das gedruckte Rätsel, 345 Vorgaben, ebenfalls aus dem Textlayer
+        gelesen. Die Antwort waren hier <b>sechs</b> Zeichen statt der
+        üblichen fünf.
       </figcaption>
     </figure>
+
+    <h3>Zwei Zusätze, und einer davon folgt von selbst</h3>
+    <p>
+      Aus der Regel werden im Modell zwei Dinge: Eine schattierte Zelle
+      trägt nur eine Ziffer — das ist dieselbe <code>allow</code>-Maske je
+      Zelle, die das Schachbrett des
+      <a href="penta-hexadoku.html">Penta-Hexadoku</a> benutzt. Und jeder
+      3×3-Block trägt 1–9 genau einmal — das sind neun zusätzliche Units mit
+      <em>neun Zellen über neun Werten</em>, wo jede andere Unit dieses
+      Rätsels fünfundzwanzig von beidem hat. Genau dafür trägt eine Unit im
+      breiten Kern ihre eigene Größe und Wertemenge.
+    </p>
+    <p>
+      Die Zeilen und Spalten des eingebetteten Sudokus braucht es dagegen
+      <em>nicht</em>. Eine schattierte Zeile kreuzt drei Blöcke, hat also
+      neun schattierte Zellen, und die tragen nur Ziffern; die 25er-Zeile
+      enthält jede Ziffer ohnehin genau einmal — damit sind diese neun
+      Zellen von selbst 1–9. Für die Spalten dasselbe. Übrig bleibt die
+      Blockregel, und die steht im Code.
+    </p>
+    <div class="note">
+      <span class="lbl">Was die Regel wert ist</span>
+      <p>
+        Sie schneidet die Kandidaten von 81 Zellen um zwei Drittel, und das
+        genügt: Das AlphaSudoku fällt <b>ohne eine einzige Verzweigung</b>,
+        allein durch Propagation. Die sechs grauen Zellen in r20c6–c11
+        ergeben <span class="code">HKCEAO</span> — der Code, den Elektor in
+        10/2008 abdruckte.
+      </p>
+    </div>
+    <p>
+      Kurioserweise dreht dieselbe Regel das Vorzeichen um, sobald man ein
+      Gitter nicht lösen, sondern <em>erfinden</em> will: ein zufälliges
+      Vollgitter zu füllen gelingt hier nicht mehr, weil die 81 Zellen auf
+      neun der fünfundzwanzig Werte festgelegt sind und die neun Blöcke
+      jeweils alle Ziffern brauchen — ein gieriges Zufallsfüllen läuft sich
+      immer wieder fest. Beim 36×36 dauert dasselbe 15 Millisekunden.
+    </p>
 
     <div class="note">
       <span class="lbl">Die Linie</span>
@@ -180,36 +407,14 @@
   </div>
 </section>
 
-<!-- ============ III ============ -->
-<section class="chapter">
-  <div class="chapter-head">
-    <span class="num">III</span>
-    <h2>Warum das hier stehen bleibt</h2>
-  </div>
-
-  <div class="body">
-    <div class="rail"><span class="chip chip-neutral">Grenze</span></div>
-    <p>
-      Alle anderen Spezialrätsel dieser Reihe brauchten Geometrie: eine
-      andere Anordnung, eine Faltung, eine Zellrestriktion, eine Suchebene.
-      Diese beiden brauchen etwas anderes — mehr Werte, als in ein
-      <code>uint16</code> passen. Das wäre ein Umbau des Kerns, nicht eine
-      weitere Variante, und der Kern ist genau dort schnell, wo er auf 16
-      Werte festgelegt ist.
-    </p>
-    <p>
-      Die beiden Dateien im Archiv bleiben deshalb Marker: sie halten fest,
-      was auf der Seite steht, damit die Pipeline sie nicht immer wieder als
-      fehlgeschlagene Rekonstruktion meldet.
-    </p>
-  </div>
-</section>
-
 <footer class="colophon">
-  Maße und Regeln aus Elektor 7-8/2007 S. 140–141 (Géry Szcepanski) und
-  7-8/2008 S. 118 (Claude Ghyselen); Schattierungen aus den Seitenrendern
-  ausgemessen. Die Gitter sind schematisch — keine der beiden Vorgabemengen
-  ist transkribiert.
+  Regeln aus Elektuur 7-8/2006 S. 140–141 (S. Jobse), Elektor 7-8/2007
+  S. 140–141 (Géry Szcepanski) und 7-8/2008 S. 118 (Claude Ghyselen);
+  Preiscodes und Leserbriefe aus Elektuur 10/2006 sowie Elektor 10/2007
+  und 10/2008;
+  Schattierungen aus den Seitenrendern ausgemessen. Die Gitter sind die
+  transkribierten Vorgaben aus <code>puzzles/elektor/</code>, dieselben
+  Dateien, die der Solver liest.
 </footer>
 
 <div class="backhome">
@@ -218,62 +423,82 @@
 
 </div>
 
+<script src="data.js"></script>
 <script src="spezial.js"></script>
 <script>
 (function () {
+  const grey = "color-mix(in srgb, var(--ink) 22%, var(--cell-bg))";
+  const clue = "color-mix(in srgb, var(--ink) 8%, var(--cell-bg))";
+
+  // fill the grey answer cells with the code, so the figure shows what a
+  // reader had to send in rather than an empty run of cells
+  function withCode(rows, [gr, gc, len], code) {
+    const out = rows.slice();
+    out[gr] = out[gr].slice(0, gc) + code + out[gr].slice(gc + len);
+    return out;
+  }
+  const inGrey = ([gr, gc, len]) => (r, c) => r === gr && c >= gc && c < gc + len;
+
   // ---- Alphanumski: 36x36, 6x6 boxes, chequerboard of boxes ----
-  const N = 36, B = 6;
-  const rows = Array.from({ length: N }, () => ".".repeat(N));
+  const isGreyA = inGrey(ALNUM_GREY);
+  const swap = new Set(ALNUM_SWAP.map(([r, c]) => r + ":" + c));
   mount(
     "alnumFig",
     drawRaster({
-      rows: rows,
-      cell: 13,
-      box: B,
-      glyphs: false,
-      title: "Alphanumski 36x36",
-      tint: (r, c) => {
-        // the 16x16 window the grid detector cut out sits somewhere in the
-        // lattice; its exact origin is not recorded, so it is drawn at a
-        // box boundary to show the scale, not a position
-        if (r >= 6 && r < 22 && c >= 6 && c < 22 && (r === 6 || r === 21 || c === 6 || c === 21))
-          return "color-mix(in srgb, var(--accent) 40%, var(--cell-bg))";
-        const shaded = (Math.floor(r / B) + Math.floor(c / B)) % 2 === 1;
-        return shaded
-          ? "color-mix(in srgb, var(--g5) 22%, var(--cell-bg))"
-          : "var(--cell-bg)";
+      rows: withCode(ALNUM, ALNUM_GREY, ALNUM_CODE),
+      cell: 15,
+      box: 6,
+      title: "Alphanumski 36×36, 820 Vorgaben",
+      tint: (r, c, ch) => {
+        if (isGreyA(r, c)) return grey;
+        if (swap.has(r + ":" + c))
+          return "color-mix(in srgb, var(--accent) 22%, var(--cell-bg))";
+        const shaded = (Math.floor(r / 6) + Math.floor(c / 6)) % 2 === 1;
+        if (shaded)
+          return "color-mix(in srgb, var(--g5) 22%, var(--cell-bg))";
+        return ch === "." ? "var(--cell-bg)" : clue;
       },
     })
   );
 
   const alpha = document.getElementById("alnumAlpha");
-  const chars = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ";
-  alpha.innerHTML = [...chars]
-    .map((ch, i) => {
-      const inHex = i < 16;
-      return `<b class="${inHex ? "digit" : "wide"}">${ch}</b>`;
-    })
+  alpha.innerHTML = [...ALNUM_ALPHABET]
+    .map((ch, i) => `<b class="${i < 16 ? "digit" : "wide"}">${ch}</b>`)
     .join("") +
     '<span style="margin-left:.8rem;align-self:center;color:var(--ink-soft)">' +
-    "die ersten 16 sind das, was dieser Solver kann</span>";
+    "die ersten 16 sind das, was in ein uint16 passt</span>";
+
+  // ---- Alfadoku: 25x25, 5x5 boxes, letters A-Y, nothing else ----
+  const isGreyF = inGrey(ALFA_GREY);
+  mount(
+    "alfaFig",
+    drawRaster({
+      rows: withCode(ALFA, ALFA_GREY, ALFA_CODE),
+      cell: 21,
+      box: 5,
+      title: "Alfadoku 25×25, 267 Vorgaben",
+      tint: (r, c, ch) => {
+        if (isGreyF(r, c)) return grey;
+        return ch === "." ? "var(--cell-bg)" : clue;
+      },
+    })
+  );
 
   // ---- AlphaSudoku: 25x25, 5x5 boxes, nine shaded 3x3 blocks ----
-  const M = 25;
-  const shadedRows = [6, 7, 8, 11, 12, 13, 16, 17, 18];
-  const inShade = (r, c) => shadedRows.includes(r) && shadedRows.includes(c);
+  const isGreyS = inGrey(ALSU_GREY);
+  const onBlock = (i) => ALSU_BLOCK_LINES.includes(i);
   mount(
     "alsuFig",
     drawRaster({
-      rows: Array.from({ length: M }, () => ".".repeat(M)),
-      cell: 18,
+      rows: withCode(ALSU, ALSU_GREY, ALSU_CODE),
+      cell: 21,
       box: 5,
-      glyphs: false,
-      title: "AlphaSudoku 25x25",
-      tint: (r, c) => {
-        if (r === 19 && c >= 5 && c < 11)
-          return "color-mix(in srgb, var(--ink) 22%, var(--cell-bg))";
-        if (inShade(r, c)) return "color-mix(in srgb, var(--g6) 34%, var(--cell-bg))";
-        return "var(--cell-bg)";
+      title: "AlphaSudoku 25×25, 345 Vorgaben",
+      tint: (r, c, ch) => {
+        if (isGreyS(r, c)) return grey;
+        if (onBlock(r) && onBlock(c))
+          return "color-mix(in srgb, var(--g6) 34%, var(--cell-bg))";
+        return ch === "." ? "var(--cell-bg)" : clue;
       },
     })
   );

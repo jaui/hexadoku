@@ -1,24 +1,55 @@
-# Elektor 2008-07_08 - not a standalone puzzle
-# "AlphaSudoku" (p. 118): the double issue prints this instead of a
-# hexadoku; p. 119 only announces the winners of the previous one (the
-# May 2008 code is 36815).
+# Elektor AlphaSudoku 2008-07_08 (Elektor 7-8/2008, p. 118), 345 clues
+# read from the PDF text layer by cmd/alphaextract (exact, not OCR):
+#   alphaextract -variant alphasudoku -page 118 Elektornonlinear.ir2008-07_08.pdf
+#
+# The double issue prints this instead of a hexadoku; p. 119 only
+# announces the winners of the previous one (the May 2008 code is 36815).
+# Puzzle designed by Claude Ghyselen, who names it in 2012 as his own
+# first for Elektor, ahead of the Hexamurai 7-8/2009, the Hexadocube
+# 7-8/2010 and the EUC Penta-Hexadoku 7-8/2012.
 #
 # 25x25 cells over 25 symbols: the numbers 1 through 9 and the letters A
 # through P - "including the letter 'O', hence the absence of the '0' in
-# the numbers", which is how a 25-symbol alphabet stays readable. Boxes
-# are 5x5, marked by a coloured outline.
+# the numbers", which is how a 25-symbol alphabet stays readable. Each
+# row, column and 5x5 box holds every symbol once.
 #
-# It carries an extra rule of its own, and it is the ancestor of the
-# later ones: "The puzzle is essentially a (16x16) Alphadoku comprising
-# nine classic (9x9) Sudokus using numbers 1 through 9." Nine 9x9 blocks
-# inside the 25x25 grid are shaded and must additionally be valid
-# sudokus over the digits alone - so those 81 cells carry two alphabets
-# at once, 25 values by the outer rules and 9 by the inner ones.
+# On top of that: "the puzzle is essentially a (16x16) Alphadoku
+# comprising nine classic (9x9) Sudokus using numbers 1 through 9. ...
+# The nine embedded Sudokus have a background colour." Measured off the
+# page render, the shading covers nine 3x3 blocks, one in the middle of
+# each of the nine middle 5x5 boxes - rows and columns 7-9, 12-14 and
+# 17-19. Every clue inside them is a digit, and each block holds 1-9
+# once; see alpha.go for why that is the whole of the extra rule.
 #
-# Claude Ghyselen names it as his own first puzzle for Elektor in the
-# 2012 article ("one of my suggestions used in the 2008 annual double
-# edition: the Alphasudoku"), ahead of the Hexamurai 7-8/2009, the
-# Hexadocube 7-8/2010 and the EUC Penta-Hexadoku 7-8/2012.
-#
-# Out of reach here for the same reason as the Alphanumski of 7-8/2007:
-# 25 values do not fit a solver built around 9 or 16.
+# The answer was six characters, not the usual five. Elektor announced
+# them in 10/2008: "The solution of the July/August 2008 AlphaSudoku is:
+# HKCEAO." The reconstruction reproduces them, and the puzzle falls to
+# propagation alone, without a single branch.
+# variant: alphasudoku
+# grey: r20c6-c11
+# code: HKCEAO
+D5.EG2..K7.IO..9P.F.41.MA
+.1I6.8A..E.HFL.2K..4..593
+..2L.9JP.38..K.7.B.5.C..N
+9..K.1CLM65BN.4D.G..F.8.2
+..H...BGI.2JP....N.1.E.7.
+46983..IJ.N.KGAMO..C..7..
+.O..FP....D....A.1..BME.H
+M.EPN.4..HC...BJ...FID..O
+HBJA...2.L.....E.......NF
+7....DG..O.FM..BIPLK8..39
+67..IJEH...ACNF.BDG.951.8
+..PO.I...DJ.5...4.7..G.K.
+GHN..A..8PM.....3..OJL...
+AK.MJ...1NE.9......LHODPC
+185.2F.MC.P.D.I.HKE.3.64.
+23156.D....GHJ.KMC.E7.O84
+CPGJAO3..MB4...L2..I.N.FK
+L..H.N.5.FA1..EO...PDJB..
+..ON......K8.6C....DLI.AP
+84..9......LI.MG.F.B6.2.1
+5EA..4.KL16C..23GO....9..
+K.82M7.FG91E.D3..I...PCHJ
+...BO6NEA87...51.JC9.F.IM
+.9..13P.B.4.GI85.A..O7K.6
+FD.37C.JH59M..P.N....4..L

@@ -15,24 +15,18 @@ package main
 import (
 	"flag"
 	"fmt"
-	"math"
 	"os"
 	"os/exec"
 	"path/filepath"
-	"regexp"
-	"sort"
-	"strconv"
 	"strings"
+
+	"hexadoku/internal/pdftext"
 )
 
-type glyph struct {
-	x, y float64
-	ch   byte
-	r, c int
-}
-
-var wordRe = regexp.MustCompile(
-	`<word xMin="([0-9.]+)" yMin="([0-9.]+)" xMax="([0-9.]+)" yMax="([0-9.]+)">([^<]*)</word>`)
+// glyph, reading the text layer and fitting the lattice it sits on are
+// shared with cmd/alphaextract, which does the same for the two wide
+// puzzles of 7-8/2007 and 7-8/2008.
+type glyph = pdftext.Glyph
 
 func main() {
 	pdftotext := flag.String("pdftotext", "pdftotext", "path to poppler's pdftotext")
@@ -54,7 +48,7 @@ func main() {
 }
 
 func run(pdftotext, path string, page, n int, out, solver string, verbose bool) error {
-	glyphs, err := readGlyphs(pdftotext, path, page)
+	glyphs, err := pdftext.ReadGlyphs(pdftotext, path, page, isHex)
 	if err != nil {
 		return err
 	}
@@ -71,13 +65,13 @@ func run(pdftotext, path string, page, n int, out, solver string, verbose bool) 
 	xs := make([]float64, len(glyphs))
 	ys := make([]float64, len(glyphs))
 	for i, g := range glyphs {
-		xs[i], ys[i] = g.x, g.y
+		xs[i], ys[i] = g.X, g.Y
 	}
-	ox, px, err := fitAxis(xs)
+	ox, px, err := pdftext.FitAxis(xs)
 	if err != nil {
 		return fmt.Errorf("column lattice: %v", err)
 	}
-	oy, py, err := fitAxis(ys)
+	oy, py, err := pdftext.FitAxis(ys)
 	if err != nil {
 		return fmt.Errorf("row lattice: %v", err)
 	}
@@ -89,15 +83,15 @@ func run(pdftotext, path string, page, n int, out, solver string, verbose bool) 
 	var onLattice []glyph
 	var rows, cols []int
 	for _, g := range glyphs {
-		c, okc := index(g.x, ox, px)
-		r, okr := index(g.y, oy, py)
+		c, okc := pdftext.Index(g.X, ox, px)
+		r, okr := pdftext.Index(g.Y, oy, py)
 		if !okc || !okr {
 			if verbose {
-				fmt.Fprintf(os.Stderr, "dropped %q at %.2f,%.2f (off the lattice)\n", g.ch, g.x, g.y)
+				fmt.Fprintf(os.Stderr, "dropped %q at %.2f,%.2f (off the lattice)\n", g.Ch, g.X, g.Y)
 			}
 			continue
 		}
-		g.r, g.c = r, c
+		g.R, g.C = r, c
 		onLattice = append(onLattice, g)
 		rows, cols = append(rows, r), append(cols, c)
 	}
@@ -112,28 +106,28 @@ func run(pdftotext, path string, page, n int, out, solver string, verbose bool) 
 		minR, minC = min(minR, rows[i]), min(minC, cols[i])
 	}
 	for i := range onLattice {
-		onLattice[i].r -= minR
-		onLattice[i].c -= minC
-		rows[i], cols[i] = onLattice[i].r, onLattice[i].c
+		onLattice[i].R -= minR
+		onLattice[i].C -= minC
+		rows[i], cols[i] = onLattice[i].R, onLattice[i].C
 	}
 
 	// the puzzle occupies span consecutive lattice lines in each direction;
 	// glyphs outside that block are text that happened to line up
-	r0, r1 := window(rows, span)
-	c0, c1 := window(cols, span)
+	r0, r1 := pdftext.Window(rows, span)
+	c0, c1 := pdftext.Window(cols, span)
 	var kept []glyph
 	maxR, maxC := 0, 0
 	for _, g := range onLattice {
-		if g.r < r0 || g.r > r1 || g.c < c0 || g.c > c1 {
+		if g.R < r0 || g.R > r1 || g.C < c0 || g.C > c1 {
 			if verbose {
 				fmt.Fprintf(os.Stderr, "dropped %q at row %d, column %d (outside the puzzle block)\n",
-					g.ch, g.r, g.c)
+					g.Ch, g.R, g.C)
 			}
 			continue
 		}
-		g.r, g.c = g.r-r0, g.c-c0
+		g.R, g.C = g.R-r0, g.C-c0
 		kept = append(kept, g)
-		maxR, maxC = max(maxR, g.r), max(maxC, g.c)
+		maxR, maxC = max(maxR, g.R), max(maxC, g.C)
 	}
 	if verbose {
 		fmt.Fprintf(os.Stderr, "%d clues on a %dx%d block\n", len(kept), maxR+1, maxC+1)
@@ -142,7 +136,7 @@ func run(pdftotext, path string, page, n int, out, solver string, verbose bool) 
 			raw[r] = []byte(strings.Repeat(".", maxC+1))
 		}
 		for _, g := range kept {
-			raw[g.r][g.c] = g.ch
+			raw[g.R][g.C] = g.Ch
 		}
 		for _, r := range raw {
 			fmt.Fprintf(os.Stderr, "|%s|\n", r)
@@ -211,37 +205,6 @@ func run(pdftotext, path string, page, n int, out, solver string, verbose bool) 
 	return os.WriteFile(out, []byte(text), 0644)
 }
 
-func readGlyphs(pdftotext, path string, page int) ([]glyph, error) {
-	tmp, err := os.MkdirTemp("", "murai")
-	if err != nil {
-		return nil, err
-	}
-	defer os.RemoveAll(tmp)
-	dst := filepath.Join(tmp, "page.html")
-	cmd := exec.Command(pdftotext, "-f", strconv.Itoa(page), "-l", strconv.Itoa(page),
-		"-bbox", "-q", path, dst)
-	if o, err := cmd.CombinedOutput(); err != nil {
-		return nil, fmt.Errorf("pdftotext: %v: %s", err, o)
-	}
-	data, err := os.ReadFile(dst)
-	if err != nil {
-		return nil, err
-	}
-	var gs []glyph
-	for _, m := range wordRe.FindAllStringSubmatch(string(data), -1) {
-		s := strings.TrimSpace(m[5])
-		if len(s) != 1 || !isHex(s[0]) {
-			continue
-		}
-		x0, _ := strconv.ParseFloat(m[1], 64)
-		y0, _ := strconv.ParseFloat(m[2], 64)
-		x1, _ := strconv.ParseFloat(m[3], 64)
-		y1, _ := strconv.ParseFloat(m[4], 64)
-		gs = append(gs, glyph{x: (x0 + x1) / 2, y: (y0 + y1) / 2, ch: s[0]})
-	}
-	return gs, nil
-}
-
 func isHex(c byte) bool {
 	return c >= '0' && c <= '9' || c >= 'A' && c <= 'F'
 }
@@ -276,85 +239,6 @@ func layouts(n int) []layout {
 
 const maxN = 16
 
-// fitAxis recovers the lattice behind a set of glyph centres. The page
-// also carries running text, and "0 to F" or "4x4" in it look exactly like
-// clues, so every step has to be robust against a minority of positions
-// that do not belong to the grid: the pitch is the *median* distance
-// between neighbouring positions, the anchor is the median position, and
-// only positions close to the resulting lattice enter the final fit.
-func fitAxis(vals []float64) (origin, pitch float64, err error) {
-	v := append([]float64(nil), vals...)
-	sort.Float64s(v)
-
-	// distances between positions that are not the same lattice line
-	var gaps []float64
-	for i := 1; i < len(v); i++ {
-		if d := v[i] - v[i-1]; d > 1 {
-			gaps = append(gaps, d)
-		}
-	}
-	if len(gaps) < 8 {
-		return 0, 0, fmt.Errorf("too few distinct positions")
-	}
-	sort.Float64s(gaps)
-	pitch = gaps[len(gaps)/2]
-	anchor := v[len(v)/2]
-
-	for round := 0; round < 3; round++ {
-		var sx, sy, sxx, sxy, m float64
-		for _, c := range v {
-			k := math.Round((c - anchor) / pitch)
-			if math.Abs(c-(anchor+k*pitch)) > pitch/4 {
-				continue // not on this lattice: running text, not a clue
-			}
-			sx, sy, sxx, sxy, m = sx+k, sy+c, sxx+k*k, sxy+k*c, m+1
-		}
-		if m < 8 {
-			return 0, 0, fmt.Errorf("only %.0f positions fit a lattice of pitch %.2f", m, pitch)
-		}
-		d := m*sxx - sx*sx
-		if d == 0 {
-			break
-		}
-		pitch = (m*sxy - sx*sy) / d
-		anchor = (sy - pitch*sx) / m
-	}
-	return anchor, pitch, nil
-}
-
-// window picks the run of span consecutive lattice lines holding the most
-// glyphs. Everything outside it is running text that happened to land on
-// the lattice.
-func window(idx []int, span int) (lo, hi int) {
-	counts := map[int]int{}
-	maxIdx := 0
-	for _, i := range idx {
-		counts[i]++
-		maxIdx = max(maxIdx, i)
-	}
-	best, bestStart := -1, 0
-	for s := 0; s <= maxIdx; s++ {
-		n := 0
-		for i := s; i < s+span; i++ {
-			n += counts[i]
-		}
-		if n > best {
-			best, bestStart = n, s
-		}
-	}
-	return bestStart, bestStart + span - 1
-}
-
-// index maps a coordinate to its lattice line, rejecting anything that
-// does not sit close enough to one.
-func index(v, origin, pitch float64) (int, bool) {
-	k := math.Round((v - origin) / pitch)
-	if math.Abs(v-(origin+k*pitch)) > pitch/3 {
-		return 0, false
-	}
-	return int(k), true // the anchor sits inside the block, so k may be negative
-}
-
 // build places the clues on the samurai raster shifted by (dr, dc) and
 // checks every rule of every grid.
 func build(gs []glyph, l layout, dr, dc int) (string, error) {
@@ -380,14 +264,14 @@ func build(gs []glyph, l layout, dr, dc int) (string, error) {
 		}
 	}
 	for _, g := range gs {
-		r, c := g.r+dr, g.c+dc
+		r, c := g.R+dr, g.C+dc
 		if !covered(r, c) {
-			return "", fmt.Errorf("clue %q lands outside every grid at row %d, column %d", g.ch, r, c)
+			return "", fmt.Errorf("clue %q lands outside every grid at row %d, column %d", g.Ch, r, c)
 		}
 		if cells[r][c] != '.' {
 			return "", fmt.Errorf("two clues in row %d, column %d", r, c)
 		}
-		cells[r][c] = g.ch
+		cells[r][c] = g.Ch
 	}
 
 	// no value twice in any row, column or box of any of the five grids

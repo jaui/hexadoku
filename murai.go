@@ -218,10 +218,20 @@ func runVariant(name string, v *variant, text string, bench int, checkUnique boo
 			name, v.name, v.ncells, v.ncells-int(g.free), v.render(g))
 	}
 
+	// with -unique the uniqueness proof finds the solution on its way,
+	// so the tree is searched once and not twice (see count)
 	nodes = 0
 	work := *g
 	start := time.Now()
-	ok := v.solveWith(&work)
+	var ok bool
+	nsol := 0
+	if checkUnique {
+		check := *g
+		nsol = v.countWith(&check, 2, &work)
+		ok = nsol > 0
+	} else {
+		ok = v.solveWith(&work)
+	}
 	elapsed := time.Since(start)
 
 	if !ok {
@@ -247,8 +257,7 @@ func runVariant(name string, v *variant, text string, bench int, checkUnique boo
 	}
 
 	if checkUnique {
-		check := *g
-		if n := v.countWith(&check, 2); n > 1 {
+		if nsol > 1 {
 			fmt.Println("warning: solution is not unique")
 		} else {
 			fmt.Println("solution is unique")
@@ -297,7 +306,7 @@ func generateVariant(v *variant, rng *rand.Rand) (*gboard, uint64) {
 	start := time.Now()
 	for i, k := range rng.Perm(v.ncells) {
 		keep[k] = false
-		if n, done := v.countBudget(build(), 2, genBudget); !done || n != 1 {
+		if n, done := v.countBudget(build(), 2, genBudget, nil); !done || n != 1 {
 			keep[k] = true
 		}
 		if (i+1)%64 == 0 {
@@ -317,7 +326,7 @@ func generateVariant(v *variant, rng *rand.Rand) (*gboard, uint64) {
 	// The removal loop keeps uniqueness as an invariant, but a budget was
 	// involved, so verify it once without one.
 	check := *pz
-	if n := v.count(&check, 2); n != 1 {
+	if n := v.count(&check, 2, nil); n != 1 {
 		fmt.Fprintf(os.Stderr, "%s: generated puzzle has %d solutions\n", v.name, n)
 	}
 	nodes = 0

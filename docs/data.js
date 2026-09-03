@@ -284,3 +284,131 @@ const WERKSTATT = [
   ".03B..95..D.7..A",
   "D..A6..2.B934..8"
 ];
+
+// Elektor 7-8/2007, Alphanumski: one 36x36 grid in 6x6 boxes over 0-9
+// and A-Z, 820 clues
+const ALNUM = [
+  "..A..R.3D......1ZW.YM.7.I.JG6X.FQ.L8",
+  "D6L.3T1Q.5...GJA.2C..B8....SO.IE0.N.",
+  "O.H..EG..7.0..KUY.D1.JIFPL...R.X..9S",
+  "7.0..SLP6HY2.N.9IQ..AOUTB3WZE.GJ1R..",
+  "GQNBJ.IE.8.V45D.3L0S.9XW7T2AH.Y...C.",
+  ".C..YIZSKN..E..X7RL...249.D05.UPH..B",
+  ".1....BJXT..S.O..VGE.8..Q5LI0..976.R",
+  "5I.LMQ..ADO8.U2Y.9WFTRN.....P7X.E0..",
+  ".V8C2.45.MGR...0B6.IL.3YNAF..OKD.1..",
+  "0.ETWBQ9..N.XF3..1..JZCVHY.4DK.U2IGO",
+  "J.3.OGW....EI.L.T..DS..28..M..B.A...",
+  "KA6..UVI..P.DJN.G8OB..9.21XEZ.M..L.C",
+  ".W15.FJG0..P94.I2...N...MHEXADOKU.VL",
+  ".3V.78.O.WHN..PLUSTG2YDK0B5916..JCZ.",
+  "9..N..6DUB..5..MEY.X..HO.7..2PAR.SF.",
+  "..K.UMCX.R4.AD.GN39.V.S.TQOW..016.27",
+  "P2.OD.EY..S.QK.T..A0.54U.JG....BN.X.",
+  "6Y.QRX9.2K7A..FO.HZL.M1E.C4.SN.GIP85",
+  ".0SK5D.2.YR.GH.V.IE.P...XW.L.8NC4.T6",
+  "TM.AINU1C.WZB..8.....HJL5..Y9G..D.E2",
+  "Y.9FL20...Q.ZTE..D..O.A3..P.74W.8U.J",
+  "1U.E.P.N.OL.F.425XMW.CYDZV.TJ.H..G..",
+  ".GB6..HT..X3L0..PAR8F7KZO..2U.QM591.",
+  ".Z4.8.DA76V.N..JQUS25TG.EK0.MC..LXP.",
+  "8.2.4VY0N.KJ.ZAQWPB3.S.X..U6..CI.F.G",
+  ".B..S.TLVU..Y2.4H.1...W6..73F0E8.A..",
+  "Q.F36....2MD.B.E1T.9Y40IRXHNKAZS.J5.",
+  ".7IWPARF.X.S69U..0.OH.......Q.2.Y.3K",
+  ".D..0C36P.I.KV.FLJUA.25QWS..Y.1..B.N",
+  "UJYH.K5Z.A...I..DO..7N.R.P9.G..4WM60",
+  "MF.8HY.R1J3..7WD.G2.XV.5S.BP.L.A.Q0.",
+  "..RJ.3.MB.DYPL.6.EH.8IZ0FN1..T..C5UX",
+  "BSQ.XWP.O..T1.03..NR9..MA2Y7.H.L.8.D",
+  "I.5.T6S7...W2Q8.......LG...KXJ.N..O3",
+  "C..2A..KL.6QU..NR43JW.B..0.DV.SH.TM.",
+  "L...172.HV89OAIBX..KUDTSCM65..JWGERY"
+];
+
+// the 36 symbols of the alphanumski, in solver order
+const ALNUM_ALPHABET = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+
+// the seven grey answer cells: row, first column, length (zero-based),
+// and the code Elektor announced for them in 10/2007
+const ALNUM_GREY = [27, 21, 7];
+const ALNUM_CODE = "LVC4ZM1";
+
+// as printed the puzzle has two solutions. They differ in these four
+// cells (zero-based), which form a rectangle whose two values can be
+// swapped around it - none of them is a grey cell, so the code holds.
+const ALNUM_SWAP = [[25, 3], [25, 32], [28, 3], [28, 32]];
+const ALNUM_SWAP_VALUES = "9X";
+
+// Elektor 7-8/2008, AlphaSudoku: one 25x25 grid in 5x5 boxes over 1-9
+// and A-P, 345 clues
+const ALSU = [
+  "D5.EG2..K7.IO..9P.F.41.MA",
+  ".1I6.8A..E.HFL.2K..4..593",
+  "..2L.9JP.38..K.7.B.5.C..N",
+  "9..K.1CLM65BN.4D.G..F.8.2",
+  "..H...BGI.2JP....N.1.E.7.",
+  "46983..IJ.N.KGAMO..C..7..",
+  ".O..FP....D....A.1..BME.H",
+  "M.EPN.4..HC...BJ...FID..O",
+  "HBJA...2.L.....E.......NF",
+  "7....DG..O.FM..BIPLK8..39",
+  "67..IJEH...ACNF.BDG.951.8",
+  "..PO.I...DJ.5...4.7..G.K.",
+  "GHN..A..8PM.....3..OJL...",
+  "AK.MJ...1NE.9......LHODPC",
+  "185.2F.MC.P.D.I.HKE.3.64.",
+  "23156.D....GHJ.KMC.E7.O84",
+  "CPGJAO3..MB4...L2..I.N.FK",
+  "L..H.N.5.FA1..EO...PDJB..",
+  "..ON......K8.6C....DLI.AP",
+  "84..9......LI.MG.F.B6.2.1",
+  "5EA..4.KL16C..23GO....9..",
+  "K.82M7.FG91E.D3..I...PCHJ",
+  "...BO6NEA87...51.JC9.F.IM",
+  ".9..13P.B.4.GI85.A..O7K.6",
+  "FD.37C.JH59M..P.N....4..L"
+];
+
+// the rows - and, mirrored, the columns - of the nine shaded 3x3 blocks
+// that carry the embedded sudoku (zero-based)
+const ALSU_BLOCK_LINES = [6, 7, 8, 11, 12, 13, 16, 17, 18];
+
+// the six grey answer cells and the code Elektor announced in 10/2008
+const ALSU_GREY = [19, 5, 6];
+const ALSU_CODE = "HKCEAO";
+
+// Elektuur 513 (7-8/2006), Alfadoku: one 25x25 grid in 5x5 boxes over
+// the 25 letters A-Y, 267 clues. Designed by a reader, S. Jobse.
+const ALFA = [
+  "TEH.R....X...I..VGJ...LY.",
+  ".DPA....WS......UO.H.I.F.",
+  "......VYT.O..BQMC.S..U...",
+  "..XK.B....SHF.E.I...O.MR.",
+  "...OMGA.F..R.VT.L.....BH.",
+  "D.EHP....K.B..NLA...I....",
+  "..L.....XT.S...YFNGE.QU.A",
+  ".V.B.....A.JKL.U....DTY.P",
+  ".S.F.IO..G.MA..R.C.......",
+  ".K..XC.R.UDO..G....TLBE..",
+  "......TSY...XFC.NL....J.R",
+  "...S..W.OPM...JK.UF.Q..V.",
+  "F.T.GJCA....SU....VY..P..",
+  "B.....Q....LND..R.A..C.XM",
+  "EHKLAX......P..S.M..N.W..",
+  ".PS..EL....Y.G.C...BW...K",
+  "..M..VUB..I..C.D.ENKG....",
+  ".C.IT.R.QOW......J..SV.P.",
+  "HX..L..N..FKRT..S......EI",
+  "....J..CI....NDA..WG.OR.T",
+  "VJY...SF...NG.H..RT.....E",
+  "XQ.N.Y..C.K...VEB.IS.....",
+  "...CF....IR.D.L.X..N.W.UJ",
+  "L....W.MP.Y.E..H...A...ON",
+  "R......OBH.....J...CKDT.S"
+];
+
+// the six answer cells - printed red here, not grey - and the code
+// Elektuur announced in 10/2006
+const ALFA_GREY = [14, 6, 6];
+const ALFA_CODE = "IDRFBV";

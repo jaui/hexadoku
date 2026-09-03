@@ -45,6 +45,12 @@ type variant struct {
 	// second mask operation.
 	allow [maxGCells]uint16
 
+	// touch[k] is the set of units whose candidate picture an assignment
+	// to cell k can change: every unit of every cell that shares a unit
+	// with k. assign ORs it into the board's dirty set, and propagate
+	// looks only at dirty units - see general.go.
+	touch [maxGCells]dirtySet
+
 	// text layout: cells sit on a width x height character raster,
 	// positions that are not part of any grid stay blank
 	width, height int
@@ -169,6 +175,15 @@ func (v *variant) finish() {
 			v.cellUnits[k][i] = v.cellUnits[k][0]
 		}
 		v.allow[k] = v.all
+	}
+	for k := 0; k < v.ncells; k++ {
+		for _, u := range v.cellUnits[k] {
+			for _, c := range v.unitCells[u][:v.nvals] {
+				for _, w := range v.cellUnits[c] {
+					v.touch[k].set(int(w))
+				}
+			}
+		}
 	}
 	v.seen = nil
 }

@@ -106,7 +106,7 @@
   <a href="hexadocube.html">Hexadocube</a>
   <a href="penta-hexadoku.html">EUC Penta-Hexadoku</a>
   <a href="digest.html">Hexadoku Digest</a>
-  <a href="fremdformate.html">Alphanumski &amp; AlphaSudoku</a>
+  <a href="fremdformate.html">Fremdformate</a>
 </nav>
 
 <header class="masthead">
@@ -122,9 +122,9 @@
 
 <section class="figures">
   <div class="fig"><b>108</b><span>Hefte mit Rätsel</span></div>
-  <div class="fig"><b>82</b><span>gegengeprüft</span></div>
+  <div class="fig"><b>85</b><span>gegengeprüft</span></div>
   <div class="fig"><b>0</b><span>Fehlschläge</span></div>
-  <div class="fig"><b>4</b><span>Sonderformate offen</span></div>
+  <div class="fig"><b>2</b><span>Sonderformate offen</span></div>
 </section>
 
 <p class="leadin">Sieben Seiten — jede Kachel führt zu einer</p>
@@ -180,11 +180,12 @@
   </a>
   <a class="card" href="fremdformate.html">
     <span class="thumb" id="tFremd"></span>
-    <span class="kicker">Elektor 7-8/2007 · 7-8/2008</span>
-    <h2>Alphanumski &amp; AlphaSudoku<span class="arrow">→</span></h2>
-    <p>36×36 und 25×25. Geometrisch harmlos — was sie außer Reichweite
-       bringt, ist das Alphabet, nicht das Layout.</p>
-    <span class="meta">36 · 25 Symbole</span>
+    <span class="kicker">Elektuur 7-8/2006 · Elektor 7-8/2007 · 7-8/2008</span>
+    <h2>Die Fremdformate<span class="arrow">→</span></h2>
+    <p>Alfadoku, Alphanumski, AlphaSudoku. Nicht das Layout stand im Weg,
+       sondern das Alphabet — alle drei gelesen, gelöst und am Preiscode
+       bestätigt.</p>
+    <span class="meta">25 · 36 Symbole</span>
   </a>
 </div>
 
@@ -323,16 +324,23 @@
     }));
   })();
 
-  // --- Fremdformate: the 36x36 chequerboard of 6x6 boxes ---
-  mount("tFremd", drawRaster({
-    rows: Array.from({ length: 36 }, () => ".".repeat(36)),
-    cell: 4, box: 6, glyphs: false, pad: 3,
-    title: "Alphanumski, 36×36 in 6×6-Boxen",
-    tint: (r, c) =>
-      (Math.floor(r / 6) + Math.floor(c / 6)) % 2 === 1
-        ? "color-mix(in srgb, var(--g5) 30%, var(--cell-bg))"
-        : "var(--cell-bg)",
-  }));
+  // --- Fremdformate: the real 36x36 alphanumski on its box chequerboard ---
+  (function () {
+    const [gr, gc, glen] = ALNUM_GREY;
+    mount("tFremd", drawRaster({
+      rows: ALNUM,
+      cell: 4, box: 6, glyphs: false, pad: 3,
+      title: "Alphanumski, 36×36 in 6×6-Boxen",
+      tint: (r, c, ch) => {
+        if (r === gr && c >= gc && c < gc + glen)
+          return "color-mix(in srgb, var(--ink) 40%, var(--cell-bg))";
+        if ((Math.floor(r / 6) + Math.floor(c / 6)) % 2 === 1)
+          return "color-mix(in srgb, var(--g5) 30%, var(--cell-bg))";
+        return ch === "." ? "var(--cell-bg)"
+          : "color-mix(in srgb, var(--ink) 22%, var(--cell-bg))";
+      },
+    }));
+  })();
 })();
 </script>
 </body>

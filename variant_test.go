@@ -9,18 +9,19 @@ import (
 	"testing"
 )
 
-// The general core and the specialized 16x16 core describe the same
-// puzzle, so they must produce the same solutions. Every hexadoku in
-// puzzles/ is solved twice and the results compared.
-func TestGeneralCoreMatchesSpecialized(t *testing.T) {
+// elektorHexadokus lists the reconstructed 16x16 puzzles in puzzles/,
+// leaving out the raw OCR and mask side files, the marker and multi-grid
+// layouts, the two wide ones, and the reconstructions the pipeline itself
+// flags as broken - those are kept as raw material for a visual reading,
+// not as puzzles.
+func elektorHexadokus(t *testing.T) []string {
+	t.Helper()
 	files, err := filepath.Glob("puzzles/elektor/20??-*.txt")
 	if err != nil || len(files) == 0 {
 		t.Skip("no elektor puzzles available")
 	}
-	// only the reconstructed puzzles, not the raw OCR / mask side files
 	name := regexp.MustCompile(`^\d{4}-\d\d(_\d\d)?\.txt$`)
-	v := gridVariant(16)
-	checked := 0
+	var out []string
 	for _, f := range files {
 		if !name.MatchString(filepath.Base(f)) {
 			continue
@@ -30,15 +31,32 @@ func TestGeneralCoreMatchesSpecialized(t *testing.T) {
 			t.Fatal(err)
 		}
 		text := string(data)
+		if wideVariantForText(text) != nil {
+			continue // alphanumski or alphasudoku: not a 16-value puzzle
+		}
 		if countAllTokens(text) != 256 {
 			continue // marker file, or one of the samurai layouts
 		}
 		if strings.Contains(text, "NOT repairable") {
-			// the pipeline itself flags this reconstruction as broken;
-			// it is kept as raw material for a visual reading, not as a
-			// puzzle. Core equivalence is not what it would test.
 			continue
 		}
+		out = append(out, f)
+	}
+	return out
+}
+
+// The general core and the specialized 16x16 core describe the same
+// puzzle, so they must produce the same solutions. Every hexadoku in
+// puzzles/ is solved twice and the results compared.
+func TestGeneralCoreMatchesSpecialized(t *testing.T) {
+	v := gridVariant(16)
+	checked := 0
+	for _, f := range elektorHexadokus(t) {
+		data, err := os.ReadFile(f)
+		if err != nil {
+			t.Fatal(err)
+		}
+		text := string(data)
 		b, err := parse(text)
 		if err != nil {
 			t.Fatalf("%s: %v", f, err)
@@ -258,7 +276,7 @@ func TestElektorHexamurai(t *testing.T) {
 		}
 		checkFull(t, v, &work)
 		work = *g
-		if n := v.count(&work, 2); n != 1 {
+		if n := v.count(&work, 2, nil); n != 1 {
 			t.Fatalf("%s: %d solutions, want exactly one", tc.file, n)
 		}
 	}
@@ -274,7 +292,7 @@ func TestGenerateSamurai(t *testing.T) {
 	rng := rand.New(rand.NewPCG(11, 0x9e3779b97f4a7c15))
 	pz, _ := generateVariant(v, rng)
 	work := *pz
-	if n := v.count(&work, 2); n != 1 {
+	if n := v.count(&work, 2, nil); n != 1 {
 		t.Fatalf("generated samurai has %d solutions, want exactly one", n)
 	}
 	work = *pz
@@ -327,7 +345,7 @@ func TestSamuraiCouplesGrids(t *testing.T) {
 	next := 0
 	for {
 		whole := *pz
-		if v.count(&whole, 2) == 1 {
+		if v.count(&whole, 2, nil) == 1 {
 			break
 		}
 		for next < len(order) && pz.grid[order[next]] != empty {
@@ -354,7 +372,7 @@ func TestSamuraiCouplesGrids(t *testing.T) {
 			mid.assign(r*16+c, pz.grid[k])
 		}
 	}
-	if n := countSolutions(mid, 2); n < 2 {
+	if n := countSolutions(mid, 2, nil); n < 2 {
 		t.Fatalf("middle grid alone has %d solution(s); it should be ambiguous "+
 			"without the constraints of the neighbouring grids", n)
 	}
