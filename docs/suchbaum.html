@@ -486,7 +486,11 @@ footer.note {
 .backlink:hover .arrow, .backlink:focus-visible .arrow { transform: translateX(-0.25em); }
 .backhome { display: block; border-top: 1px solid var(--rule); margin-top: 2.5rem; padding-top: 1.4rem; }
 .backhome .backlink { font-size: 0.8rem; }
-.masthead { padding-top: 1.6rem; }
+/* the bar opens the page, so nothing may sit above it - this .wrap
+   carries its own top padding, and it is a flex column whose 2rem
+   gap already separates the bar from the masthead */
+.wrap { padding-top: 0; }
+.masthead { padding-top: 0.4rem; }
 .pagenav {
   display: flex;
   flex-wrap: wrap;
