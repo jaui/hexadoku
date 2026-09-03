@@ -356,11 +356,68 @@ code {
   .closing { grid-template-columns: minmax(0, 1fr); gap: 0.75rem; }
 }
 </style>
+<style>
+/* zurück zur Übersicht - passt sich den Tokens dieser Seite an */
+.backlink {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45em;
+  font-family: var(--f-mono);
+  font-size: 0.72rem;
+  font-weight: 500;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--accent);
+  text-decoration: underline;
+  text-decoration-color: color-mix(in srgb, var(--accent) 35%, transparent);
+  text-decoration-thickness: 1px;
+  text-underline-offset: 4px;
+}
+.backlink .arrow { display: inline-block; text-decoration: none; transition: transform 0.14s ease-out; }
+.backlink:hover, .backlink:focus-visible { text-decoration-color: var(--accent); }
+.backlink:hover .arrow, .backlink:focus-visible .arrow { transform: translateX(-0.25em); }
+.backhome { display: block; border-top: 1px solid var(--rule); margin-top: 2.5rem; padding-top: 1.4rem; }
+.backhome .backlink { font-size: 0.8rem; }
+.masthead .backlink {
+  align-self: flex-start;
+  text-decoration: none;
+  border: 1px solid color-mix(in srgb, var(--accent) 40%, transparent);
+  border-radius: 2px;
+  padding: 0.4rem 0.75rem;
+  margin-bottom: 1.6rem;
+}
+.pagenav {
+  border-top: 2px solid var(--ink);
+  margin-top: 1.6rem;
+  padding-top: 1rem;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem 1.6rem;
+  font-family: var(--f-mono);
+  font-size: 0.68rem;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+.pagenav a {
+  color: color-mix(in srgb, var(--ink) 58%, transparent);
+  text-decoration: none;
+  border-bottom: 1px solid transparent;
+}
+.pagenav a:hover { color: var(--ink); border-bottom-color: var(--accent); }
+.pagenav a[aria-current="page"] { color: var(--accent); }
+.masthead .pagenav { grid-column: 1 / -1; }
+
+.masthead .backlink:hover, .masthead .backlink:focus-visible {
+  background: color-mix(in srgb, var(--accent) 12%, transparent);
+  border-color: var(--accent);
+}
+</style>
 
 <div class="wrap">
 
 <header class="masthead">
   <div>
+  <a class="backlink" href="index.html"><span class="arrow">&#8592;</span> Alle Seiten</a>
     <p class="eyebrow">Werkstattbericht · Solver &amp; Archivpipeline</p>
     <h1>Hexadoku</h1>
     <p class="standfirst">
@@ -374,6 +431,16 @@ code {
     <div class="grid-art" id="gridArt" aria-label="Hexadoku aus Elektor 06-2007"></div>
     <p class="grid-cap">Elektor 06-2007 · per Sichtprüfung gerettet<br>120 Vorgaben · löst mit 0 Verzweigungen</p>
   </div>
+  <nav class="pagenav">
+    <a href="hexamurai.html">Hexamurai</a>
+    <a href="hexadocube.html">Hexadocube</a>
+    <a href="penta-hexadoku.html">EUC Penta-Hexadoku</a>
+    <a href="digest.html">Hexadoku Digest</a>
+    <a href="fremdformate.html">Alphanumski &amp; AlphaSudoku</a>
+    <a href="werkstattbericht.html" aria-current="page">Werkstattbericht</a>
+    <a href="suchbaum.html">Suchbaum</a>
+    <a href="index.html">Übersicht</a>
+  </nav>
 </header>
 
 <section class="figures">
@@ -1222,6 +1289,10 @@ code {
     </p>
   </div>
 </footer>
+
+<div class="backhome">
+  <a class="backlink" href="index.html"><span class="arrow">&#8592;</span> Zurück zur Übersicht</a>
+</div>
 
 </div>
 

@@ -377,6 +377,59 @@ blockquote {
 .rail { display: flex; flex-direction: column; gap: 0.5rem; align-items: flex-start; }
 @media (max-width: 760px) { .rail { flex-direction: row; align-items: center; } }
 
+/* ---------- zurück zur Übersicht ---------- */
+
+/* Deliberately not part of .pagenav: coming back has to be findable at a
+   glance, the way the cards on the index page are, not one entry among
+   seven siblings. Sits above the eyebrow and again below the colophon,
+   because these pages are long. */
+.backlink {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45em;
+  font-family: var(--f-mono);
+  font-size: 0.72rem;
+  font-weight: 500;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--accent);
+  text-decoration: underline;
+  text-decoration-color: color-mix(in srgb, var(--accent) 35%, transparent);
+  text-decoration-thickness: 1px;
+  text-underline-offset: 4px;
+  margin: 0 0 1.4rem;
+}
+.backlink .arrow {
+  display: inline-block;
+  text-decoration: none;
+  transition: transform 0.14s ease-out;
+}
+.backlink:hover, .backlink:focus-visible { text-decoration-color: var(--accent); }
+.backlink:hover .arrow, .backlink:focus-visible .arrow { transform: translateX(-0.25em); }
+
+/* In the masthead the link would otherwise read as a second eyebrow -
+   same colour, same mono caps. A bordered chip is the vocabulary the
+   controls on these pages already use, so it reads as something to press. */
+.masthead .backlink {
+  text-decoration: none;
+  border: 1px solid color-mix(in srgb, var(--accent) 40%, transparent);
+  border-radius: 2px;
+  padding: 0.4rem 0.75rem;
+  margin-bottom: 1.6rem;
+}
+.masthead .backlink:hover, .masthead .backlink:focus-visible {
+  background: var(--accent-bg);
+  border-color: var(--accent);
+}
+
+.backhome {
+  display: block;
+  border-top: 1px solid var(--rule);
+  margin-top: 2.5rem;
+  padding-top: 1.4rem;
+}
+.backhome .backlink { margin: 0; font-size: 0.8rem; }
+
 /* ---------- Navigation zwischen den Seiten ---------- */
 
 .pagenav {
