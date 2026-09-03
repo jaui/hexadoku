@@ -1256,7 +1256,7 @@ code {
 <section class="chapter">
   <div class="chapter-head">
     <span class="num">XIII</span>
-    <h2>Zwei Rätsel, die nicht am Layout scheiterten</h2>
+    <h2>Drei Rätsel, die nicht am Layout scheiterten</h2>
     <p>Die Sommerhefte 7-8/2006, 7-8/2007 und 7-8/2008 galten lange als außer Reichweite.
        Ihre Geometrie ist die schlichteste der ganzen Reihe — im Weg stand das
        Alphabet: 25 und 36 Werte gegen einen Kern, der auf 16 gebaut ist.
@@ -1335,15 +1335,40 @@ code {
       </dl>
     </div>
   </article>
+</section>
+
+<!-- ============ 14 ============ -->
+<section class="chapter">
+  <div class="chapter-head">
+    <span class="num">XIV</span>
+    <h2>Laufzeit</h2>
+    <p>Als das Archiv vollständig war, trugen zwei Rätsel fast die ganze
+       Rechenzeit: der Eindeutigkeitsbeweis des Hexamurai 2011 und das
+       Alfadoku. Zuerst wurde gemessen, was <em>nicht</em> hilft, dann das
+       Profil gelesen.</p>
+  </div>
+
   <article class="entry">
-    <div class="rail"><span class="tag">WIDE-07</span><span class="chip chip-ok">gelöst</span></div>
+    <div class="rail"><span class="tag">PERF-01</span><span class="chip chip-neutral">gemessen, verworfen</span></div>
+    <div>
+      <h3>Multithreading hilft, aber nicht genug, um es zu bauen</h3>
+      <dl>
+        <div><dt>Versuch</dt><dd>Eine Suche auf Kerne verteilen: den Baum an der Wurzel in ein paar tausend Teilbäume aufspalten und die per Worker-Pool zählen. Auf zwölf Kernen bringt das den Alfadoku-Beweis von 5,25 s auf 1,03 s (5,1×), den Hexamurai von 23,1 s auf 5,2 s (4,5×) — bei einer <em>Gesamt</em>-Rechenarbeit, die sich verdoppelt bis verdreifacht.</dd></div>
+        <div><dt>Kontrolle</dt><dd>Woher der Verlust kommt, zeigt ein Lauf ohne jede Koordination: zwölf <em>unabhängige</em> Kopien desselben Beweises gleichzeitig, kein Aufteilen, kein geteilter Zustand. Jede einzelne dauert das 2,75-Fache (Alfadoku) bzw. 3,98-Fache (Hexamurai) ihrer Alleinlaufzeit; mit zwei Kopien nur das 1,1- bis 1,2-Fache. Die Decke ist also der Speicher — jeder Verzweigungsknoten kopiert ein 2,3-kB-Board, und genau das macht den seriellen Kern schnell —, nicht die Verwaltung.</dd></div>
+        <div><dt>Konsequenz</dt><dd>Die 3–4×, die die Maschine überhaupt hergibt, bekommt man geschenkt, wenn mehrere Rätsel nebeneinander laufen: die drei breiten laufen im Test als parallele Subtests (74 s → 38 s). Für <code>validate_elektor.ps1</code> wurde dasselbe gebaut und wieder ausgebaut — 57,0 s gegen 48,7 s, ein Faktor 1,17, weil vier Fünftel der Laufzeit in einem einzigen Beweis sitzen. Work-Stealing im Solver, samt race-festen Zählern, wäre für diesen einen Fall gebaut worden.</dd></div>
+      </dl>
+    </div>
+  </article>
+
+  <article class="entry">
+    <div class="rail"><span class="tag">PERF-02</span><span class="chip chip-ok">gelöst</span></div>
     <div>
       <h3>Nicht zweimal suchen, nicht alles ansehen</h3>
       <dl>
         <div><dt>Profil</dt><dd>Zwei Rätsel trugen fast die ganze Laufzeit des Archivs: der Eindeutigkeitsbeweis des Hexamurai 2011 (46–59 s) und das Alfadoku (10–25 s). Das CPU-Profil war eindeutig — 97 % in <code>propagate</code>, davon die Hälfte in <code>cand</code>; Kopieren des Boards, MRV, Zuweisung zusammen unter 3 %. Und <code>-unique</code> lief denselben Baum zweimal ab: einmal <code>solve</code>, einmal <code>count</code>, je 22 s.</dd></div>
         <div><dt>Zwei Eingriffe</dt><dd><code>count</code> gibt die erste gefundene Lösung zurück, damit der Beweis die Lösung nebenbei liefert und niemand vorher suchen muss. Und <code>propagate</code> sieht nur noch Units an, in denen sich etwas geändert haben kann: eine Zuweisung berührt genau die Units der Zellen, die eine Unit mit ihr teilen — je Zelle vorberechnet als Bitmenge, die <code>assign</code> mit fünf ORs in die Dirty-Menge des Boards mischt. Beim Hexamurai sind das 48 von 176 Units statt aller 176 plus 768 Zellen, mehrfach je Knoten.</dd></div>
         <div><dt>Beweis</dt><dd>Naked und Hidden Singles sind monoton, ihr kleinster Fixpunkt ist eindeutig — also müssen exakt dieselben Suchbäume herauskommen. Der Test hält die alte Propagation als Orakel daneben und vergleicht auf allen 112 Rätseln des Archivs die Zahl der Verzweigungen: identisch, bis hin zu den 3 364 151 des Hexamurai und den 454 055 des Alfadoku.</dd></div>
-        <div><dt>Ergebnis</dt><dd>Best-of-3: <code>-unique</code> Hexamurai 2011 <b>46–59 s → 10,4 s</b>, Alfadoku <b>10–25 s → 4,1 s</b>, die ganze Validierung <b>55 s → 17 s</b>. Nicht geholfen haben <code>GOAMD64=v3</code> (+13 %) und PGO (+38 %, beides langsamer) — und, wie in WIDE-04 gemessen, Multithreading.</dd></div>
+        <div><dt>Ergebnis</dt><dd>Best-of-3: <code>-unique</code> Hexamurai 2011 <b>46–59 s → 10,4 s</b>, Alfadoku <b>10–25 s → 4,1 s</b>, die ganze Validierung <b>55 s → 17 s</b>. Nicht geholfen haben <code>GOAMD64=v3</code> (+13 %) und PGO (+38 %, beides langsamer) — und Multithreading, siehe PERF-01.</dd></div>
       </dl>
     </div>
   </article>
